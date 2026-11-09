@@ -1,0 +1,23 @@
+name: Задача
+description: Новая задача (код, арт, документ)
+title: "[Задача] "
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Что сделать
+      description: Коротко и конкретно
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Как понять, что готово
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+  - type: dropdown
+    id: patch
+    attributes:
+      label: Патч
+      options: ["0.1", "0.2", "0.3", "0.4", "1.0"]

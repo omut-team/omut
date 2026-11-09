@@ -1,0 +1,61 @@
+# ---------- Unity ----------
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+crashlytics-buildid.txt
+*.apk
+*.aab
+*.unitypackage
+*.app
+.utmp/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+ExportedObj/
+[Aa]ssets/AssetStoreTools*
+[Aa]ssets/Plugins/Editor/JetBrains*
+*_BurstDebugInformation_DoNotShip/
+
+# ---------- IDE ----------
+.vs/
+.vscode/
+.idea/
+*.swp
+
+# ---------- .NET (server) ----------
+server/**/bin/
+server/**/obj/
+TestResults/
+
+# ---------- Секреты ----------
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+
+# ---------- Система ----------
+Thumbs.db
+Desktop.ini
+.DS_Store
