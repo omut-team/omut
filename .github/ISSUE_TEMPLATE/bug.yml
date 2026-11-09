@@ -1,6 +1,7 @@
 name: Баг
 description: Что-то работает не так
 title: "[Баг] "
+projects: ["omut-team/1"]
 labels: ["баг"]
 body:
   - type: textarea

@@ -1,6 +1,7 @@
 name: Задача
 description: Новая задача (код, арт, документ)
 title: "[Задача] "
+projects: ["omut-team/1"]
 body:
   - type: textarea
     id: what

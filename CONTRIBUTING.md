@@ -14,7 +14,7 @@ feature/<что-делаю>   ← твоя ветка под одну задач
 
 ## Порядок работы над задачей
 
-1. Взять задачу в [Issues](https://github.com/omut-team/omut/issues), назначить себя.
+1. Взять задачу на [доске](https://github.com/orgs/omut-team/projects/1), назначить себя и перетащить в **In Progress**. Новые задачи через Issues сами попадают на доску.
 2. Обновить `dev` и сделать от неё свою ветку:
    ```bash
    git checkout dev

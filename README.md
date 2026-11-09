@@ -61,7 +61,7 @@
 | Сервер | ASP.NET Core Web API, PostgreSQL, JWT |
 | Сайт рекордов | HTML, CSS, JS, nginx |
 | Запуск | Docker Compose |
-| Работа в команде | GitHub, Issues, Pull Requests, Git LFS |
+| Работа в команде | GitHub (организация omut-team), Projects (Kanban), Issues, Pull Requests, Git LFS |
 | Тесты | Unity Test Framework, xUnit, ручные тест-кейсы |
 
 ## Архитектура
@@ -117,7 +117,7 @@ docker compose up --build
 - [ ] **0.4** ночь целиком: туман, паника, мутанты; звук, сайт, остальные локации
 - [ ] **1.0** финал, тесты, документация, презентация
 
-Задачи на доске: [Issues](https://github.com/omut-team/omut/issues) и [Milestones](https://github.com/omut-team/omut/milestones)
+**Kanban-доска:** https://github.com/orgs/omut-team/projects/1 · [Issues](https://github.com/omut-team/omut/issues) · [Патчи](https://github.com/omut-team/omut/milestones)
 
 ## Как мы работаем
 

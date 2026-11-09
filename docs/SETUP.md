@@ -115,7 +115,7 @@ git checkout dev
 ### Через GitHub Desktop (проще)
 
 **1. Взять задачу.**
-На сайте: **Issues** → открой свою задачу → справа **Assignees → assign yourself**.
+Открой [доску задач](https://github.com/orgs/omut-team/projects/1) → своя задача → справа **Assignees → assign yourself** → перетащи карточку в **In Progress**. После слияния PR задача сама закроется, перетащи её в **Done**.
 
 **2. Обновиться.**
 GitHub Desktop → **Current branch: dev** → кнопка **Fetch origin / Pull origin**.
