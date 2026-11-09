@@ -94,7 +94,7 @@ omut/
 Первый раз? Пошаговая инструкция для Windows: **[docs/SETUP.md](docs/SETUP.md)**
 
 ```bash
-git clone https://github.com/Yarik002/omut.git
+git clone https://github.com/omut-team/omut.git
 cd omut
 git checkout dev
 ```
@@ -117,7 +117,7 @@ docker compose up --build
 - [ ] **0.4** ночь целиком: туман, паника, мутанты; звук, сайт, остальные локации
 - [ ] **1.0** финал, тесты, документация, презентация
 
-Задачи на доске: [Issues](https://github.com/Yarik002/omut/issues) и [Milestones](https://github.com/Yarik002/omut/milestones)
+Задачи на доске: [Issues](https://github.com/omut-team/omut/issues) и [Milestones](https://github.com/omut-team/omut/milestones)
 
 ## Как мы работаем
 

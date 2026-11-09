@@ -22,9 +22,13 @@
 
 1. Зарегистрируйся на https://github.com, если ещё нет аккаунта.
 2. Скинь ник в общий чат, тебя добавят в репозиторий.
-3. Открой почту, найди письмо от GitHub про **Yarik002/omut** и нажми **View invitation → Accept invitation**.
-   Письма нет? Открой https://github.com/Yarik002/omut/invitations
-4. Проверка: открываешь https://github.com/Yarik002/omut и сверху видишь вкладки **Issues** и **Pull requests**. Готово.
+3. **Сначала войди в свой GitHub** (github.com → Sign in). Без входа приглашение не видно и будет 404.
+4. Прими приглашение одним из способов:
+   - открой https://github.com/omut-team/omut, сверху жёлтая плашка **You've been invited** → **View invitation → Accept**;
+   - или письмо от GitHub на почте → **View invitation**;
+   - или колокольчик справа вверху: https://github.com/notifications
+5. Если пришло приглашение в организацию **omut-team**, прими и его: https://github.com/orgs/omut-team/invitation
+6. Проверка: на https://github.com/omut-team/omut видна вкладка **Settings**. Значит, у тебя полные права. Готово.
 
 ## Часть 2. Git и GitHub Desktop (все, 10 минут)
 
@@ -45,7 +49,7 @@ git config --global user.email "почта@от.github"
 ## Часть 3. Скачать проект (все, 5 минут)
 
 **Через GitHub Desktop:**
-1. **File → Clone repository → вкладка GitHub.com → Yarik002/omut**.
+1. **File → Clone repository → вкладка GitHub.com → omut-team/omut**.
 2. Local path: `C:\Users\<ты>\Desktop\omut` → **Clone**.
 3. Сверху **Current branch** → выбери **dev**.
 
@@ -53,7 +57,7 @@ git config --global user.email "почта@от.github"
 
 ```bash
 cd %USERPROFILE%\Desktop
-git clone https://github.com/Yarik002/omut.git
+git clone https://github.com/omut-team/omut.git
 cd omut
 git checkout dev
 ```
@@ -206,4 +210,4 @@ git push -u origin feature/boat-movement
 | Лиза | Тайлы воды и берега, подобрать музыку | #11, #12 |
 | Сарина | Начать ТЗ и диаграмму вариантов использования | #13, #14 |
 
-Все задачи: https://github.com/Yarik002/omut/issues
+Все задачи: https://github.com/omut-team/omut/issues
