@@ -7,7 +7,7 @@
 2D-игра про рыбалку с мистикой на озере в белорусском Полесье.
 Групповой проект по ТРПО, группа ПО-2409.
 
-![Unity](https://img.shields.io/badge/Unity-6_LTS-000000?logo=unity&logoColor=white)
+![Unity](https://img.shields.io/badge/Unity-6000.3.28f1-000000?logo=unity&logoColor=white)
 ![C#](https://img.shields.io/badge/C%23-.NET-512BD4?logo=dotnet&logoColor=white)
 ![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-API-5C2D91?logo=dotnet&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-DB-4169E1?logo=postgresql&logoColor=white)
@@ -57,7 +57,7 @@
 
 | Часть | Технологии |
 |---|---|
-| Игра | Unity 6 LTS, 2D URP, C#, Tilemap, 2D Light, ScriptableObject, сохранения в JSON |
+| Игра | Unity 6.3 LTS (**6000.3.28f1**), 2D URP, C#, Tilemap, 2D Light, ScriptableObject, сохранения в JSON |
 | Сервер | ASP.NET Core Web API, PostgreSQL, JWT |
 | Сайт рекордов | HTML, CSS, JS, nginx |
 | Запуск | Docker Compose |
@@ -80,7 +80,7 @@ flowchart LR
 
 ```
 omut/
-├── game/        Unity-проект (появится в патче 0.1)
+├── game/        Unity-проект (Unity 6000.3.28f1)
 ├── server/      API на ASP.NET Core (.NET 10)
 ├── web/         сайт рекордов (nginx)
 ├── docker-compose.yml   сервер + база + сайт одной командой
@@ -99,7 +99,7 @@ cd omut
 git checkout dev
 ```
 
-**Игра:** открыть папку `game` через Unity Hub (версия Unity: **будет указана в патче 0.1**).
+**Игра:** открыть папку `game` через Unity Hub (версия Unity строго **6000.3.28f1**).
 
 **Сервер и сайт:**
 
