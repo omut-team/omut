@@ -70,13 +70,13 @@ git checkout dev
 
 1. Скачай **Unity Hub**: https://unity.com/download и установи.
 2. Открой Hub → войди в Unity-аккаунт (или зарегистрируйся) → лицензия **Personal** (бесплатно).
-3. Посмотри нужную версию: она написана в [README](../README.md#стек) и в файле `game/ProjectSettings/ProjectVersion.txt` (появится, когда Ярослав создаст проект).
-4. Hub → **Installs → Install Editor → Archive** (или вкладка с LTS) → ставь **именно эту** версию.
+3. Нужная версия: **6000.3.28f1** (Unity 6.3 LTS). Она же записана в `game/ProjectSettings/ProjectVersion.txt`.
+4. Hub → **Установки → Установить редактор** → найди **6000.3.28f1** (если её нет в списке, открой https://unity.com/releases/editor/archive, найди 6000.3.28f1 и нажми **Install** / «Открыть в Unity Hub»).
    Модули: **Windows Build Support (Mono)**. Программистам ещё **Visual Studio** (если его нет).
-5. Hub → **Projects → Add → Add project from disk** → выбери папку `omut\game`.
+5. Hub → **Проекты → Добавить → Добавить проект с диска** (англ.: Projects → Add → Add project from disk) → выбери папку `omut\game`.
 6. Первое открытие идёт долго (5–15 минут), так и должно быть.
 
-**Пока папки `game` нет**, Unity можно не ставить, проект появится в задаче #2.
+Если Unity при открытии пишет про другую версию, **не соглашайся на обновление**, закрой и поставь 6000.3.28f1.
 
 ## Часть 5. Для программистов (Илья, Ярослав)
 
