@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Омут: рекорды</title>
+  <style>
+    body { margin: 0; font-family: Georgia, serif; background: #0f1d24; color: #e8e2cf; }
+    main { max-width: 640px; margin: 0 auto; padding: 32px 16px; }
+    h1 { margin: 0 0 4px; }
+    p { color: #9fb3b0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #2b4450; }
+    .status { font-size: 14px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>🎣 Омут</h1>
+  <p>Доска трофеев группы ПО-2409</p>
+  <div class="status" id="status">Проверяю сервер...</div>
+  <table>
+    <thead><tr><th>Игрок</th><th>Рыба</th><th>Вес, кг</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</main>
+<script>
+  fetch('/api/health').then(r => r.json())
+    .then(() => document.getElementById('status').textContent = 'Сервер работает ✅')
+    .catch(() => document.getElementById('status').textContent = 'Сервер не отвечает ❌');
+  fetch('/api/leaderboard').then(r => r.json()).then(list => {
+    document.getElementById('rows').innerHTML = list.map(x =>
+      `<tr><td>${x.player}</td><td>${x.fish}</td><td>${x.weightKg}</td></tr>`).join('');
+  }).catch(() => {});
+</script>
+</body>
+</html>

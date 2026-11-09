@@ -81,8 +81,9 @@ flowchart LR
 ```
 omut/
 ├── game/        Unity-проект (появится в патче 0.1)
-├── server/      API на ASP.NET Core
-├── web/         сайт рекордов
+├── server/      API на ASP.NET Core (.NET 10)
+├── web/         сайт рекордов (nginx)
+├── docker-compose.yml   сервер + база + сайт одной командой
 ├── design/      исходники арта (.psd, .aseprite, .kra)
 ├── docs/        идея, ТЗ, диаграммы, тесты, инструкции
 └── .github/     шаблоны задач и pull request'ов
@@ -95,11 +96,18 @@ omut/
 ```bash
 git clone https://github.com/Yarik002/omut.git
 cd omut
-git lfs pull
+git checkout dev
 ```
 
-Игра: открыть папку `game` через Unity Hub.
-Сервер и сайт (когда появятся): `docker compose up`
+**Игра:** открыть папку `game` через Unity Hub (версия Unity: **будет указана в патче 0.1**).
+
+**Сервер и сайт:**
+
+```bash
+docker compose up --build
+```
+
+Сайт: http://localhost:8080 · сервер: http://localhost:5000/api/health
 
 ## План (патчи)
 

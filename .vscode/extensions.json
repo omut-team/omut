@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "visualstudiotoolsforunity.vstuc",
+    "ms-dotnettools.csdevkit",
+    "editorconfig.editorconfig",
+    "bierner.markdown-mermaid",
+    "hediet.vscode-drawio",
+    "ms-azuretools.vscode-docker"
+  ]
+}
