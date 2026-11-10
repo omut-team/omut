@@ -128,6 +128,7 @@ docker compose up --build
 | Документ | Где |
 |---|---|
 | Идея проекта | [docs/CONCEPT.md](docs/CONCEPT.md) |
+| План разработки | [docs/PLAN.md](docs/PLAN.md) |
 | Роли | [docs/TEAM.md](docs/TEAM.md) |
 | Установка | [docs/SETUP.md](docs/SETUP.md) |
 | Гайд для дизайнеров | [docs/ART.md](docs/ART.md) |
