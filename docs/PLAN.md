@@ -89,8 +89,8 @@
 Код всех этапов пишет Ярослав. Каждый этап: своя ветка от `dev`, PR в `dev`, ревью Ильи. Сроки патчей стоят в [Milestones](https://github.com/omut-team/omut/milestones).
 
 ### Патч 0.1 (до 6 декабря 2026)
-1. **Каркас** · `feature/core-states` · Closes #18. ✅ СДЕЛАНО, PR #19 (ждёт ревью и слияния в `dev`). `Core/GameState`, `Core/GameStateMachine`, `Core/GameEvents`, `Core/GameManager`, 11 тестов.
-2. **Лодка и камера** · `feature/boat-movement` · Closes #3, #4. `Player/BoatController`, `Player/BoatMotor`, `Player/BoatData` (SO: скорость, разгон, прочность, размер трюма, радиус света, множитель паники, эхолот), `World/CameraFollow`. Данные: `Data/Boats/Barkas`. Тесты: `BoatMotor`.
+1. **Каркас** · `feature/core-states` · Closes #18. ✅ СДЕЛАНО, PR #19 (ждёт слияния в `dev`). `Core/GameState`, `Core/GameStateMachine`, `Core/GameEvents`, `Core/GameManager`, 11 тестов.
+2. **Лодка и камера** · `feature/boat-movement` · Closes #3, #4. ✅ СДЕЛАНО, PR #23 (ждёт слияния в `dev`). `Player/BoatController`, `Player/BoatMotor`, `Player/BoatData` (SO: скорость, разгон, прочность, размер трюма, радиус света, множитель паники, эхолот), `World/CameraFollow`. Данные: `Data/Boats/Barkas`. Тесты: `BoatMotor` (10 штук). Пока нет арта: заглушки баркаса `Art/Boats/boat_barkas.png`, воды и камней `Art/Placeholders/`.
 3. **День, ночь, колокол** · `feature/day-night` · Closes #5. `World/GameClock`, `World/DayNightCycle`, `UI/ClockHud`, событие колокола в 20:00. Тесты: время → фаза.
 4. **Меню, пауза, настройки** · `feature/menu-settings` · Closes #6, #7. `UI/MainMenu`, `UI/PauseMenu`, `Core/SettingsManager`, `Core/SettingsData`.
 
