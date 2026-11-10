@@ -22,3 +22,14 @@ body:
     attributes:
       label: Патч
       options: ["0.1", "0.2", "0.3", "0.4", "1.0"]
+  - type: input
+    id: stage
+    attributes:
+      label: Этап из docs/PLAN.md
+      description: К какому этапу кода это нужно (номер 1–22), если есть
+      placeholder: "5"
+  - type: dropdown
+    id: who
+    attributes:
+      label: Кто делает
+      options: ["Ярослав", "Илья", "Ульяна", "Лиза", "Сарина", "все"]
