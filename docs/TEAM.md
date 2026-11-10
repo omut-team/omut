@@ -28,7 +28,7 @@
 - сервер (ASP.NET Core + PostgreSQL), сайт рекордов, Docker Compose;
 - репозиторий: структура, `.gitignore`, Git LFS, помощь всем с git.
 
-Папки: `game/Assets/Scripts`, `game/Assets/Tests`, `game/Assets/Prefabs`, `server/`, `web/`
+Папки: `game/Assets/Scripts`, `Tests`, `Prefabs`, `Data`, `Art` (подключённый арт из `design/export/`), `server/`, `web/`, `docker-compose.yml`
 
 ## Ульяна: дизайнер (персонажи, рыбы, предметы, интерфейс)
 
@@ -39,7 +39,7 @@
 - интерфейс: меню, HUD, шкала заброса, шкала натяжения, карточка трофея, журнал, трюм, магазин, диалоги;
 - анимации: лодка, герой, поплавок.
 
-Папки: `game/Assets/Art/Characters`, `Fish`, `Items`, `UI`, исходники в `design/`
+Папки: готовые PNG в `design/export/` (boats, characters, fish, items, ui), исходники в `design/src/ulyana/`. В `game/` не коммитит: картинки в игру подключает Ярослав.
 
 ## Лиза: дизайнер (мир и звук)
 
@@ -49,7 +49,7 @@
 - звуки и музыка (бесплатные, с правильной лицензией): день, ночь, колокол в 20:00, шёпот;
 - логотип и обложка.
 
-Папки: `game/Assets/Art/Tiles`, `Environment`, `game/Assets/Audio`, своя сцена `Sandbox_Liza`
+Папки: `game/Assets/Art/Tiles`, `Environment`, `game/Assets/Audio`, `game/Assets/Prefabs/Zones`, своя сцена `Sandbox_Liza`, исходники в `design/src/liza/`, логотип и обложка в `design/export/brand/`
 
 ## Сарина: тестировщик, документовед, сценарист
 
@@ -59,7 +59,7 @@
 - тексты: диалоги Тараса и Михалыча, 5 квестов, 5 страниц дневника, описания 14 рыб, «тайна за редкую рыбу»;
 - README, руководство пользователя, итоговая презентация.
 
-Папки: `docs/` (тексты в `docs/texts/`, Ярослав переносит их в игру)
+Папки: `docs/` (тексты в `docs/texts/`, диаграммы в `docs/diagrams/`, тест-кейсы в `docs/tests/`). Ярослав переносит тексты в игру.
 
 ## Кто кого проверяет
 

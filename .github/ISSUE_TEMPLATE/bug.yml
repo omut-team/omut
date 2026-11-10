@@ -31,3 +31,8 @@ body:
     attributes:
       label: Версия / ветка
       placeholder: dev, 0.2
+  - type: dropdown
+    id: os
+    attributes:
+      label: Система
+      options: ["Windows 10", "Windows 11", "macOS", "другая"]
