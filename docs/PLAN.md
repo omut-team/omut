@@ -91,7 +91,7 @@
 ### Патч 0.1 (до 6 декабря 2026)
 1. **Каркас** · `feature/core-states` · Closes #18. ✅ СДЕЛАНО, PR #19 (ждёт слияния в `dev`). `Core/GameState`, `Core/GameStateMachine`, `Core/GameEvents`, `Core/GameManager`, 11 тестов.
 2. **Лодка и камера** · `feature/boat-movement` · Closes #3, #4. ✅ СДЕЛАНО, PR #23 (ждёт слияния в `dev`). `Player/BoatController`, `Player/BoatMotor`, `Player/BoatData` (SO: скорость, разгон, прочность, размер трюма, радиус света, множитель паники, эхолот), `World/CameraFollow`. Данные: `Data/Boats/Barkas`. Тесты: `BoatMotor` (10 штук). Пока нет арта: заглушки баркаса `Art/Boats/boat_barkas.png`, воды и камней `Art/Placeholders/`.
-3. **День, ночь, колокол** · `feature/day-night` · Closes #5. `World/GameClock`, `World/DayNightCycle`, `UI/ClockHud`, событие колокола в 20:00. Тесты: время → фаза.
+3. **День, ночь, колокол** · `feature/day-night` · Closes #5. ✅ СДЕЛАНО, PR (ждёт слияния в `dev`). `World/GameClock`, `World/DayNightCycle`, `UI/ClockHud`, события `DayPhaseChanged`, `BellRang` (20:00), `NewDayStarted` (06:00) в `GameEvents`. Фазы: утро 06–10, день 10–17, вечер 17–20, ночь 20–06. Тесты: `GameClock` (23 штуки). Отладка в редакторе: T +1 час, Y сразу 19:55. Звук колокола пока пустой (`sfx_bell.wav` от Лизы).
 4. **Меню, пауза, настройки** · `feature/menu-settings` · Closes #6, #7. `UI/MainMenu`, `UI/PauseMenu`, `Core/SettingsManager`, `Core/SettingsData`.
 
 ### Патч 0.2 (до 10 января 2027)
