@@ -1,4 +1,5 @@
 using System;
+using Omut.World;
 using UnityEngine;
 
 namespace Omut.Core
@@ -17,12 +18,30 @@ namespace Omut.Core
             GameStateChanged?.Invoke(from, to);
         }
 
+        // Сменилась фаза суток: (было, стало). Например, Evening -> Night.
+        public static event Action<DayPhase, DayPhase> DayPhaseChanged;
+
+        // 20:00, бьёт колокол маяка. Дальше ночь: безопасно только у света.
+        public static event Action BellRang;
+
+        // 06:00, начался новый день (номер дня).
+        public static event Action<int> NewDayStarted;
+
+        public static void RaiseDayPhaseChanged(DayPhase from, DayPhase to) => DayPhaseChanged?.Invoke(from, to);
+
+        public static void RaiseBellRang() => BellRang?.Invoke();
+
+        public static void RaiseNewDayStarted(int day) => NewDayStarted?.Invoke(day);
+
         // В проекте выключена перезагрузка скриптов при нажатии Play (так Play запускается быстрее).
         // Из-за этого подписки от прошлого запуска остаются в памяти. Чистим их перед каждым запуском.
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetSubscribers()
         {
             GameStateChanged = null;
+            DayPhaseChanged = null;
+            BellRang = null;
+            NewDayStarted = null;
         }
     }
 }
