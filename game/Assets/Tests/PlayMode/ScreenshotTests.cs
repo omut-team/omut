@@ -101,6 +101,12 @@ namespace Omut.Tests
             yield return Shot("hold");
             Object.FindAnyObjectByType<InventoryUI>().Close();
 
+            Object.FindAnyObjectByType<BagUI>().Open();
+            yield return new WaitForSeconds(0.2f);
+            yield return Shot("bag");
+            Object.FindAnyObjectByType<BagUI>().Close();
+            yield return null;
+
             session.Journal.Register(new CatchInfo(session.Database.FindFish("pike"), 5f, false, Omut.World.ZoneId.Pool, 1));
             Object.FindAnyObjectByType<JournalUI>().Open();
             yield return new WaitForSeconds(0.2f);
@@ -116,6 +122,7 @@ namespace Omut.Tests
 
             DockingZone.Instance.Board();
             yield return new WaitForSeconds(0.3f);
+            yield return Shot("boat");
             FishingController fishing = FishingController.Instance;
             fishing.SetState(fishing.Charging);
             fishing.CastPower = 0.6f;

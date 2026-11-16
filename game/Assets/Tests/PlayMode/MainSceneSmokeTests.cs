@@ -5,6 +5,7 @@ using Omut.Fishing;
 using Omut.UI;
 using Omut.Player;
 using Omut.NPC;
+using Omut.Inventory;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -316,5 +317,63 @@ namespace Omut.Tests
             yield return new WaitForSeconds(0.5f);
             Assert.IsTrue(CreditsUI.Instance.IsOpen);
         }
-}
+
+        [UnityTest]
+        public IEnumerator Walker_CanWalkFromHutToPierTip()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance.StartGame();
+            yield return null;
+
+            // Путь пешком: от хаты на дорожку, вниз по мосткам до конца. Стык земли и мостков проходим.
+            Vector2 pierTip = DockingZone.Instance.transform.Find("WalkPoint").position;
+            for (float y = 26.5f; y >= pierTip.y; y -= 0.1f)
+                Assert.IsTrue(PlayerWalker.CanStand(new Vector2(pierTip.x, y)), $"Застрял на y = {y:0.0}");
+            for (float x = -45f; x <= pierTip.x; x += 0.1f)
+                Assert.IsTrue(PlayerWalker.CanStand(new Vector2(x, 26.5f)), $"Застрял на x = {x:0.0}");
+        }
+
+        // Подсказки и панель предметов: после новой игры видно, к кому идти, а удочка в руке.
+        [UnityTest]
+        public IEnumerator NewGame_ShowsObjective_Hotbar_AndRider()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance.StartGame();
+            yield return new WaitForSeconds(1f);
+
+            StringAssert.Contains("Тарас", Guide.LastText);
+            Assert.IsNotNull(Hotbar.Instance);
+            Assert.AreEqual(0, Hotbar.Instance.Selected);
+            Assert.IsFalse(Hotbar.HoldsLantern);
+            Assert.IsNotNull(BoatRider.Instance);
+
+            // Блёсен ещё нет: в руку не берутся, остаётся червь.
+            int spoons = GameSession.Instance.Tackle.Count(BaitType.Spoon);
+            Hotbar.Instance.Use(1);
+            Assert.AreEqual(spoons > 0 ? 1 : 0, Hotbar.Instance.Selected);
+
+            Hotbar.Instance.Use(Hotbar.LanternSlot);
+            Assert.IsTrue(Hotbar.HoldsLantern);
+            yield return null;
+        }
+
+        // Окно не должно "зависать": если игра уже снова в плавании, трюм и лавка открываются.
+        [UnityTest]
+        public IEnumerator StaleWindow_IsReleased()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance.StartGame();
+            yield return null;
+
+            var hold = Object.FindAnyObjectByType<InventoryUI>();
+            Assert.IsTrue(hold.Open());
+            GameManager.Instance.ChangeState(GameState.Sailing);
+            yield return null;
+
+            Assert.IsNull(GameWindow.Active);
+            Assert.IsTrue(Object.FindAnyObjectByType<BagUI>().Open(), "Другое окно открывается");
+            Object.FindAnyObjectByType<BagUI>().Close();
+            Assert.AreEqual(GameState.Sailing, GameManager.Instance.CurrentState);
+        }
+    }
 }

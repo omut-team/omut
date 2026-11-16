@@ -53,7 +53,6 @@ namespace Omut.Core
 
             hudLines.Add(() => $"Монеты: <b>{Wallet.Money}</b>");
             hudLines.Add(BoatHudLine);
-            hudLines.Add(QuestHudLine);
             hudLines.Add(() => $"Наживка: <b>{BaitTitle(Tackle.Current)}</b>{(TackleBox.IsInfinite(Tackle.Current) ? "" : $" ({Tackle.Count(Tackle.Current)})")}  [Q]");
             foreach (System.Func<string> line in hudLines)
                 Hud.AddLine(line);

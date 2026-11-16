@@ -10,7 +10,29 @@ namespace Omut.UI
     // Esc или своя клавиша (ToggleKey) закрывают окно.
     public abstract class GameWindow : MonoBehaviour
     {
-        public static GameWindow Active { get; private set; }
+        private static GameWindow active;
+
+        // Открытое окно. Если окно "зависло" (игра уже снова в плавании или окно спрятано),
+        // метка снимается сама: иначе после обморока или выхода в меню не открывались трюм,
+        // лавка, разговоры и не получалось рыбачить.
+        public static GameWindow Active
+        {
+            get
+            {
+                if (active != null && (active.Root == null || !active.Root.gameObject.activeSelf
+                                       || (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Sailing)))
+                {
+                    GameWindow stale = active;
+                    active = null;
+                    if (stale.Root != null)
+                        stale.Root.gameObject.SetActive(false);
+                    stale.OnClosed();
+                }
+
+                return active;
+            }
+            private set => active = value;
+        }
 
         protected Canvas Canvas { get; private set; }
         protected RectTransform Root { get; private set; }

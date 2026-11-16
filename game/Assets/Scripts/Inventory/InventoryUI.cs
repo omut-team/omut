@@ -122,7 +122,7 @@ namespace Omut.Inventory
             {
                 for (int x = 0; x < width; x++)
                 {
-                    Image cell = UiFactory.Panel(cellsLayer, $"Cell {x},{y}", new Color(0.55f, 0.47f, 0.36f, 1f));
+                    Image cell = UiFactory.SlotPanel(cellsLayer, $"Cell {x},{y}");
                     RectTransform r = cell.rectTransform;
                     r.anchorMin = r.anchorMax = new Vector2(0f, 1f);
                     r.pivot = new Vector2(0f, 1f);

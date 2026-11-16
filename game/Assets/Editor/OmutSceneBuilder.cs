@@ -36,6 +36,8 @@ namespace Omut.EditorTools
         {
             OmutDataBuilder.Build(false);
             ArtImportSettings.FixPivots();
+            ArtImportSettings.FixBorders();
+            EnsureUiSkin();
             EnsureUnlitMaterial();
 
             var scene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
@@ -66,6 +68,7 @@ namespace Omut.EditorTools
         {
             OmutDataBuilder.Build(true);
             BuildMainScene();
+            OmutVoiceExport.Export();
         }
 
         public static Omut.Core.GameDatabase Database =>

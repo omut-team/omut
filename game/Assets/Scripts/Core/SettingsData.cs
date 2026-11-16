@@ -11,6 +11,7 @@ namespace Omut.Core
         public float masterVolume = 1f;   // общая громкость 0..1
         public float musicVolume = 0.7f;  // музыка 0..1
         public float sfxVolume = 1f;      // звуки 0..1
+        public float voiceVolume = 1f;    // голоса персонажей 0..1
         public bool fullscreen = true;
         public int resolutionWidth;       // 0 = как у монитора
         public int resolutionHeight;
@@ -22,6 +23,7 @@ namespace Omut.Core
             masterVolume = Mathf.Clamp01(masterVolume);
             musicVolume = Mathf.Clamp01(musicVolume);
             sfxVolume = Mathf.Clamp01(sfxVolume);
+            voiceVolume = Mathf.Clamp01(voiceVolume);
             resolutionWidth = Mathf.Max(0, resolutionWidth);
             resolutionHeight = Mathf.Max(0, resolutionHeight);
         }

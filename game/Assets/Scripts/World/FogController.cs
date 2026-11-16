@@ -24,7 +24,7 @@ namespace Omut.World
         [Tooltip("Сколько клубов тумана вокруг камеры")]
         [SerializeField] private int puffCount = 18;
 
-        [SerializeField] private Color nightFogColor = new Color(0.55f, 0.62f, 0.7f, 1f);
+        [SerializeField] private Color nightFogColor = new Color(0.32f, 0.4f, 0.5f, 1f);
         [SerializeField] private Color reefFogColor = new Color(0.78f, 0.8f, 0.82f, 1f);
 
         private readonly List<(SpriteRenderer sr, Vector2 velocity)> puffs = new List<(SpriteRenderer, Vector2)>();
@@ -89,7 +89,7 @@ namespace Omut.World
 
             DayNightCycle cycle = DayNightCycle.Instance;
             DayPhase phase = cycle != null ? cycle.Clock.Phase : DayPhase.Day;
-            float nightFog = phase == DayPhase.Night ? 0.75f : (phase == DayPhase.Evening ? 0.25f : 0f);
+            float nightFog = phase == DayPhase.Night ? 0.6f : (phase == DayPhase.Evening ? 0.2f : 0f);
             float target = Mathf.Max(nightFog, InEternalFog ? 1f : 0f);
             density = Mathf.MoveTowards(density, target, Time.deltaTime * 0.5f);
 
@@ -130,9 +130,9 @@ namespace Omut.World
                 sr.transform.position = p;
 
                 // Рядом с лодкой туман реже (свет фонаря).
-                float near = Mathf.Clamp01(Vector2.Distance(p, focus) / 4f);
+                float near = Mathf.Clamp01((Vector2.Distance(p, focus) - 1.5f) / 5f);
                 Color c = color;
-                c.a = density * 0.3f * (0.4f + 0.6f * near);
+                c.a = density * 0.16f * near; // рядом с героем туман расступается, вдали лёгкая дымка
                 sr.color = c;
             }
         }
@@ -140,12 +140,12 @@ namespace Omut.World
         // На рифе днём: плотная стена тумана с "окном" вокруг лодки.
         private void UpdateHole(Vector2 focus, Color color, DayPhase phase)
         {
-            float alpha = InEternalFog ? density * (phase == DayPhase.Night ? 0.55f : 0.9f) : 0f;
+            float alpha = InEternalFog ? density * (phase == DayPhase.Night ? 0.4f : 0.78f) : 0f;
             Color c = color;
             c.a = alpha;
 
             // fx_fog_hole 256 px = 8 клеток, прозрачная середина. Масштаб: окно около 3 клеток.
-            float scale = 1.6f;
+            float scale = 2f;
             float size = 8f * scale;
             hole.transform.position = focus;
             hole.transform.localScale = new Vector3(scale, scale, 1f);

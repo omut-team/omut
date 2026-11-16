@@ -24,7 +24,7 @@ namespace Omut.UI
             UiFactory.Place(caption.rectTransform, new Vector2(0.5f, 1f), new Vector2(700f, 40f), Vector2.zero);
 
             fill = UiFactory.Bar(root, "Bar", new Vector2(700f, 36f), new Color(0f, 0f, 0f, 0.6f), UiFactory.Theme.Gold);
-            UiFactory.Place(fill.transform.parent as RectTransform, new Vector2(0.5f, 0f), new Vector2(700f, 36f), Vector2.zero);
+            UiFactory.Place(UiFactory.BarRoot(fill), new Vector2(0.5f, 0f), new Vector2(700f, 36f), Vector2.zero);
 
             var aimObject = new GameObject("CastAim");
             aimObject.transform.SetParent(transform, false);
