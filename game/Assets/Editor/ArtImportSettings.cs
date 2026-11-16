@@ -47,12 +47,12 @@ namespace Omut.EditorTools
             importer.SetTextureSettings(settings);
         }
 
-        // Объекты, которые "стоят" на земле или воде (кроме лодок: у них опора по центру).
+        // Объекты, которые "стоят" на земле или воде: опора внизу (вид 45°).
         public static bool StandsOnGround(string file)
         {
             if (file.EndsWith("_portrait"))
                 return false;
-            return file.StartsWith("obj_") && file != "obj_bobber"
+            return file.StartsWith("obj_") && file != "obj_bobber" || file.StartsWith("boat_")
                    || file.StartsWith("npc_") || file.StartsWith("hero_") || file == "env_reed";
         }
 

@@ -74,7 +74,7 @@ namespace Omut.World
 
                 float t = Mathf.Repeat(Time.time * 0.35f + i / (float)rings.Count, 1f);
                 float size = Mathf.Lerp(radius * 1.6f, 0.3f, t); // круги сходятся к центру
-                sr.transform.localScale = new Vector3(size, size * 0.55f, 1f);
+                sr.transform.localScale = new Vector3(size, size * 0.5f, 1f);
                 sr.transform.localRotation = Quaternion.Euler(0f, 0f, Time.time * 40f + i * 30f);
                 sr.color = new Color(0.55f, 1f, 0.75f, Mathf.Sin(t * Mathf.PI) * 0.9f);
             }

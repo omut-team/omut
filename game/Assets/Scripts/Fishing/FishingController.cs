@@ -142,7 +142,8 @@ namespace Omut.Fishing
 
         // ---------- заброс ----------
 
-        public Vector2 RodTip => (Vector2)transform.position + new Vector2(facing * 0.9f, 0.2f);
+        // Опора лодки внизу (ватерлиния), удочка на уровне палубы.
+        public Vector2 RodTip => (Vector2)transform.position + new Vector2(facing * 0.9f, 0.8f);
 
         public Vector2 ComputeTarget(float power)
         {
