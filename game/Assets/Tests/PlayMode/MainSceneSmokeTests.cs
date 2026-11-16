@@ -213,5 +213,31 @@ namespace Omut.Tests
                 SaveSystem.Delete();
             }
         }
+
+        [UnityTest]
+        public IEnumerator Panic100_Faint_LosesNightCatchOnly()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance.StartGame();
+            yield return new WaitForSeconds(0.3f);
+
+            DockingZone.Instance.Board();
+            Omut.World.DayNightCycle.Instance.Clock.SetTime(23, 0);
+            GameSession session = GameSession.Instance;
+            var fish = session.Database.FindFish("crucian");
+            session.Hold.TryAdd(new CatchInfo(fish, 1f, false, Omut.World.ZoneId.Bay, 1));
+            session.Hold.TryAdd(new CatchInfo(fish, 1f, true, Omut.World.ZoneId.Bay, 1));
+            int day = Omut.World.DayNightCycle.Instance.Clock.Day;
+
+            session.Panic.Set(100f);
+            yield return new WaitForSeconds(4.5f);
+
+            Assert.IsTrue(PlayerWalker.OnFoot, "Очнулся на причале");
+            Assert.AreEqual(1, session.Hold.Count, "Ночной улов пропал, дневной цел");
+            Assert.AreEqual(day + 1, Omut.World.DayNightCycle.Instance.Clock.Day);
+            Assert.AreEqual(Omut.World.DayPhase.Morning, Omut.World.DayNightCycle.Instance.Clock.Phase);
+            Assert.Less(session.Panic.Value, 1f);
+            Assert.AreEqual(1, session.Boat.Durability, "Лодка побита");
+        }
 }
 }

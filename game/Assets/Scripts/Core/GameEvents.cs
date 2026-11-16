@@ -84,6 +84,11 @@ namespace Omut.Core
 
         public static void RaiseBoatSunk() => BoatSunk?.Invoke();
 
+        // Обморок от паники (сколько ночной рыбы потеряно).
+        public static event Action<int> Fainted;
+
+        public static void RaiseFainted(int lostFish) => Fainted?.Invoke(lostFish);
+
         // ---------- звук ----------
 
         // Сыграть звук по имени ("cast", "bite", "bell"...). Слушает AudioManager (этап 21).
@@ -111,6 +116,7 @@ namespace Omut.Core
             PlaySound = null;
             DockChanged = null;
             BoatSunk = null;
+            Fainted = null;
         }
     }
 }

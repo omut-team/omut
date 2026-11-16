@@ -23,6 +23,9 @@ namespace Omut.Core
         public Wallet Wallet { get; private set; } = new Wallet();
         public TackleBox Tackle { get; private set; } = new TackleBox();
 
+        // Паника 0..100 (этап 18). Один объект на всю игру: на него подписаны эффекты.
+        public PanicMeter Panic { get; } = new PanicMeter();
+
         // Запасы: керосин для фонаря (0..100 %) и термосы с чаем.
         public float Kerosene { get; set; }
         public int Thermos { get; set; }
@@ -141,6 +144,7 @@ namespace Omut.Core
             TotalCaught = 0;
             ResetQuests();
             ResetBoats();
+            Panic.Reset();
             BoatChanged?.Invoke(CurrentBoat);
         }
 

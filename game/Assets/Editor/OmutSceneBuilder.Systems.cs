@@ -23,6 +23,10 @@ namespace Omut.EditorTools
             SetRef(fog, "whiteSprite", OmutDataBuilder.FindSprite("fx_white"));
             SetRef(fog, "unlitMaterial", Database.unlitMaterial);
 
+            PanicEffects panic = EnsureComponent<PanicEffects>(systems);
+            SetRef(panic, "silhouetteSprite", OmutDataBuilder.FindSprite("obj_reef_rock"));
+            SetRef(panic, "unlitMaterial", Database.unlitMaterial);
+
             // Свет героя на причале ночью.
             Lantern lantern = Object.FindAnyObjectByType<Lantern>();
             GameObject heroLight = GameObject.Find("World/Dock/Hero/WalkerLight");
@@ -122,6 +126,8 @@ namespace Omut.EditorTools
             EnsureComponent<QuestLogUI>(ui);
             EnsureComponent<ShipyardUI>(ui);
             EnsureComponent<LoginUI>(ui);
+            SetRef(EnsureComponent<PanicBar>(ui), "vignetteSprite", OmutDataBuilder.FindSprite("fx_vignette"));
+            EnsureComponent<ScreenFader>(ui);
             SetRef(EnsureComponent<DialogueUI>(ui), "heroPortrait", OmutDataBuilder.FindSprite("hero_symon_portrait"));
             EnsureComponent<InventoryUI>(ui);
         }
