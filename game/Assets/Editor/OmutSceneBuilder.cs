@@ -167,7 +167,9 @@ namespace Omut.EditorTools
         private static void BuildDockPeople(Transform dock)
         {
             GameObject taras = Npc(dock, "Taras", "npc_taras", TarasPosition);
-            taras.AddComponent<Omut.NPC.Merchant>();
+            taras.AddComponent<Omut.NPC.Merchant>().Setup(Omut.NPC.NpcId.Taras, "Тарас", OmutDataBuilder.FindSprite("npc_taras_portrait"),
+                Database.FindDialogue("taras_first"),
+                new System.Collections.Generic.List<string> { "Ну что, клюёт?", "Колокол сегодня в восемь, как всегда.", "Опять ты. Ладно, говори.", "Маяк горит, значит, всё в порядке." });
             BuildMoreDockPeople(dock);
 
             // Сымон пешком.

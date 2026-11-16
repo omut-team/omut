@@ -1,24 +1,21 @@
+using System;
 using System.Collections.Generic;
 using Omut.Core;
 using Omut.Inventory;
 using Omut.UI;
-using UnityEngine;
 
 namespace Omut.NPC
 {
     // Тарас, смотритель маяка: скупает рыбу, продаёт наживку, керосин и термос.
-    public class Merchant : Interactable
+    // В разговоре у него пункт "Торговать".
+    public class Merchant : Npc
     {
-        [SerializeField] private string npcName = "Тарас";
+        public string NpcName => DisplayName;
 
-        public string NpcName => npcName;
-
-        public override string Prompt => "поговорить с " + (npcName == "Тарас" ? "Тарасом" : npcName);
-
-        // Что открыть при разговоре. По умолчанию сразу магазин, диалоги подставят своё (этап 13).
-        public static System.Action<Merchant> OnTalk = merchant => ShopUI.Instance?.OpenFor(merchant);
-
-        public override void Interact() => OnTalk(this);
+        public override List<(string label, Action action)> ExtraOptions()
+        {
+            return new List<(string, Action)> { ("Торговать", () => ShopUI.Instance?.OpenFor(this)) };
+        }
 
         // Список товаров: строится из базы данных игры.
         public List<ShopGood> Catalog()
@@ -50,7 +47,7 @@ namespace Omut.NPC
             return goods;
         }
 
-        // Наживки добавляются на этапе 11.
-        public static System.Action<List<ShopGood>, GameSession> AddMoreGoods = (goods, session) => { };
+        // Наживки добавляет GameSession (этап 11).
+        public static Action<List<ShopGood>, GameSession> AddMoreGoods = (goods, session) => { };
     }
 }

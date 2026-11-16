@@ -47,6 +47,7 @@ namespace Omut.Core
             Merchant.AddMoreGoods = AddBaitGoods;
 
             hudLines.Add(() => $"Монеты: <b>{Wallet.Money}</b>");
+            hudLines.Add(QuestHudLine);
             hudLines.Add(() => $"Наживка: <b>{BaitTitle(Tackle.Current)}</b>{(TackleBox.IsInfinite(Tackle.Current) ? "" : $" ({Tackle.Count(Tackle.Current)})")}  [Q]");
             foreach (System.Func<string> line in hudLines)
                 Hud.AddLine(line);
@@ -137,6 +138,7 @@ namespace Omut.Core
             Tackle = new TackleBox();
             Tackle.Add(BaitType.Spoon, 3);
             TotalCaught = 0;
+            ResetQuests();
         }
 
         // Пересесть на другую лодку: другой размер трюма. Что не влезло, остаётся на берегу (продаётся Тарасу автоматически).
@@ -185,6 +187,7 @@ namespace Omut.Core
         private void OnFishCaught(CatchInfo info)
         {
             TotalCaught++;
+            Quests.OnFishCaught(info);
             info.isNewRecord = Journal.Register(info);
             if (info.isNewRecord)
                 Notifications.Show($"Новая запись в журнале: {info.Title} ({Journal.CaughtCount} из {Journal.TotalEntries})", UiFactory.Theme.Gold);

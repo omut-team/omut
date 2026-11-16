@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Omut.Fishing;
 using Omut.Inventory;
+using Omut.NPC;
 using Omut.Player;
 using UnityEngine;
 
@@ -16,6 +17,11 @@ namespace Omut.Core
         public List<BoatData> boats = new List<BoatData>();
         public List<ItemData> items = new List<ItemData>();
         public List<BaitData> baits = new List<BaitData>();
+        public List<QuestData> quests = new List<QuestData>();
+        public List<NoteData> notes = new List<NoteData>();
+        public List<DialogueData> dialogues = new List<DialogueData>();
+
+        public DialogueData FindDialogue(string id) => dialogues.Find(d => d != null && d.id == id);
 
         public FishData FindFish(string id) => fish.Find(f => f != null && f.id == id);
 
