@@ -18,6 +18,9 @@ namespace Omut.UI
         [Tooltip("Фон главного меню (Ульяна: Art/UI/ui_menu_bg)")]
         [SerializeField] private Sprite background;
 
+        [Tooltip("Дощечка для кнопок (Art/UI/ui_button_plank). Пусто = обычные кнопки")]
+        [SerializeField] private Sprite buttonSprite;
+
         private Canvas canvas;
         private RectTransform root;
         private RectTransform buttons;
@@ -57,7 +60,10 @@ namespace Omut.UI
             Image shade = UiFactory.Panel(canvas.transform, "MainMenu", new Color(0.03f, 0.07f, 0.09f, background != null ? 0.45f : 0.72f));
             root = UiFactory.Stretch(shade.rectTransform);
 
+            bool art = background != null;
+
             Text title = UiFactory.HudLabel(root, "ОМУТ", 150, TextAnchor.MiddleCenter);
+            title.gameObject.SetActive(!art); // на фоне Ульяны вывеска уже нарисована
             title.fontStyle = FontStyle.Bold;
             title.color = UiFactory.Theme.Paper;
             UiFactory.Place(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(1200f, 180f), new Vector2(0f, -110f));
@@ -65,10 +71,11 @@ namespace Omut.UI
             Text subtitle = UiFactory.HudLabel(root, "Полесье. Тихие Вирки. Колокол бьёт в 20:00.", 34, TextAnchor.MiddleCenter);
             subtitle.color = new Color(0.75f, 0.82f, 0.8f);
             UiFactory.Place(subtitle.rectTransform, new Vector2(0.5f, 1f), new Vector2(1200f, 50f), new Vector2(0f, -290f));
+            subtitle.gameObject.SetActive(!art);
 
             buttons = UiFactory.Rect(root, "Buttons");
-            UiFactory.Place(buttons, new Vector2(0.5f, 0.5f), new Vector2(460f, 620f), new Vector2(0f, -150f));
-            UiFactory.Column(buttons, 16f);
+            UiFactory.Place(buttons, new Vector2(0.5f, 1f), new Vector2(520f, 700f), new Vector2(0f, art ? -330f : -360f));
+            UiFactory.Column(buttons, art ? 8f : 16f);
 
             continueButton = UiFactory.Button(buttons, "Продолжить", OnContinue, new Vector2(440f, 70f), 34);
             UiFactory.Button(buttons, "Новая игра", OnNewGame, new Vector2(440f, 70f), 34);
@@ -78,6 +85,10 @@ namespace Omut.UI
             UiFactory.Button(buttons, "Об игре", () => ShowInfo("Об игре", AboutText), new Vector2(440f, 70f), 34);
             UiFactory.Button(buttons, "Выход", OnQuit, new Vector2(440f, 70f), 34);
 
+            if (buttonSprite != null)
+                foreach (Button b in buttons.GetComponentsInChildren<Button>(true))
+                    StylePlank(b);
+
             Text version = UiFactory.HudLabel(root, "версия " + Application.version, 22, TextAnchor.LowerRight);
             UiFactory.Place(version.rectTransform, new Vector2(1f, 0f), new Vector2(400f, 40f), new Vector2(-20f, 14f));
 
@@ -86,6 +97,33 @@ namespace Omut.UI
 
             settings = new SettingsPanel(canvas.transform, () => buttons.gameObject.SetActive(true));
             info = new InfoPanel(canvas.transform, new Vector2(1100f, 700f), () => buttons.gameObject.SetActive(true));
+        }
+
+        // Кнопка-дощечка как на макете Ульяны: бумага в деревянной рамке, тёмные буквы.
+        private void StylePlank(Button button)
+        {
+            var image = button.GetComponent<Image>();
+            image.sprite = buttonSprite;
+            image.type = Image.Type.Simple;
+            image.color = Color.white;
+            var rect = (RectTransform)button.transform;
+            rect.sizeDelta = new Vector2(500f, 88f);
+            var layout = button.GetComponent<LayoutElement>();
+            layout.preferredWidth = 500f;
+            layout.preferredHeight = 88f;
+
+            ColorBlock colors = button.colors;
+            colors.normalColor = new Color(0.92f, 0.9f, 0.86f);
+            colors.highlightedColor = Color.white;
+            colors.selectedColor = new Color(0.92f, 0.9f, 0.86f);
+            colors.pressedColor = new Color(0.75f, 0.7f, 0.62f);
+            button.colors = colors;
+
+            Text label = button.GetComponentInChildren<Text>();
+            label.color = UiFactory.Theme.Ink;
+            label.fontStyle = FontStyle.Bold;
+            label.fontSize = 32;
+            label.text = label.text.ToUpperInvariant();
         }
 
         private void Show(bool visible)
