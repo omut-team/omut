@@ -145,16 +145,16 @@ namespace Omut.World
         }
 
         // Цвета по умолчанию: ночь синяя, утро тёплое, день белый, закат оранжевый.
-        private static Gradient CreateDefaultColors()
+        public static Gradient CreateDefaultColors()
         {
             var gradient = new Gradient();
             gradient.SetKeys(
                 new[]
                 {
                     new GradientColorKey(new Color(0.25f, 0.30f, 0.55f), 0.00f),  // 00:00 ночь
-                    new GradientColorKey(new Color(0.25f, 0.30f, 0.55f), 0.22f),  // 05:15
-                    new GradientColorKey(new Color(1.00f, 0.80f, 0.65f), 0.27f),  // 06:30 рассвет
-                    new GradientColorKey(new Color(1.00f, 1.00f, 1.00f), 0.42f),  // 10:00 день
+                    new GradientColorKey(new Color(0.25f, 0.30f, 0.55f), 0.20f),  // 04:50
+                    new GradientColorKey(new Color(1.00f, 0.85f, 0.70f), 0.25f),  // 06:00 рассвет
+                    new GradientColorKey(new Color(1.00f, 1.00f, 1.00f), 0.36f),  // 08:40 день
                     new GradientColorKey(new Color(1.00f, 1.00f, 1.00f), 0.70f),  // 17:00
                     new GradientColorKey(new Color(1.00f, 0.60f, 0.40f), 0.80f),  // 19:10 закат
                     new GradientColorKey(new Color(0.25f, 0.30f, 0.55f), 0.86f),  // 20:40 ночь
@@ -164,12 +164,13 @@ namespace Omut.World
         }
 
         // Яркость по умолчанию: ночью 0.25, днём 1.
-        private static AnimationCurve CreateDefaultIntensity()
+        public static AnimationCurve CreateDefaultIntensity()
         {
             return new AnimationCurve(
                 new Keyframe(0.00f, 0.25f),  // 00:00
-                new Keyframe(0.22f, 0.25f),  // 05:15
-                new Keyframe(0.30f, 0.90f),  // 07:10
+                new Keyframe(0.20f, 0.25f),  // 04:50
+                new Keyframe(0.25f, 0.80f),  // 06:00
+                new Keyframe(0.30f, 0.95f),  // 07:10
                 new Keyframe(0.42f, 1.00f),  // 10:00
                 new Keyframe(0.70f, 1.00f),  // 17:00
                 new Keyframe(0.83f, 0.30f),  // 20:00

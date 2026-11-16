@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Omut.Core;
 using Omut.Fishing;
+using Omut.Inventory;
 using Omut.Player;
 using Omut.World;
 using UnityEditor;
@@ -29,6 +30,11 @@ namespace Omut.EditorTools
 
             db.fish = BuildFish(overwrite);
             db.boats = new List<BoatData> { AssetDatabase.LoadAssetAtPath<BoatData>(DataRoot + "/Boats/Barkas.asset") };
+            db.items = new List<ItemData>
+            {
+                Item("kerosene", "Керосин", "Заправка фонаря на половину бака.", ItemKind.Kerosene, 12, 50, "item_kerosene", overwrite),
+                Item("thermos", "Термос с чаем", "Горячий чай. Выпить (C): паника -35.", ItemKind.Thermos, 20, 1, "item_thermos", overwrite),
+            };
             BuildMore(db, overwrite);
 
             EditorUtility.SetDirty(db);
@@ -155,6 +161,24 @@ namespace Omut.EditorTools
             }
 
             return list;
+        }
+
+        private static ItemData Item(string id, string title, string text, ItemKind kind, int price, int amount, string sprite, bool overwrite)
+        {
+            ItemData item = LoadOrCreate<ItemData>($"{DataRoot}/Items/{id}.asset", out bool created);
+            if (created || overwrite)
+            {
+                item.id = id;
+                item.displayName = title;
+                item.description = text;
+                item.kind = kind;
+                item.price = price;
+                item.amount = amount;
+                item.sprite = FindSprite(sprite);
+                EditorUtility.SetDirty(item);
+            }
+
+            return item;
         }
 
         // ---------- помощники ----------

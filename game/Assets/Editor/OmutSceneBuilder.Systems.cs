@@ -12,10 +12,22 @@ namespace Omut.EditorTools
         {
             GameObject systems = EnsureRoot("Systems");
             SetRef(EnsureComponent<GameSession>(systems), "database", Database);
+
+            // Свет суток всегда из кода (DayNightCycle.CreateDefault...), чтобы правки цветов попадали в сцену.
+            var cycle = Object.FindAnyObjectByType<Omut.World.DayNightCycle>();
+            if (cycle != null)
+            {
+                var so = new UnityEditor.SerializedObject(cycle);
+                so.FindProperty("lightColor").gradientValue = Omut.World.DayNightCycle.CreateDefaultColors();
+                so.FindProperty("lightIntensity").animationCurveValue = Omut.World.DayNightCycle.CreateDefaultIntensity();
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
         }
 
         static partial void BuildUi(GameObject ui)
         {
+            EnsureComponent<Hud>(ui);
+            EnsureComponent<ShopUI>(ui);
             EnsureComponent<JournalUI>(ui);
             EnsureComponent<InventoryUI>(ui);
         }

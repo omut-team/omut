@@ -3,6 +3,8 @@ using NUnit.Framework;
 using Omut.Core;
 using Omut.Fishing;
 using Omut.UI;
+using Omut.Player;
+using Omut.NPC;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -59,6 +61,8 @@ namespace Omut.Tests
 
             FishingController fishing = FishingController.Instance;
             Assert.IsNotNull(fishing, "На лодке нет FishingController");
+            DockingZone.Instance.Board();
+            yield return null;
 
             CatchInfo caught = null;
             System.Action<CatchInfo> onCaught = info => caught = info;
@@ -117,6 +121,48 @@ namespace Omut.Tests
                 yield return null;
                 Assert.AreEqual(GameState.Sailing, GameManager.Instance.CurrentState, window.GetType().Name);
             }
+        }
+
+        [UnityTest]
+        public IEnumerator Dock_WalkTalkSell_WithoutErrors()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance.StartGame();
+            yield return new WaitForSeconds(0.3f);
+
+            Assert.IsTrue(PlayerWalker.OnFoot, "Новая игра начинается на причале");
+            Assert.IsTrue(PlayerWalker.CanStand(PlayerWalker.Instance.transform.position), "Сымон должен стоять на земле");
+
+            // Положить рыбу в трюм и продать Тарасу.
+            GameSession session = GameSession.Instance;
+            var fish = session.Database.FindFish("crucian");
+            session.Hold.TryAdd(new CatchInfo(fish, 1f, false, Omut.World.ZoneId.Bay, 1));
+            int before = session.Wallet.Money;
+
+            Merchant taras = Object.FindAnyObjectByType<Merchant>();
+            Assert.IsNotNull(taras);
+            taras.Interact();
+            yield return null;
+            Assert.AreEqual(GameState.Shop, GameManager.Instance.CurrentState);
+            yield return null;
+            ShopUI.Instance.Close();
+            yield return null;
+
+            foreach (var item in new System.Collections.Generic.List<Omut.Inventory.GridItem>(session.Hold.Items))
+            {
+                session.Hold.Remove(item);
+                session.Wallet.Earn(item.catchInfo.price);
+            }
+            Assert.Greater(session.Wallet.Money, before);
+
+            // Сесть в лодку и сойти обратно.
+            DockingZone.Instance.Board();
+            yield return new WaitForSeconds(0.2f);
+            Assert.IsFalse(PlayerWalker.OnFoot);
+            Assert.IsTrue(DockingZone.Instance.BoatNearDock);
+            DockingZone.Instance.Disembark();
+            yield return null;
+            Assert.IsTrue(PlayerWalker.OnFoot);
         }
 }
 }

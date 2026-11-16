@@ -340,6 +340,44 @@ namespace Omut.UI
             return valueText;
         }
 
+        // Область с прокруткой колёсиком. Возвращает content: в него класть элементы.
+        public static RectTransform ScrollArea(RectTransform area)
+        {
+            var scroll = area.gameObject.AddComponent<ScrollRect>();
+            scroll.horizontal = false;
+            scroll.scrollSensitivity = 30f;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+
+            RectTransform viewport = Stretch(Rect(area, "Viewport"));
+            viewport.gameObject.AddComponent<RectMask2D>();
+            var hit = viewport.gameObject.AddComponent<Image>();
+            hit.color = new Color(1f, 1f, 1f, 0.001f); // чтобы колёсико ловилось и в пустом месте
+
+            RectTransform content = Rect(viewport, "Content");
+            content.anchorMin = new Vector2(0f, 1f);
+            content.anchorMax = new Vector2(1f, 1f);
+            content.pivot = new Vector2(0.5f, 1f);
+            content.offsetMin = content.offsetMax = Vector2.zero;
+            var fitter = content.gameObject.AddComponent<ContentSizeFitter>();
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            scroll.viewport = viewport;
+            scroll.content = content;
+            return content;
+        }
+
+        // Удалить все дочерние объекты (перед перестройкой списка).
+        public static void ClearChildren(Transform parent)
+        {
+            for (int i = parent.childCount - 1; i >= 0; i--)
+            {
+                GameObject child = parent.GetChild(i).gameObject;
+                child.SetActive(false);
+                child.transform.SetParent(null, false);
+                UnityEngine.Object.Destroy(child);
+            }
+        }
+
         // Картинка спрайта (иконка рыбы, предмета).
         public static Image Icon(Transform parent, Sprite sprite, Vector2 size)
         {

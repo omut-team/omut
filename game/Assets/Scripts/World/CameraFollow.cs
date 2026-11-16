@@ -36,6 +36,16 @@ namespace Omut.World
             cam = GetComponent<Camera>();
         }
 
+        // Сразу поставить камеру на цель, без плавного подлёта (после телепорта).
+        public void SnapToTarget()
+        {
+            if (target != null)
+            {
+                transform.position = GetDesiredPosition();
+                currentVelocity = Vector3.zero;
+            }
+        }
+
         private void Start()
         {
             // В начале сразу ставим камеру на цель, чтобы не было "подлёта" через всю карту.

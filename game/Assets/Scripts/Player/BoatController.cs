@@ -75,6 +75,10 @@ namespace Omut.Player
             if (game != null && game.CurrentState != GameState.Sailing)
                 return Vector2.zero;
 
+            // Сымон сошёл на берег: лодка стоит у мостков.
+            if (PlayerWalker.OnFoot)
+                return Vector2.zero;
+
             return moveAction.ReadValue<Vector2>();
         }
 
