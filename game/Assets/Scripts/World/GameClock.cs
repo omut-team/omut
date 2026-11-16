@@ -101,6 +101,17 @@ namespace Omut.World
                 PhaseChanged?.Invoke(before, Phase);
         }
 
+        // Перемотать на утро следующего дня (обморок): 06:00, новый день, события фазы и нового дня.
+        public void AdvanceToMorning()
+        {
+            DayPhase before = Phase;
+            Day++;
+            Minutes = MorningStart;
+            if (before != DayPhase.Morning)
+                PhaseChanged?.Invoke(before, DayPhase.Morning);
+            NewDay?.Invoke(Day);
+        }
+
         // Номер дня (из сохранения).
         public void SetDay(int day) => Day = Math.Max(1, day);
 

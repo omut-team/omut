@@ -16,6 +16,13 @@ namespace Omut.Player
         [Tooltip("Картинка лодки. Повернём её влево или вправо по ходу движения")]
         [SerializeField] private SpriteRenderer sprite;
 
+        // Задержка руля в секундах (паника 80+). 0 = руль слушается сразу.
+        public static float InputDelay { get; set; }
+
+        private readonly System.Collections.Generic.Queue<(float time, Vector2 input)> delayed =
+            new System.Collections.Generic.Queue<(float, Vector2)>();
+        private Vector2 delayedInput;
+
         private Rigidbody2D body;
         private BoatMotor motor;
         private InputAction moveAction;
@@ -74,7 +81,7 @@ namespace Omut.Player
             // Если лодка упёрлась в камень, физика уже уменьшила скорость. Сообщаем мотору.
             motor.SetVelocity(body.linearVelocity);
 
-            Vector2 velocity = motor.Tick(ReadInput(), Time.fixedDeltaTime);
+            Vector2 velocity = motor.Tick(DelayedInput(ReadInput()), Time.fixedDeltaTime);
             body.linearVelocity = velocity;
 
             TurnSprite(velocity);
@@ -94,6 +101,21 @@ namespace Omut.Player
                 return Vector2.zero;
 
             return moveAction.ReadValue<Vector2>();
+        }
+
+        // При панике руль отзывается с опозданием: нажатие применяется через InputDelay секунд.
+        private Vector2 DelayedInput(Vector2 input)
+        {
+            if (InputDelay <= 0f)
+            {
+                delayed.Clear();
+                return input;
+            }
+
+            delayed.Enqueue((Time.time, input));
+            while (delayed.Count > 0 && Time.time - delayed.Peek().time >= InputDelay)
+                delayedInput = delayed.Dequeue().input;
+            return delayedInput;
         }
 
         // Лодка нарисована носом вправо. Плывём влево: отражаем картинку.
