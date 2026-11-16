@@ -1,4 +1,5 @@
 using Omut.Core;
+using Omut.Inventory;
 using Omut.UI;
 using UnityEngine;
 
@@ -16,6 +17,7 @@ namespace Omut.EditorTools
         static partial void BuildUi(GameObject ui)
         {
             EnsureComponent<JournalUI>(ui);
+            EnsureComponent<InventoryUI>(ui);
         }
     }
 }
