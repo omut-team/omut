@@ -46,6 +46,11 @@ namespace Omut.EditorTools
             GameObject ui = EnsureRoot("UI");
             EnsureComponent<MainMenu>(ui);
             EnsureComponent<PauseMenu>(ui);
+            EnsureComponent<Notifications>(ui);
+            SetRef(EnsureComponent<CastPowerBar>(ui), "aimSprite", OmutDataBuilder.FindSprite("fx_soft_circle"));
+            EnsureComponent<BitePrompt>(ui);
+            EnsureComponent<TensionBar>(ui);
+            EnsureComponent<CatchCard>(ui);
             BuildUi(ui);
 
             EditorSceneManager.MarkSceneDirty(scene);
@@ -59,7 +64,11 @@ namespace Omut.EditorTools
             BuildMainScene();
         }
 
+        public static Omut.Core.GameDatabase Database =>
+            AssetDatabase.LoadAssetAtPath<Omut.Core.GameDatabase>(OmutDataBuilder.DataRoot + "/GameDatabase.asset");
+
         // Хуки для следующих этапов.
+        static partial void SetupBoat(BoatController boat);
         static partial void BuildSystems();
         static partial void BuildUi(GameObject ui);
         static partial void BuildWorldExtras(Transform world, System.Random random);
@@ -195,6 +204,13 @@ namespace Omut.EditorTools
             {
                 boat.transform.position = BoatStart;
                 boat.name = "Boat";
+
+                FishingController fishing = EnsureComponent<FishingController>(boat.gameObject);
+                SetRef(fishing, "database", Database);
+                SetRef(fishing, "bobberSprite", OmutDataBuilder.FindSprite("obj_bobber"));
+                SetRef(fishing, "biteSprite", OmutDataBuilder.FindSprite("fx_bite"));
+                SetRef(fishing, "lineSprite", OmutDataBuilder.FindSprite("fx_white"));
+                SetupBoat(boat);
             }
 
             Camera cam = Camera.main;
