@@ -24,7 +24,7 @@ namespace Omut.EditorTools
         public static readonly Rect Lake = new Rect(-50f, -32f, 100f, 64f);
         public static readonly Rect DockLand = new Rect(-50f, 24f, 16f, 8f);
         public static readonly Rect Pier = new Rect(-42f, 16f, 3f, 8f);
-        public static readonly Vector2 BoatStart = new Vector2(-40.5f, 13.5f);
+        public static readonly Vector2 BoatStart = new Vector2(-40.5f, 14.6f);
 
         public static readonly Rect DockZone = new Rect(-50f, 12f, 40f, 20f);
         public static readonly Rect BayZone = new Rect(-50f, -32f, 40f, 44f);
@@ -133,16 +133,68 @@ namespace Omut.EditorTools
 
             SpriteRenderer land = Tiled(dock, "Land", "tile_grass", DockLand.center, DockLand.size, -20);
             land.gameObject.AddComponent<BoxCollider2D>().size = DockLand.size;
+            land.gameObject.AddComponent<WalkableGround>();
 
             SpriteRenderer pier = Tiled(dock, "Pier", "tile_dock", Pier.center, Pier.size, -19);
             pier.gameObject.AddComponent<BoxCollider2D>().size = Pier.size;
+            pier.gameObject.AddComponent<WalkableGround>();
 
             Tiled(dock, "Path", "tile_dock", new Vector2(-40.5f, 26f), new Vector2(3f, 4f), -18);
 
             Solid(dock, "Hut", "obj_hut", new Vector2(-46.5f, 29.5f), new Vector2(2.6f, 1.2f), new Vector2(0f, -0.6f));
             Solid(dock, "Garage", "obj_garage", new Vector2(-37f, 29.8f), new Vector2(2.6f, 1.2f), new Vector2(0f, -0.6f));
             Solid(dock, "Lighthouse", "obj_lighthouse", new Vector2(-33.5f, 26.5f), new Vector2(1f, 1f), new Vector2(0f, -1.5f));
+
+            BuildDockPeople(dock);
         }
+
+        public static readonly Vector2 MooringPoint = new Vector2(-40.5f, 14.6f);
+        public static readonly Vector2 PierTip = new Vector2(-40.5f, 16.7f);
+        public static readonly Vector2 HeroStart = new Vector2(-46.5f, 27.5f);
+        public static readonly Vector2 TarasPosition = new Vector2(-35.4f, 25.3f);
+        public static readonly Vector2 MikhalychPosition = new Vector2(-38.6f, 28.2f);
+
+        // NPC на причале с маленьким коллайдером у ног (герой их обходит).
+        public static GameObject Npc(Transform parent, string name, string sprite, Vector2 position)
+        {
+            SpriteRenderer sr = Plain(parent, name, sprite, position, 3);
+            var box = sr.gameObject.AddComponent<BoxCollider2D>();
+            box.size = new Vector2(0.6f, 0.3f);
+            box.offset = new Vector2(0f, -0.6f);
+            return sr.gameObject;
+        }
+
+        private static void BuildDockPeople(Transform dock)
+        {
+            GameObject taras = Npc(dock, "Taras", "npc_taras", TarasPosition);
+            taras.AddComponent<Omut.NPC.Merchant>();
+            BuildMoreDockPeople(dock);
+
+            // Сымон пешком.
+            SpriteRenderer hero = Plain(dock, "Hero", "hero_symon", HeroStart, 4);
+            var walker = hero.gameObject.AddComponent<PlayerWalker>();
+            SetRef(walker, "sprite", hero);
+
+            // Место швартовки у конца мостков.
+            var mooring = new GameObject("DockingZone");
+            mooring.transform.SetParent(dock, false);
+            mooring.transform.position = MooringPoint;
+            var walkPoint = new GameObject("WalkPoint").transform;
+            walkPoint.SetParent(mooring.transform, false);
+            walkPoint.position = PierTip;
+            var startPoint = new GameObject("StartPoint").transform;
+            startPoint.SetParent(mooring.transform, false);
+            startPoint.position = HeroStart;
+
+            var zone = mooring.AddComponent<DockingZone>();
+            SetRef(zone, "boat", Object.FindAnyObjectByType<BoatController>());
+            SetRef(zone, "walker", walker);
+            SetRef(zone, "cameraFollow", Camera.main != null ? Camera.main.GetComponent<CameraFollow>() : null);
+            SetRef(zone, "walkPoint", walkPoint);
+            SetRef(zone, "startPoint", startPoint);
+        }
+
+        static partial void BuildMoreDockPeople(Transform dock);
 
         // Камыш и кувшинки в заливе, коряги в омуте, скалы и биостанция на рифе.
         private static void BuildDecor(Transform world, System.Random random)

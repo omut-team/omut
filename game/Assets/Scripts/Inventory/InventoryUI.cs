@@ -12,7 +12,7 @@ namespace Omut.Inventory
     // Мышью перетаскивать, R во время перетаскивания: повернуть, бросить мимо сетки: выбросить за борт.
     public class InventoryUI : GameWindow
     {
-        private const float Cell = 80f;
+        private const float Cell = 100f;
 
         private RectTransform grid;
         private RectTransform cellsLayer;

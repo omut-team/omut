@@ -19,6 +19,14 @@ namespace Omut.Core
         public GameDatabase Database => database;
         public Journal Journal { get; } = new Journal();
         public InventoryGrid Hold { get; private set; }
+        public Wallet Wallet { get; private set; } = new Wallet();
+
+        // Запасы: керосин для фонаря (0..100 %) и термосы с чаем.
+        public float Kerosene { get; set; }
+        public int Thermos { get; set; }
+
+        public const int StartMoney = 30;
+        public const int MaxThermos = 3;
 
         // Лодка, на которой плаваем сейчас (меняется на верфи, этап 14).
         public BoatData CurrentBoat { get; private set; }
@@ -28,10 +36,16 @@ namespace Omut.Core
             Instance = this;
             ResetProgress();
             CatchCard.TryStore = StoreCatch;
+
+            hudLine = () => $"Монеты: <b>{Wallet.Money}</b>";
+            Hud.AddLine(hudLine);
         }
+
+        private System.Func<string> hudLine;
 
         private void OnDestroy()
         {
+            Hud.RemoveLine(hudLine);
             if (Instance == this)
                 Instance = null;
         }
@@ -54,6 +68,38 @@ namespace Omut.Core
             Journal.Clear();
             CurrentBoat = database != null && database.boats.Count > 0 ? database.boats[0] : null;
             Hold = new InventoryGrid(CurrentBoat != null ? CurrentBoat.holdWidth : 4, CurrentBoat != null ? CurrentBoat.holdHeight : 5);
+            Wallet.Set(StartMoney, 0);
+            Kerosene = 100f;
+            Thermos = 1;
+        }
+
+        // ---------- запасы (магазин Тараса) ----------
+
+        public string SupplyText(ItemKind kind)
+        {
+            switch (kind)
+            {
+                case ItemKind.Kerosene: return $"(в баке {Mathf.RoundToInt(Kerosene)}%)";
+                case ItemKind.Thermos: return $"(у тебя {Thermos} из {MaxThermos})";
+                default: return "";
+            }
+        }
+
+        public string CannotBuySupply(ItemData item)
+        {
+            if (item.kind == ItemKind.Kerosene && Kerosene >= 100f)
+                return "Бак фонаря и так полный.";
+            if (item.kind == ItemKind.Thermos && Thermos >= MaxThermos)
+                return "Больше термосов не унести.";
+            return null;
+        }
+
+        public void AddSupply(ItemData item)
+        {
+            if (item.kind == ItemKind.Kerosene)
+                Kerosene = Mathf.Min(100f, Kerosene + item.amount);
+            else if (item.kind == ItemKind.Thermos)
+                Thermos = Mathf.Min(MaxThermos, Thermos + item.amount);
         }
 
         private void OnFishCaught(CatchInfo info)

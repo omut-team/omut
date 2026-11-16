@@ -30,3 +30,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 50d386a7bdc83aa4a92a6881f414b60b, type: 2}
   boats:
   - {fileID: 11400000, guid: 5afcb7acba48933439c4f9c1af8a915d, type: 2}
+  items:
+  - {fileID: 11400000, guid: edc6e7956ca668346a8daf85da23fca3, type: 2}
+  - {fileID: 11400000, guid: 0131ec2fed5d6d244a0829355fcac48d, type: 2}

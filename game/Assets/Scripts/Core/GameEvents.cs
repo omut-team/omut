@@ -67,6 +67,18 @@ namespace Omut.Core
         public static void RaiseCatchKept(CatchInfo info) => CatchKept?.Invoke(info);
         public static void RaiseBaitUsed(BaitType bait) => BaitUsed?.Invoke(bait);
 
+        // Рыба продана Тарасу (для квестов и рекордов).
+        public static event Action<CatchInfo> FishSold;
+
+        public static void RaiseFishSold(CatchInfo info) => FishSold?.Invoke(info);
+
+        // ---------- причал ----------
+
+        // Сымон сошёл на берег (true) или сел в лодку (false).
+        public static event Action<bool> DockChanged;
+
+        public static void RaiseDockChanged(bool onShore) => DockChanged?.Invoke(onShore);
+
         // ---------- звук ----------
 
         // Сыграть звук по имени ("cast", "bite", "bell"...). Слушает AudioManager (этап 21).
@@ -90,7 +102,9 @@ namespace Omut.Core
             CatchLost = null;
             CatchKept = null;
             BaitUsed = null;
+            FishSold = null;
             PlaySound = null;
+            DockChanged = null;
         }
     }
 }
