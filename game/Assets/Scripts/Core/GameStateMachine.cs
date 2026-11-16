@@ -13,9 +13,11 @@ namespace Omut.Core
             new Dictionary<GameState, GameState[]>
             {
                 { GameState.Menu,    new[] { GameState.Sailing } },
-                { GameState.Sailing, new[] { GameState.Fishing, GameState.Shop, GameState.Paused } },
+                { GameState.Sailing, new[] { GameState.Fishing, GameState.Shop, GameState.Window, GameState.Paused } },
                 { GameState.Fishing, new[] { GameState.Sailing, GameState.Paused } },
-                { GameState.Shop,    new[] { GameState.Sailing, GameState.Paused } },
+                { GameState.Shop,    new[] { GameState.Sailing, GameState.Window, GameState.Paused } },
+                // Из окна (например, титры после финала) можно выйти в меню.
+                { GameState.Window,  new[] { GameState.Sailing, GameState.Shop, GameState.Paused, GameState.Menu } },
                 // Из паузы можно выйти в меню. Возврат в игру проверяется отдельно (см. CanChangeTo).
                 { GameState.Paused,  new[] { GameState.Menu } },
             };

@@ -33,6 +33,16 @@ namespace Omut.Core
 
         public static void RaiseNewDayStarted(int day) => NewDayStarted?.Invoke(day);
 
+        // Игрок нажал "Новая игра" в меню (сбросить прогресс).
+        public static event Action NewGameStarted;
+
+        // Игрок нажал "Продолжить" (загрузить сохранение).
+        public static event Action ContinueRequested;
+
+        public static void RaiseNewGameStarted() => NewGameStarted?.Invoke();
+
+        public static void RaiseContinueRequested() => ContinueRequested?.Invoke();
+
         // В проекте выключена перезагрузка скриптов при нажатии Play (так Play запускается быстрее).
         // Из-за этого подписки от прошлого запуска остаются в памяти. Чистим их перед каждым запуском.
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -42,6 +52,8 @@ namespace Omut.Core
             DayPhaseChanged = null;
             BellRang = null;
             NewDayStarted = null;
+            NewGameStarted = null;
+            ContinueRequested = null;
         }
     }
 }

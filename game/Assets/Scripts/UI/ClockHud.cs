@@ -47,7 +47,8 @@ namespace Omut.UI
         private void Update()
         {
             DayNightCycle cycle = DayNightCycle.Instance;
-            string text = cycle == null ? "" : FormatClock(cycle.Clock);
+            bool inMenu = GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Menu;
+            string text = cycle == null || inMenu ? "" : FormatClock(cycle.Clock);
 
             // Обновляем текст только когда он поменялся, чтобы не пересобирать UI каждый кадр.
             if (text != lastShown)

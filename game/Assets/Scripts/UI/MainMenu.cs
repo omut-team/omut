@@ -1,0 +1,117 @@
+using Omut.Core;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Omut.UI
+{
+    // Главное меню: Новая игра, Продолжить, Настройки, Управление, Об игре, Выход.
+    // Видно только в состоянии Menu. За меню видно озеро, время там стоит.
+    public class MainMenu : MonoBehaviour
+    {
+        public const string AboutText =
+            "Полесье, деревня Тихие Вирки. Сымон, горожанин, получил в наследство от деда Язэпа хату и старый баркас. " +
+            "Дед пропал три года назад.\n\n" +
+            "На причале стоит запертый сундук деда, а в дневнике вырваны страницы.\n\n" +
+            "Правило озера: в 20:00 бьёт колокол маяка. После него безопасно только у света.\n\n" +
+            "Групповой проект по ТРПО, группа ПО-2409, 2026.";
+
+        private Canvas canvas;
+        private RectTransform root;
+        private RectTransform buttons;
+        private Button continueButton;
+        private SettingsPanel settings;
+        private InfoPanel info;
+
+        // Есть ли сохранение, которое можно продолжить. Подставляет SaveSystem (этап 12).
+        public static System.Func<bool> HasSave = () => false;
+
+        private void Awake()
+        {
+            canvas = UiFactory.CreateCanvas("MainMenuCanvas", 100, transform);
+            Build();
+        }
+
+        private void OnEnable() => GameEvents.GameStateChanged += OnStateChanged;
+
+        private void OnDisable() => GameEvents.GameStateChanged -= OnStateChanged;
+
+        private void Start() => Show(GameManager.Instance == null || GameManager.Instance.CurrentState == GameState.Menu);
+
+        private void Build()
+        {
+            Image shade = UiFactory.Panel(canvas.transform, "MainMenu", new Color(0.03f, 0.07f, 0.09f, 0.72f));
+            root = UiFactory.Stretch(shade.rectTransform);
+
+            Text title = UiFactory.HudLabel(root, "ОМУТ", 150, TextAnchor.MiddleCenter);
+            title.fontStyle = FontStyle.Bold;
+            title.color = UiFactory.Theme.Paper;
+            UiFactory.Place(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(1200f, 180f), new Vector2(0f, -110f));
+
+            Text subtitle = UiFactory.HudLabel(root, "Полесье. Тихие Вирки. Колокол бьёт в 20:00.", 34, TextAnchor.MiddleCenter);
+            subtitle.color = new Color(0.75f, 0.82f, 0.8f);
+            UiFactory.Place(subtitle.rectTransform, new Vector2(0.5f, 1f), new Vector2(1200f, 50f), new Vector2(0f, -290f));
+
+            buttons = UiFactory.Rect(root, "Buttons");
+            UiFactory.Place(buttons, new Vector2(0.5f, 0.5f), new Vector2(460f, 520f), new Vector2(0f, -110f));
+            UiFactory.Column(buttons, 16f);
+
+            continueButton = UiFactory.Button(buttons, "Продолжить", OnContinue, new Vector2(440f, 70f), 34);
+            UiFactory.Button(buttons, "Новая игра", OnNewGame, new Vector2(440f, 70f), 34);
+            UiFactory.Button(buttons, "Настройки", OnSettings, new Vector2(440f, 70f), 34);
+            UiFactory.Button(buttons, "Управление", () => ShowInfo("Управление", Controls.Help), new Vector2(440f, 70f), 34);
+            UiFactory.Button(buttons, "Об игре", () => ShowInfo("Об игре", AboutText), new Vector2(440f, 70f), 34);
+            UiFactory.Button(buttons, "Выход", OnQuit, new Vector2(440f, 70f), 34);
+
+            Text version = UiFactory.HudLabel(root, "версия " + Application.version, 22, TextAnchor.LowerRight);
+            UiFactory.Place(version.rectTransform, new Vector2(1f, 0f), new Vector2(400f, 40f), new Vector2(-20f, 14f));
+
+            settings = new SettingsPanel(canvas.transform, () => buttons.gameObject.SetActive(true));
+            info = new InfoPanel(canvas.transform, new Vector2(1100f, 700f), () => buttons.gameObject.SetActive(true));
+        }
+
+        private void Show(bool visible)
+        {
+            canvas.gameObject.SetActive(visible);
+            if (!visible)
+                return;
+
+            buttons.gameObject.SetActive(true);
+            continueButton.gameObject.SetActive(HasSave());
+        }
+
+        private void OnStateChanged(GameState from, GameState to) => Show(to == GameState.Menu);
+
+        private void OnNewGame()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance?.StartGame();
+        }
+
+        private void OnContinue()
+        {
+            GameEvents.RaiseContinueRequested();
+            GameManager.Instance?.StartGame();
+        }
+
+        private void OnSettings()
+        {
+            buttons.gameObject.SetActive(false);
+            settings.Open();
+        }
+
+        private void ShowInfo(string title, string body)
+        {
+            buttons.gameObject.SetActive(false);
+            info.Show(title, body);
+        }
+
+        private void OnQuit()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
+    }
+}

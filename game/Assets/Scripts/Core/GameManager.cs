@@ -25,10 +25,6 @@ namespace Omut.Core
 
             var managerObject = new GameObject("GameManager");
             managerObject.AddComponent<GameManager>();
-
-            // Клавиши для проверки состояний нужны только в редакторе и тестовых сборках.
-            if (Debug.isDebugBuild)
-                managerObject.AddComponent<DebugStateKeys>();
         }
 
         private void Awake()
@@ -66,6 +62,18 @@ namespace Omut.Core
         }
 
         public void StartGame() => ChangeState(GameState.Sailing);
+
+        // Сразу в главное меню из любого состояния (перезапуск сцены, автотесты).
+        public void ResetToMenu()
+        {
+            GameState from = CurrentState;
+            stateMachine.StateChanged -= OnStateChanged;
+            stateMachine = new GameStateMachine(GameState.Menu);
+            stateMachine.StateChanged += OnStateChanged;
+            Time.timeScale = 1f;
+            if (from != GameState.Menu)
+                GameEvents.RaiseGameStateChanged(from, GameState.Menu);
+        }
 
         public void BackToMenu() => ChangeState(GameState.Menu);
 
