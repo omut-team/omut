@@ -19,5 +19,12 @@ namespace Omut.Fishing
 
         [Tooltip("Сколько штук в упаковке")]
         [Min(1)] public int packSize = 5;
+
+        [Tooltip("Множитель ожидания поклёвки: 0.6 = клюёт быстрее")]
+        public float biteSpeed = 1f;
+
+        [Tooltip("Любимая рыба (id) и шанс, что клюнет именно она")]
+        public string favoriteFish = "";
+        [Range(0f, 1f)] public float favoriteChance;
     }
 }

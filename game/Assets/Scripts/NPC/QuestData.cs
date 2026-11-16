@@ -6,7 +6,9 @@ namespace Omut.NPC
     public enum NpcId
     {
         Taras,
-        Mikhalych
+        Mikhalych,
+        Yadviga,   // пани Ядвига, соседка (персонаж Ульяны)
+        Yazep      // дед Язэп, появляется после финала
     }
 
     public enum QuestGoal

@@ -14,6 +14,8 @@ namespace Omut.UI
         public static DialogueUI Instance { get; private set; }
 
         [SerializeField] private Sprite heroPortrait;
+        [Tooltip("Портрет деда Язэпа для его письма (рисунок Ульяны)")]
+        [SerializeField] private Sprite yazepPortrait;
 
         private Image portrait;
         private Text speakerText;
@@ -211,7 +213,8 @@ namespace Omut.UI
         {
             speakerText.text = speaker;
             bool hero = speaker == "Сымон";
-            portrait.sprite = hero ? heroPortrait : (npc != null ? npc.Portrait : null);
+            bool letter = speaker == "Письмо деда" || speaker == "Язэп";
+            portrait.sprite = hero ? heroPortrait : letter ? yazepPortrait : (npc != null ? npc.Portrait : null);
             portrait.color = portrait.sprite != null ? Color.white : Color.clear;
         }
 

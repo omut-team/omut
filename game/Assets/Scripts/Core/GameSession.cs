@@ -49,7 +49,13 @@ namespace Omut.Core
             HookSaving();
             JournalUI.DiaryText = DiaryText;
             FishingController.ChestAllowed = () => DiaryPages < DiaryPagesTotal;
-            Merchant.AddMoreGoods = AddBaitGoods;
+            Merchant.AddMoreGoods = (goods, session) =>
+            {
+                AddBaitGoods(goods, session);
+                AddRodGoods(goods);
+            };
+            FishingController.CurrentRod = () => CurrentRod;
+            FishingController.CurrentBaitData = () => database != null ? database.FindBait(Tackle.Current) : null;
 
             hudLines.Add(() => $"Монеты: <b>{Wallet.Money}</b>");
             hudLines.Add(BoatHudLine);
@@ -147,6 +153,7 @@ namespace Omut.Core
             ResetBoats();
             Panic.Reset();
             ResetDiary();
+            ResetRods();
             BoatChanged?.Invoke(CurrentBoat);
         }
 

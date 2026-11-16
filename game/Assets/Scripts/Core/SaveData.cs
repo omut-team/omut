@@ -41,6 +41,14 @@ namespace Omut.Core
         public int spoons;
         public int phosphor;
         public string currentBait = "Worm";
+        public int maggots;
+        public int dough;
+        public int leeches;
+        public List<string> rods = new List<string>();
+        public string rod = "bamboo";
+
+        // 2 = мир по карте Ульяны. В старых сохранениях координаты лодки от прежнего озера.
+        public int mapVersion;
 
         // Лодка и где стоим
         public string boatId = "Barkas";

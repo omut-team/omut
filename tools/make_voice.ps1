@@ -28,6 +28,7 @@ $synth = New-Object Windows.Media.SpeechSynthesis.SpeechSynthesizer
 $pavel = [Windows.Media.SpeechSynthesis.SpeechSynthesizer]::AllVoices | Where-Object { $_.DisplayName -like "*Pavel*" } | Select-Object -First 1
 if ($null -eq $pavel) { throw "Нет голоса Microsoft Pavel. Добавь русский голос в настройках Windows." }
 $synth.Voice = $pavel
+$irina = [Windows.Media.SpeechSynthesis.SpeechSynthesizer]::AllVoices | Where-Object { $_.DisplayName -like "*Irina*" } | Select-Object -First 1
 
 # Голос под характер: Тарас старый и медленный, Сымон молодой, письмо деда тихо и медленно.
 function Prosody($speaker) {
@@ -35,6 +36,8 @@ function Prosody($speaker) {
         "Тарас"       { return @{ pitch = "-18%"; rate = "-12%" } }
         "Михалыч"     { return @{ pitch = "-6%";  rate = "0%" } }
         "Сымон"       { return @{ pitch = "+12%"; rate = "+4%" } }
+        "Пани Ядвига" { return @{ pitch = "+4%";  rate = "-6%"; female = $true } }
+        "Язэп"        { return @{ pitch = "-24%"; rate = "-15%" } }
         default       { return @{ pitch = "-22%"; rate = "-18%" } }
     }
 }
@@ -48,6 +51,8 @@ foreach ($row in Get-Content $lines -Encoding UTF8) {
     if (Test-Path $file) { continue }
 
     $p = Prosody $speaker
+    # Женский голос для пани Ядвиги (Irina), остальным Pavel.
+    if ($p.female -and $null -ne $irina) { $synth.Voice = $irina } else { $synth.Voice = $pavel }
     $safe = [System.Security.SecurityElement]::Escape($text)
     $ssml = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='ru-RU'><prosody pitch='$($p.pitch)' rate='$($p.rate)'>$safe</prosody></speak>"
 
