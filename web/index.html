@@ -5,33 +5,187 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Омут: рекорды</title>
   <style>
-    body { margin: 0; font-family: Georgia, serif; background: #0f1d24; color: #e8e2cf; }
-    main { max-width: 640px; margin: 0 auto; padding: 32px 16px; }
-    h1 { margin: 0 0 4px; }
-    p { color: #9fb3b0; }
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #2b4450; }
-    .status { font-size: 14px; }
+    :root {
+      --bg: #0f1d24; --panel: #16303a; --line: #2b4450; --text: #e8e2cf; --muted: #9fb3b0;
+      --gold: #f2c94c; --night: #8fa8ff; --accent: #c0703f;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Georgia, "Times New Roman", serif; background: var(--bg); color: var(--text); }
+    header { background: linear-gradient(180deg, #0b161b, var(--bg)); padding: 32px 16px 8px; text-align: center; }
+    header h1 { margin: 0; font-size: 56px; letter-spacing: 6px; }
+    header p { margin: 6px 0 0; color: var(--muted); }
+    main { max-width: 960px; margin: 0 auto; padding: 16px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 16px 0; }
+    .stat { background: var(--panel); border: 1px solid var(--line); padding: 14px; text-align: center; }
+    .stat b { display: block; font-size: 30px; color: var(--gold); }
+    .stat span { color: var(--muted); font-size: 14px; }
+    .status { font-size: 14px; color: var(--muted); text-align: center; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+    .tabs button { background: var(--panel); color: var(--text); border: 1px solid var(--line); padding: 10px 16px;
+      font: inherit; cursor: pointer; }
+    .tabs button.active { background: var(--accent); border-color: var(--accent); }
+    .filter { margin: 8px 0; color: var(--muted); }
+    .filter select { font: inherit; background: var(--panel); color: var(--text); border: 1px solid var(--line); padding: 6px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; background: var(--panel); }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    th { color: var(--muted); font-weight: normal; font-size: 14px; }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    tr:first-child td { color: var(--gold); }
+    .night { color: var(--night); }
+    .empty { padding: 24px; text-align: center; color: var(--muted); }
+    footer { text-align: center; color: var(--muted); font-size: 13px; padding: 24px 16px 40px; }
+    @media (max-width: 600px) { header h1 { font-size: 40px; } th, td { padding: 8px; } }
   </style>
 </head>
 <body>
+<header>
+  <h1>ОМУТ</h1>
+  <p>Доска трофеев рыбаков Тихих Вирок. Колокол бьёт в 20:00.</p>
+</header>
 <main>
-  <h1>🎣 Омут</h1>
-  <p>Доска трофеев группы ПО-2409</p>
   <div class="status" id="status">Проверяю сервер...</div>
-  <table>
-    <thead><tr><th>Игрок</th><th>Рыба</th><th>Вес, кг</th></tr></thead>
-    <tbody id="rows"></tbody>
-  </table>
+
+  <section class="stats">
+    <div class="stat"><b id="sPlayers">0</b><span>рыбаков</span></div>
+    <div class="stat"><b id="sCatches">0</b><span>трофеев</span></div>
+    <div class="stat"><b id="sKg">0</b><span>килограммов рыбы</span></div>
+  </section>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="top" class="active">Самые тяжёлые</button>
+    <button data-tab="fish">Рекорд каждого вида</button>
+    <button data-tab="players">Лучшие рыбаки</button>
+    <button data-tab="recent">Последние уловы</button>
+  </nav>
+
+  <div class="filter" id="filterBox">
+    Рыба:
+    <select id="fishFilter">
+      <option value="">все</option>
+    </select>
+  </div>
+
+  <div class="table-wrap"><table id="table"></table></div>
 </main>
+<footer>
+  Групповой проект по ТРПО, ПО-2409, 2026. Данные с сервера игры (ASP.NET Core + PostgreSQL), обновляются каждые 30 секунд.
+</footer>
+
 <script>
-  fetch('/api/health').then(r => r.json())
-    .then(() => document.getElementById('status').textContent = 'Сервер работает ✅')
-    .catch(() => document.getElementById('status').textContent = 'Сервер не отвечает ❌');
-  fetch('/api/leaderboard').then(r => r.json()).then(list => {
-    document.getElementById('rows').innerHTML = list.map(x =>
-      `<tr><td>${x.player}</td><td>${x.fish}</td><td>${x.weightKg}</td></tr>`).join('');
-  }).catch(() => {});
+  // Названия рыб для фильтра (id как в игре).
+  const FISH = {
+    crucian: 'Карась', perch: 'Окунь', bream: 'Лещ', tench: 'Линь', carp: 'Карп', pike: 'Щука', zander: 'Судак',
+    burbot: 'Налим', glow_eel: 'Светящийся угорь', twohead_perch: 'Двухголовый окунь', pale_blindfish: 'Бледный слепыш',
+    black_catfish: 'Чёрный сом', lake_master: 'Дед-сом, Хозяин Омута'
+  };
+
+  let tab = 'top';
+  const $ = id => document.getElementById(id);
+
+  for (const [id, name] of Object.entries(FISH)) {
+    const option = document.createElement('option');
+    option.value = id;
+    option.textContent = name;
+    $('fishFilter').appendChild(option);
+  }
+
+  // Текст в ячейку только через textContent: имена игроков не могут вставить свой HTML.
+  function cell(row, text, cls) {
+    const td = document.createElement('td');
+    td.textContent = text;
+    if (cls) td.className = cls;
+    row.appendChild(td);
+  }
+
+  function render(headers, rows, toCells) {
+    const table = $('table');
+    table.innerHTML = '';
+    const head = document.createElement('tr');
+    headers.forEach(h => { const th = document.createElement('th'); th.textContent = h; head.appendChild(th); });
+    table.appendChild(head);
+    if (!rows.length) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = headers.length;
+      td.className = 'empty';
+      td.textContent = 'Пока пусто. Поймай трофей в игре, войдя в «Онлайн-рекорды».';
+      tr.appendChild(td);
+      table.appendChild(tr);
+      return;
+    }
+    rows.forEach((r, i) => { const tr = document.createElement('tr'); toCells(tr, r, i); table.appendChild(tr); });
+  }
+
+  const kg = v => Number(v).toFixed(2).replace('.', ',') + ' кг';
+  const date = v => new Date(v).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  const time = night => night ? 'ночь' : 'день';
+
+  async function get(url) {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(response.status);
+    return response.json();
+  }
+
+  async function load() {
+    try {
+      await get('/api/health');
+      $('status').textContent = 'Сервер работает. Обновлено ' + new Date().toLocaleTimeString('ru-RU');
+      const stats = await get('/api/stats');
+      $('sPlayers').textContent = stats.players;
+      $('sCatches').textContent = stats.catches;
+      $('sKg').textContent = Number(stats.totalKg).toFixed(1).replace('.', ',');
+    } catch (e) {
+      $('status').textContent = 'Сервер не отвечает. Запусти в папке проекта: docker compose up --build';
+      return;
+    }
+
+    $('filterBox').style.display = tab === 'top' ? '' : 'none';
+    try {
+      if (tab === 'top') {
+        const fish = $('fishFilter').value;
+        const list = await get('/api/leaderboard?top=20' + (fish ? '&fish=' + encodeURIComponent(fish) : ''));
+        render(['#', 'Рыбак', 'Рыба', 'Вес', 'Когда', 'Пойман'], list, (tr, r, i) => {
+          cell(tr, i + 1); cell(tr, r.player); cell(tr, r.fishName); cell(tr, kg(r.weightKg), 'num');
+          cell(tr, time(r.night), r.night ? 'night' : ''); cell(tr, date(r.caughtAt));
+        });
+      } else if (tab === 'fish') {
+        const list = await get('/api/leaderboard/fish');
+        render(['Рыба', 'Рекорд', 'Рыбак', 'Пойман'], list, (tr, r) => {
+          cell(tr, r.fishName); cell(tr, kg(r.weightKg), 'num'); cell(tr, r.player); cell(tr, date(r.caughtAt));
+        });
+      } else if (tab === 'players') {
+        const list = await get('/api/leaderboard/players?top=20');
+        render(['#', 'Рыбак', 'Трофеев', 'Всего', 'Самая большая', 'На сумму'], list, (tr, r, i) => {
+          cell(tr, i + 1); cell(tr, r.player); cell(tr, r.catches, 'num'); cell(tr, kg(r.totalKg), 'num');
+          cell(tr, kg(r.biggestKg), 'num'); cell(tr, r.totalPrice + ' мон.', 'num');
+        });
+      } else {
+        const list = await get('/api/catches/recent?top=20');
+        render(['Когда', 'Рыбак', 'Рыба', 'Вес', 'Время суток', 'Зона'], list, (tr, r) => {
+          cell(tr, date(r.caughtAt)); cell(tr, r.player); cell(tr, r.fishName); cell(tr, kg(r.weightKg), 'num');
+          cell(tr, time(r.night), r.night ? 'night' : ''); cell(tr, zoneName(r.zone));
+        });
+      }
+    } catch (e) {
+      $('status').textContent = 'Не удалось загрузить рекорды (' + e.message + ')';
+    }
+  }
+
+  function zoneName(z) {
+    return { Dock: 'причал', Bay: 'залив', Pool: 'омут', Reef: 'риф' }[z] || z;
+  }
+
+  $('tabs').addEventListener('click', e => {
+    if (e.target.tagName !== 'BUTTON') return;
+    tab = e.target.dataset.tab;
+    document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b === e.target));
+    load();
+  });
+  $('fishFilter').addEventListener('change', load);
+
+  load();
+  setInterval(load, 30000);
 </script>
 </body>
 </html>
