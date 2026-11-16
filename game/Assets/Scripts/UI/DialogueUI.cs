@@ -80,6 +80,20 @@ namespace Omut.UI
             }
         }
 
+        // Реплики без NPC (сундук, финал): показать и закрыть окно.
+        public void Monologue(List<DialogueLine> lines, Action then = null)
+        {
+            npc = null;
+            if (!Open())
+                return;
+
+            PlayLines(lines, () =>
+            {
+                Close();
+                then?.Invoke();
+            });
+        }
+
         // ---------- реплики по очереди ----------
 
         public void PlayLines(List<DialogueLine> lines, Action then)
