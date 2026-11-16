@@ -151,7 +151,15 @@ namespace Omut.EditorTools
             if (old != null)
                 Object.DestroyImmediate(old.gameObject);
 
-            Light2D light = PointLight(boat.transform, "LanternLight", new Vector2(0.3f, 0.1f), 2.5f, 1.1f, new Color(1f, 0.85f, 0.55f));
+            // Опора лодки снизу (вид 45°): коллайдер по корпусу у воды, фонарь на палубе.
+            var capsule = boat.GetComponent<CapsuleCollider2D>();
+            if (capsule != null)
+            {
+                capsule.size = new Vector2(1.8f, 0.6f);
+                capsule.offset = new Vector2(0f, 0.35f);
+            }
+
+            Light2D light = PointLight(boat.transform, "LanternLight", new Vector2(0.3f, 0.7f), 2.5f, 1.1f, new Color(1f, 0.85f, 0.55f));
             Lantern lantern = EnsureComponent<Lantern>(boat.gameObject);
             SetRef(lantern, "lanternLight", light);
         }

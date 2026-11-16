@@ -114,17 +114,28 @@ save(img, 'item_diary_page')
 
 
 # ---------- лодки 64x32, носом вправо ----------
-def boat(name, hull, deck, cabin, lamp):
-    img, d = new(64, 32)
-    d.polygon([(2, 10), (50, 6), (62, 16), (50, 26), (2, 22)], fill=hull, outline=shade(hull, 0.5))
-    d.polygon([(8, 12), (48, 10), (56, 16), (48, 22), (8, 20)], fill=deck)
-    d.rectangle([18, 11, 34, 21], fill=cabin, outline=(20, 20, 20))
-    d.ellipse([40, 13, 46, 19], fill=lamp)
-    save(img, 'boat_' + name)
+def boat(name, hull, deck, cabin, lamp, folder=None):
+    # Вид 3/4 под 45°: сверху палуба, снизу виден передний борт. 64x48, низ = ватерлиния.
+    img, d = new(64, 48)
+    d.ellipse([4, 40, 60, 47], fill=(0, 0, 0, 60))                                  # тень на воде
+    d.polygon([(2, 22), (52, 20), (62, 28), (52, 42), (6, 42)], fill=shade(hull, 0.7), outline=shade(hull, 0.4))  # борт
+    d.polygon([(2, 14), (50, 10), (62, 22), (50, 30), (2, 28)], fill=hull, outline=shade(hull, 0.5))            # верх борта
+    d.polygon([(8, 16), (48, 13), (56, 22), (48, 27), (8, 26)], fill=deck)                                         # палуба
+    d.rectangle([18, 8, 34, 22], fill=cabin, outline=(20, 20, 20))
+    d.rectangle([18, 8, 34, 11], fill=shade(cabin, 0.8))
+    d.ellipse([40, 15, 46, 21], fill=lamp)
+    d.line([(6, 36), (52, 36)], fill=shade(hull, 0.5))
+    if folder:
+        img.save(os.path.join(folder, 'boat_' + name + '.png'))
+    else:
+        save(img, 'boat_' + name)
 
 
 boat('sledopyt', (60, 90, 120), (170, 150, 110), (200, 200, 190), (255, 240, 170))
 boat('okhotnik', (40, 40, 50), (90, 80, 70), (60, 70, 80), (255, 230, 120))
+# Заглушка баркаса лежит в Art/Boats (её заменит рисунок Ульяны с тем же именем).
+boat('barkas', (120, 80, 45), (170, 130, 80), (140, 100, 60), (230, 80, 50),
+     os.path.join(os.path.dirname(__file__), '..', 'game', 'Assets', 'Art', 'Boats'))
 
 
 # ---------- люди 32x48 и портреты 96x96 ----------
@@ -254,8 +265,9 @@ d.ellipse([14, 12, 20, 18], fill=(240, 240, 230))
 save(img, 'env_lily')
 
 img, d = new(16, 16)
-d.ellipse([4, 4, 12, 12], fill=(230, 60, 40), outline=(90, 20, 10))
-d.rectangle([7, 0, 9, 5], fill=(240, 240, 240))
+d.ellipse([2, 9, 14, 15], fill=(255, 255, 255, 90))                    # круг на воде, овал 2:1
+d.ellipse([5, 6, 11, 12], fill=(230, 60, 40), outline=(90, 20, 10))    # поплавок
+d.rectangle([7, 0, 9, 7], fill=(240, 240, 240))
 save(img, 'obj_bobber')
 
 # ---------- эффекты (белые, цвет и прозрачность задаёт код) ----------

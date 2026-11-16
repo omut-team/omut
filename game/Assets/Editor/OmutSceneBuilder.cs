@@ -46,7 +46,9 @@ namespace Omut.EditorTools
             BuildSystems();
 
             GameObject ui = EnsureRoot("UI");
-            SetRef(EnsureComponent<MainMenu>(ui), "background", OmutDataBuilder.FindSprite("ui_menu_bg"));
+            MainMenu menu = EnsureComponent<MainMenu>(ui);
+            SetRef(menu, "background", OmutDataBuilder.FindSprite("ui_menu_bg"));
+            SetRef(menu, "buttonSprite", OmutDataBuilder.FindSprite("ui_button_plank"));
             EnsureComponent<PauseMenu>(ui);
             EnsureComponent<Notifications>(ui);
             SetRef(EnsureComponent<CastPowerBar>(ui), "aimSprite", OmutDataBuilder.FindSprite("fx_soft_circle"));

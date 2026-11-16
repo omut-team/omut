@@ -80,7 +80,7 @@ namespace Omut.Fishing
         private void AnimateRipple(SpriteRenderer sr, float t, float fade)
         {
             float size = Mathf.Lerp(0.4f, 1.2f, t) * radius;
-            sr.transform.localScale = new Vector3(size, size * 0.6f, 1f); // сплющено: вид сверху под углом
+            sr.transform.localScale = new Vector3(size, size * 0.5f, 1f); // овал 2:1: вид под 45°
             Color c = ShowThroughFog ? new Color(0.4f, 1f, 0.6f, 1f) : baseColor;
             c.a *= (1f - t) * fade;
             sr.color = c;
