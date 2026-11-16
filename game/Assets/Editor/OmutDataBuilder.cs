@@ -35,6 +35,12 @@ namespace Omut.EditorTools
                 Item("kerosene", "Керосин", "Заправка фонаря на половину бака.", ItemKind.Kerosene, 12, 50, "item_kerosene", overwrite),
                 Item("thermos", "Термос с чаем", "Горячий чай. Выпить (C): паника -35.", ItemKind.Thermos, 20, 1, "item_thermos", overwrite),
             };
+            db.baits = new List<BaitData>
+            {
+                Bait(BaitType.Worm, "Червь", "Мирная рыба: карась, лещ, линь, карп, налим. Бесплатно, копаешь сам.", true, 0, 1, "item_worm", overwrite),
+                Bait(BaitType.Spoon, "Блесна", "Хищники: окунь, щука, судак.", false, 25, 5, "item_spoon", overwrite),
+                Bait(BaitType.Phosphor, "Фосфорная блесна", "Светится в темноте. Только ночные мутанты, днём бесполезна.", false, 60, 3, "item_phosphor_spoon", overwrite),
+            };
             BuildMore(db, overwrite);
 
             EditorUtility.SetDirty(db);
@@ -161,6 +167,24 @@ namespace Omut.EditorTools
             }
 
             return list;
+        }
+
+        private static BaitData Bait(BaitType type, string title, string text, bool infinite, int price, int pack, string sprite, bool overwrite)
+        {
+            BaitData bait = LoadOrCreate<BaitData>($"{DataRoot}/Baits/{type.ToString().ToLower()}.asset", out bool created);
+            if (created || overwrite)
+            {
+                bait.type = type;
+                bait.displayName = title;
+                bait.description = text;
+                bait.infinite = infinite;
+                bait.packPrice = price;
+                bait.packSize = pack;
+                bait.sprite = FindSprite(sprite);
+                EditorUtility.SetDirty(bait);
+            }
+
+            return bait;
         }
 
         private static ItemData Item(string id, string title, string text, ItemKind kind, int price, int amount, string sprite, bool overwrite)
