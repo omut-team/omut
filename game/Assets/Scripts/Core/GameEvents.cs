@@ -1,4 +1,5 @@
 using System;
+using Omut.Fishing;
 using Omut.World;
 using UnityEngine;
 
@@ -43,6 +44,36 @@ namespace Omut.Core
 
         public static void RaiseContinueRequested() => ContinueRequested?.Invoke();
 
+        // ---------- рыбалка ----------
+
+        // Подсёк: рыба на крючке, началось вываживание.
+        public static event Action<FishData> FishHooked;
+
+        // Рыба вытащена (карточка трофея).
+        public static event Action<CatchInfo> FishCaught;
+
+        // Рыба сорвалась (lineBroke = леска оборвалась).
+        public static event Action<FishData, bool> CatchLost;
+
+        // Игрок решил оставить рыбу: положить в трюм.
+        public static event Action<CatchInfo> CatchKept;
+
+        // Наживка потрачена (съедена рыбой или ушла с оборванной леской).
+        public static event Action<BaitType> BaitUsed;
+
+        public static void RaiseFishHooked(FishData fish) => FishHooked?.Invoke(fish);
+        public static void RaiseFishCaught(CatchInfo info) => FishCaught?.Invoke(info);
+        public static void RaiseCatchLost(FishData fish, bool lineBroke) => CatchLost?.Invoke(fish, lineBroke);
+        public static void RaiseCatchKept(CatchInfo info) => CatchKept?.Invoke(info);
+        public static void RaiseBaitUsed(BaitType bait) => BaitUsed?.Invoke(bait);
+
+        // ---------- звук ----------
+
+        // Сыграть звук по имени ("cast", "bite", "bell"...). Слушает AudioManager (этап 21).
+        public static event Action<string> PlaySound;
+
+        public static void RaisePlaySound(string id) => PlaySound?.Invoke(id);
+
         // В проекте выключена перезагрузка скриптов при нажатии Play (так Play запускается быстрее).
         // Из-за этого подписки от прошлого запуска остаются в памяти. Чистим их перед каждым запуском.
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -54,6 +85,12 @@ namespace Omut.Core
             NewDayStarted = null;
             NewGameStarted = null;
             ContinueRequested = null;
+            FishHooked = null;
+            FishCaught = null;
+            CatchLost = null;
+            CatchKept = null;
+            BaitUsed = null;
+            PlaySound = null;
         }
     }
 }

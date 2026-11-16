@@ -96,8 +96,8 @@
 
 ### Патч 0.2 (до 10 января 2027)
 5. **Рыбы и рыбные места** · `feature/fish-data`. ✅ СДЕЛАНО (ждёт слияния в `dev`). `Fishing/FishData` (SO), `Fishing/FishSelector` (зона, время, наживка, дальность, редкость), `Fishing/FishingSpot`, `Fishing/FishingSpotSpawner`, `Core/GameDatabase`, `World/Zone`, `World/Hazard`. Данные: все 14 записей журнала + металлолом сразу (`Data/Fish`), тексты в `texts/fish.md`. Карта озера 100x64 клетки с четырьмя зонами строится сборщиком сцены. Заглушки арта: `tools/make_placeholders.py` → `Art/Placeholders`. Тесты: `FishSelector` (12).
-6. **Заброс и подсечка** · `feature/casting`. `Fishing/FishingController` (State), `Fishing/Bobber`, `UI/CastPowerBar`, `UI/BitePrompt`. Попадание в круги ускоряет поклёвку.
-7. **Вываживание и карточка трофея** · `feature/reeling`. `Fishing/TensionModel` (натяжение, прогресс, таймер красной зоны 3 с), `Fishing/ReelMinigame`, поведения `SteadyPull`, `JerkPull`, `HeavyPull`, `UI/TensionBar`, `UI/CatchCard`.
+6. **Заброс и подсечка** · `feature/casting`. ✅ СДЕЛАНО (ждёт слияния в `dev`). Сделан вместе с этапом 7 одним PR. `Fishing/FishingController` + состояния `Fishing/FishingStates` (State: Idle, Charging, Flying, Waiting, Bite, Reeling, Caught), поплавок и леска, прицел мышью, `UI/CastPowerBar`, `UI/BitePrompt`, `UI/Notifications`. В кругах клюёт через 2–5 с, вне кругов через 6–13 с.
+7. **Вываживание и карточка трофея** · `feature/reeling`. ✅ СДЕЛАНО (ждёт слияния в `dev`). `Fishing/TensionModel`, стратегии `SteadyPull`, `JerkPull`, `HeavyPull`, `ReversePull`, `AllPull` (Strategy, `Fishing/FishBehaviours`), `UI/TensionBar`, `UI/CatchCard`, `Fishing/CatchInfo`. `ReversePull` из этапа 17 сделан здесь. Тесты: `TensionModel` (14), PlayMode: полный цикл рыбалки.
 8. **Журнал** · `feature/journal`. `Core/Journal`, `UI/JournalUI`, счётчик «N из 14».
 
 ### Патч 0.3 (до 14 февраля 2027)
