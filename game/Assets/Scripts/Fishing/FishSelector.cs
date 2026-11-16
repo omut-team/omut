@@ -1,0 +1,120 @@
+using System;
+using System.Collections.Generic;
+using Omut.World;
+
+namespace Omut.Fishing
+{
+    // Условия заброса: где, когда, на что и как далеко.
+    public struct CastConditions
+    {
+        public ZoneId zone;
+        public DayPhase phase;
+        public BaitType bait;
+        public float castDistance;
+        public bool inSpot;        // поплавок попал в круги на воде
+        public bool chestAllowed;  // ещё остались страницы дневника на дне
+
+        public CastConditions(ZoneId zone, DayPhase phase, BaitType bait, float castDistance, bool inSpot = false, bool chestAllowed = true)
+        {
+            this.zone = zone;
+            this.phase = phase;
+            this.bait = bait;
+            this.castDistance = castDistance;
+            this.inSpot = inSpot;
+            this.chestAllowed = chestAllowed;
+        }
+    }
+
+    // Выбирает, какая рыба клюнет. Обычный C#-класс, проверяется тестами (FishSelectorTests).
+    // 1) Отбираем рыбу, которая подходит по зоне, времени, наживке и дальности.
+    // 2) Из подходящих берём случайную, обычные чаще, редкие реже (веса по редкости).
+    public class FishSelector
+    {
+        private readonly IReadOnlyList<FishData> allFish;
+        private readonly Random random;
+
+        public FishSelector(IReadOnlyList<FishData> allFish, int? seed = null)
+        {
+            this.allFish = allFish;
+            random = seed.HasValue ? new Random(seed.Value) : new Random();
+        }
+
+        // Вес редкости: из 100 забросов примерно столько раз клюнет рыба этой редкости.
+        public static float RarityWeight(Rarity rarity, bool inSpot)
+        {
+            float bonus = inSpot ? 1.6f : 1f; // в кругах чаще клюёт редкая рыба
+            switch (rarity)
+            {
+                case Rarity.Common: return 60f;
+                case Rarity.Uncommon: return 28f * bonus;
+                case Rarity.Rare: return 12f * bonus;
+                case Rarity.Epic: return 5f * bonus;
+                default: return 0f; // легендарную случайно не поймать, только в финале
+            }
+        }
+
+        public bool Fits(FishData fish, CastConditions c)
+        {
+            if (fish == null || fish.isBoss)
+                return false;
+            if (fish.isChest && !c.chestAllowed)
+                return false;
+            if ((fish.zones & Zone.ToMask(c.zone)) == 0)
+                return false;
+            if (!fish.BitesAt(c.phase))
+                return false;
+            if (!fish.BitesOn(c.bait))
+                return false;
+            return c.castDistance >= fish.minCastDistance;
+        }
+
+        public List<FishData> Candidates(CastConditions c)
+        {
+            var list = new List<FishData>();
+            foreach (FishData fish in allFish)
+            {
+                if (Fits(fish, c))
+                    list.Add(fish);
+            }
+
+            return list;
+        }
+
+        // Кто клюнет. null = на эту наживку здесь сейчас никто не клюёт.
+        public FishData Pick(CastConditions c)
+        {
+            List<FishData> candidates = Candidates(c);
+            float total = 0f;
+            foreach (FishData fish in candidates)
+                total += RarityWeight(fish.rarity, c.inSpot);
+
+            if (total <= 0f)
+                return null;
+
+            double roll = random.NextDouble() * total;
+            foreach (FishData fish in candidates)
+            {
+                roll -= RarityWeight(fish.rarity, c.inSpot);
+                if (roll <= 0)
+                    return fish;
+            }
+
+            return candidates[candidates.Count - 1];
+        }
+
+        // Вес пойманной рыбы. Крупные попадаются реже (квадрат случайного числа).
+        public float RollWeight(FishData fish)
+        {
+            double r = random.NextDouble();
+            float weight = fish.minWeight + (fish.maxWeight - fish.minWeight) * (float)(r * r);
+            return (float)Math.Round(weight, 2);
+        }
+
+        // Цена у Тараса: вес x цена за кг, ночью x3.
+        public static int Price(FishData fish, float weight, bool caughtAtNight)
+        {
+            float price = fish.pricePerKg * weight * (caughtAtNight ? 3f : 1f);
+            return (int)Math.Round(price);
+        }
+    }
+}

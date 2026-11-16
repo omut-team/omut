@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96c61e63ececda84d841dea70010599c, type: 3}
+  m_Name: GameDatabase
+  m_EditorClassIdentifier: Omut::Omut.Core.GameDatabase
+  fish:
+  - {fileID: 11400000, guid: e4cda48eeeaf6b44fb6bb1725793c692, type: 2}
+  - {fileID: 11400000, guid: 1abeb4c3c65bd504e82c3280288359a1, type: 2}
+  - {fileID: 11400000, guid: 6e3fe730e6ed41442b8e01f2e2ae490c, type: 2}
+  - {fileID: 11400000, guid: ed910f5b3fbe8c5469999989fd15528e, type: 2}
+  - {fileID: 11400000, guid: aa3723bf909bbc64790c4659921a97e4, type: 2}
+  - {fileID: 11400000, guid: ff1305654ac1a984f927181131d8d533, type: 2}
+  - {fileID: 11400000, guid: f094e6e672537cf4fa491e9cd886d40d, type: 2}
+  - {fileID: 11400000, guid: 603a9d3174961fe48b6bbf7b9f983647, type: 2}
+  - {fileID: 11400000, guid: 11ca88e6090a40048ad634fabc9322b5, type: 2}
+  - {fileID: 11400000, guid: bb9a41ae9e07b5840ad3c1a282b37272, type: 2}
+  - {fileID: 11400000, guid: 194a764d0fd5c6649b16dc2a311c7c92, type: 2}
+  - {fileID: 11400000, guid: 08311cb9442900b4a80a4fa9282bfb6b, type: 2}
+  - {fileID: 11400000, guid: b446f3f185ade7f4d931a71112eb6777, type: 2}
+  - {fileID: 11400000, guid: 1b0789a88f6f0384da032557da1a419c, type: 2}
+  - {fileID: 11400000, guid: 50d386a7bdc83aa4a92a6881f414b60b, type: 2}
+  boats:
+  - {fileID: 11400000, guid: 5afcb7acba48933439c4f9c1af8a915d, type: 2}
+  - {fileID: 11400000, guid: b1441da4ee368164b92d7a891ffb4ec8, type: 2}
+  - {fileID: 11400000, guid: efb6207e5b096bc46b2052e8e70ffd1d, type: 2}
+  items:
+  - {fileID: 11400000, guid: edc6e7956ca668346a8daf85da23fca3, type: 2}
+  - {fileID: 11400000, guid: 0131ec2fed5d6d244a0829355fcac48d, type: 2}
+  baits:
+  - {fileID: 11400000, guid: da08f5826b9d4f945b5dcae25b29e453, type: 2}
+  - {fileID: 11400000, guid: e8590b1a7c001e14a9c7d0eec1c2f80a, type: 2}
+  - {fileID: 11400000, guid: dd6c6c84675bfc84f8c9c462f8c6422a, type: 2}
+  quests:
+  - {fileID: 11400000, guid: 66b8c3f2074c69247a6b8a99b3eca686, type: 2}
+  - {fileID: 11400000, guid: 681503d6d467f624fb1913fd3f6d8886, type: 2}
+  - {fileID: 11400000, guid: 780ae2c10cc00a742beee80f05be15c9, type: 2}
+  - {fileID: 11400000, guid: 399e0797f5b0f1a4ea7a06582d43aeca, type: 2}
+  - {fileID: 11400000, guid: f419becb6eda5004cb8df27acc95b6f5, type: 2}
+  notes:
+  - {fileID: 11400000, guid: 8f21b0029df29b64bba7a3cd4781315a, type: 2}
+  - {fileID: 11400000, guid: 2009f0b070db3ee40acc45b60bf14792, type: 2}
+  - {fileID: 11400000, guid: 85f265b2c8e00684c9a56856c470571b, type: 2}
+  - {fileID: 11400000, guid: 756ecafa63a62b440bb5ea65d405511d, type: 2}
+  - {fileID: 11400000, guid: d77342e176997584aabdc3fae329fc61, type: 2}
+  - {fileID: 11400000, guid: bd0aa539f9a181741b38006cb89266aa, type: 2}
+  - {fileID: 11400000, guid: 765206d166e4b5d45b80592a52f0a770, type: 2}
+  - {fileID: 11400000, guid: f78ac83504962604ebd4bae7a24caa22, type: 2}
+  - {fileID: 11400000, guid: 1d01e86e2ea5f3c4f9ed1a2ed1c81f90, type: 2}
+  - {fileID: 11400000, guid: 09fc41ff77b1a6e47982dfcccf3b215c, type: 2}
+  - {fileID: 11400000, guid: be246087b0274f54c965252e43f252d0, type: 2}
+  - {fileID: 11400000, guid: 61e47444ab1b7d74383b6270f54dfa4d, type: 2}
+  dialogues:
+  - {fileID: 11400000, guid: 2d3a0801f90ee0f4680a29409d3dbacd, type: 2}
+  - {fileID: 11400000, guid: 6c5f96f38ed2e97479a7148be2562fd8, type: 2}
+  - {fileID: 11400000, guid: 0dd3717dca3f3ec409c5147c9e68af26, type: 2}
+  zones:
+  - {fileID: 11400000, guid: fad1372221cf2e04eb020f96ae969b10, type: 2}
+  - {fileID: 11400000, guid: 38b60ed14d2227743a3d815fd2d356c3, type: 2}
+  - {fileID: 11400000, guid: fc12c0590245e38438617502bed40c0d, type: 2}
+  - {fileID: 11400000, guid: 8d5ca64e720d63f4cb8ba7095b8467de, type: 2}
+  unlitMaterial: {fileID: 2100000, guid: b943546ccb44f9f40a57ea74b440ba07, type: 2}

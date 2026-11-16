@@ -20,6 +20,8 @@ crashlytics-buildid.txt
 .utmp/
 .consulo/
 *.csproj
+# Проекты сервера (это не сгенерированные Unity файлы, их надо хранить в git)
+!server/**/*.csproj
 *.unityproj
 *.sln
 *.slnx

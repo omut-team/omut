@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d2023f5e8ac4b4aad208a4e98b1af5, type: 3}
+  m_Name: spoon
+  m_EditorClassIdentifier: Omut::Omut.Fishing.BaitData
+  type: 1
+  displayName: "\u0411\u043B\u0435\u0441\u043D\u0430"
+  description: "\u0425\u0438\u0449\u043D\u0438\u043A\u0438: \u043E\u043A\u0443\u043D\u044C,
+    \u0449\u0443\u043A\u0430, \u0441\u0443\u0434\u0430\u043A."
+  sprite: {fileID: 21300000, guid: fc3c05f515a386b458442521ad915408, type: 3}
+  infinite: 0
+  packPrice: 25
+  packSize: 5
