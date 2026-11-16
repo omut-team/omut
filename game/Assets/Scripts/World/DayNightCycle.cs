@@ -163,18 +163,19 @@ namespace Omut.World
             return gradient;
         }
 
-        // Яркость по умолчанию: ночью 0.25, днём 1.
+        // Яркость по умолчанию: ночью почти темно (0.07), днём 1.
         public static AnimationCurve CreateDefaultIntensity()
         {
             return new AnimationCurve(
-                new Keyframe(0.00f, 0.25f),  // 00:00
-                new Keyframe(0.20f, 0.25f),  // 04:50
+                new Keyframe(0.00f, 0.07f),  // 00:00 ночь: видно только то, что освещено
+                new Keyframe(0.20f, 0.07f),  // 04:50
                 new Keyframe(0.25f, 0.80f),  // 06:00
                 new Keyframe(0.30f, 0.95f),  // 07:10
                 new Keyframe(0.42f, 1.00f),  // 10:00
                 new Keyframe(0.70f, 1.00f),  // 17:00
-                new Keyframe(0.83f, 0.30f),  // 20:00
-                new Keyframe(1.00f, 0.25f)); // 24:00
+                new Keyframe(0.80f, 0.55f),  // 19:10 сумерки
+                new Keyframe(0.835f, 0.12f), // 20:00 колокол
+                new Keyframe(1.00f, 0.07f)); // 24:00
         }
     }
 }

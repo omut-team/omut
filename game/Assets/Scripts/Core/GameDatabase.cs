@@ -21,6 +21,9 @@ namespace Omut.Core
         public List<NoteData> notes = new List<NoteData>();
         public List<DialogueData> dialogues = new List<DialogueData>();
 
+        [Tooltip("Материал спрайтов без освещения (туман, метки эхолота): Art/Materials/SpriteUnlit")]
+        public Material unlitMaterial;
+
         public DialogueData FindDialogue(string id) => dialogues.Find(d => d != null && d.id == id);
 
         public FishData FindFish(string id) => fish.Find(f => f != null && f.id == id);

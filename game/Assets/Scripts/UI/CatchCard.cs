@@ -114,6 +114,13 @@ namespace Omut.UI
             Close();
         }
 
+        // Закрыть карточку, отпустив рыбу (обморок, автотесты).
+        public void Dismiss()
+        {
+            if (current != null)
+                Close();
+        }
+
         private void Release()
         {
             if (current == null)
