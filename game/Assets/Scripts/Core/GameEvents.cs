@@ -94,6 +94,11 @@ namespace Omut.Core
 
         public static void RaiseZoneEntered(Zone zone) => ZoneEntered?.Invoke(zone);
 
+        // Хозяин Омута пойман и отпущен: финал.
+        public static event Action Finale;
+
+        public static void RaiseFinale() => Finale?.Invoke();
+
         // ---------- звук ----------
 
         // Сыграть звук по имени ("cast", "bite", "bell"...). Слушает AudioManager (этап 21).
@@ -123,6 +128,7 @@ namespace Omut.Core
             BoatSunk = null;
             Fainted = null;
             ZoneEntered = null;
+            Finale = null;
         }
     }
 }

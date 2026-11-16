@@ -83,7 +83,9 @@ namespace Omut.World
 
             Vector2 focus = FocusPoint();
             Zone zone = Zone.Find(focus);
-            InEternalFog = zone != null && zone.AlwaysFoggy;
+            // После финала туман над рифом уходит.
+            bool finale = GameSession.Instance != null && GameSession.Instance.HasFlag(BossEncounter.FinaleFlag);
+            InEternalFog = zone != null && zone.AlwaysFoggy && !finale;
 
             DayNightCycle cycle = DayNightCycle.Instance;
             DayPhase phase = cycle != null ? cycle.Clock.Phase : DayPhase.Day;

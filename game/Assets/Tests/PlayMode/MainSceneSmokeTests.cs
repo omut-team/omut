@@ -272,5 +272,49 @@ namespace Omut.Tests
             DialogueUI.Instance.Close();
             yield return null;
         }
+
+        [UnityTest]
+        public IEnumerator Boss_OnlyAfterLetter_AtNight_OnPhosphor()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance.StartGame();
+            yield return new WaitForSeconds(0.3f);
+
+            GameSession session = GameSession.Instance;
+            DockingZone.Instance.Board();
+            var boss = Omut.World.BossEncounter.Instance;
+            Assert.IsNotNull(boss);
+            Omut.World.DayNightCycle.Instance.Clock.SetTime(23, 0);
+            yield return null;
+            Assert.IsFalse(boss.IsActive, "Без письма деда водоворота нет");
+
+            session.SetFlag(Omut.World.DockChest.BossFlag);
+            session.Tackle.Add(BaitType.Phosphor, 3);
+            session.Tackle.Select(BaitType.Phosphor);
+            yield return null;
+            Assert.IsTrue(boss.IsActive);
+
+            FishingController fishing = FishingController.Instance;
+            fishing.SetState(fishing.Charging);
+            fishing.ShowBobber(boss.transform.position);
+            fishing.Landed(boss.transform.position);
+            Assert.IsNotNull(fishing.HookedFish);
+            Assert.IsTrue(fishing.HookedFish.isBoss, "В водовороте на фосфорную блесну клюёт Хозяин");
+
+            fishing.SetState(fishing.Reeling);
+            yield return null;
+            fishing.OnCaught();
+            yield return new WaitForSeconds(0.3f);
+
+            Assert.IsTrue(session.HasFlag(Omut.World.BossEncounter.FinaleFlag));
+            Assert.IsTrue(session.Journal.IsCaught("lake_master"));
+            Assert.AreEqual(0, session.Hold.Count, "Хозяин в трюм не кладётся");
+            Assert.IsTrue(DialogueUI.Instance.IsOpen, "Идёт финальная сцена");
+            DialogueUI.Instance.Close();
+            yield return null;
+            CreditsUI.Instance.Show();
+            yield return new WaitForSeconds(0.5f);
+            Assert.IsTrue(CreditsUI.Instance.IsOpen);
+        }
 }
 }

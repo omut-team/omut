@@ -62,6 +62,10 @@ namespace Omut.UI
         // Показываем в LateUpdate, чтобы журнал успел отметить "новая запись" (он тоже слушает FishCaught).
         private void Show(CatchInfo info)
         {
+            // Хозяина Омута показывает финал (BossEncounter), не карточка.
+            if (info.fish != null && info.fish.isBoss)
+                return;
+
             current = info;
             needsRender = true;
         }
