@@ -89,6 +89,11 @@ namespace Omut.Core
 
         public static void RaiseFainted(int lostFish) => Fainted?.Invoke(lostFish);
 
+        // Лодка (или Сымон) въехала в другую зону озера.
+        public static event Action<Zone> ZoneEntered;
+
+        public static void RaiseZoneEntered(Zone zone) => ZoneEntered?.Invoke(zone);
+
         // ---------- звук ----------
 
         // Сыграть звук по имени ("cast", "bite", "bell"...). Слушает AudioManager (этап 21).
@@ -117,6 +122,7 @@ namespace Omut.Core
             DockChanged = null;
             BoatSunk = null;
             Fainted = null;
+            ZoneEntered = null;
         }
     }
 }

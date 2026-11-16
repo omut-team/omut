@@ -39,10 +39,20 @@ namespace Omut.World
         [Tooltip("Здесь всегда туман, даже днём (риф)")]
         [SerializeField] private bool alwaysFoggy;
 
+        [Tooltip("Описание зоны (Data/Zones)")]
+        [SerializeField] private ZoneData data;
+
         public ZoneId Id => id;
         public string DisplayName => displayName;
         public Rect Area => area;
         public bool AlwaysFoggy => alwaysFoggy;
+        public ZoneData Data => data;
+
+        public void Setup(ZoneData zoneData, Rect zoneArea)
+        {
+            data = zoneData;
+            Setup(zoneData.id, zoneData.displayName, zoneArea, zoneData.alwaysFoggy);
+        }
 
         public void Setup(ZoneId zoneId, string zoneName, Rect zoneArea, bool foggy)
         {
