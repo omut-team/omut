@@ -101,7 +101,7 @@
 8. **Журнал** · `feature/journal`. ✅ СДЕЛАНО (ждёт слияния в `dev`). `Core/Journal`, `Core/GameSession` (Singleton, хранит прогресс игры, объект `Systems` в сцене), `UI/JournalUI` (J): 14 карточек, «N из 14», описание, где и на что ловится, вкладка «Дневник деда» (заполнится на этапе 20). Тесты: `Journal` (6), PlayMode: все окна открываются и закрываются.
 
 ### Патч 0.3 (до 14 февраля 2027)
-9. **Трюм-сетка** · `feature/inventory-grid`. `Inventory/InventoryGrid`, `Inventory/ItemData`, `Inventory/InventoryUI`, `Inventory/DraggableItem`.
+9. **Трюм-сетка** · `feature/inventory-grid`. ✅ СДЕЛАНО (ждёт слияния в `dev`). `Inventory/InventoryGrid` (сетка, поворот, перемещение, выброс, смена размера при смене лодки), `Inventory/InventoryUI` (Tab или I), `Inventory/DraggableItem`, `Inventory/ItemData` (керосин, термос). Улов из карточки трофея ложится в первое свободное место. Тесты: `InventoryGrid` (13).
 10. **Причал, ходьба, Тарас** · `feature/dock-shop`. `Player/PlayerWalker`, `Player/DockingZone`, `NPC/Interactable`, `NPC/Merchant`, `Core/Wallet`, `UI/ShopUI`. Играбельная цепочка готова.
 11. **Наживки и остальная дневная рыба** · `feature/baits`. `Fishing/BaitData` (SO), `Fishing/TackleBox` (выбор наживки на Q), покупка у Тараса. Данные: червь, блесна; линь, карп, судак.
 12. **Сохранения** · `feature/save-load`. `Core/SaveSystem`, `Core/SaveData`.
