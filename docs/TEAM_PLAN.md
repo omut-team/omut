@@ -117,7 +117,7 @@
 ### 0.1
 | Что | Файлы | Размер | К этапу |
 |---|---|---|---|
-| Старый баркас (с Сымоном в лодке) | `boat_barkas.png`, `boat_barkas_idle_sheet.png` (покачивание, 4 кадра) | 64x32 | 2 |
+| Старый баркас (с Сымоном в лодке) | `boat_barkas.png`, `boat_barkas_idle_sheet.png` (покачивание, 4 кадра) | 64x48, вид 45° | 2 |
 | Герой Сымон | `hero_simon_idle.png` | 32x48 | 2 (#9) |
 | Часы на HUD | `ui_clock.png` | на выбор | 3 |
 | Меню, пауза, настройки | `ui_button_sheet.png` (обычная, наведение, нажата), `ui_panel.png`, `ui_slider_bg.png`, `ui_slider_handle.png`, `ui_checkbox_sheet.png` | на выбор | 4 (#10) |
@@ -143,7 +143,7 @@
 | Линь, карп, судак | `fish_tench.png`, `fish_carp.png`, `fish_zander.png` | 64x32, 64x64, 96x32 | 11 |
 | Портреты, Михалыч | `npc_taras_portrait.png`, `npc_mikhalych.png`, `npc_mikhalych_portrait.png` | 96x96, 32x48, 96x96 | 13 |
 | Окно диалога, журнал квестов | `ui_dialog_bg.png`, `ui_quest_log_bg.png` | на выбор | 13 |
-| Лодки «Следопыт» и «Охотник за тенями» | `boat_sledopyt.png`, `boat_okhotnik.png` (+ `_idle_sheet`) | 64x32 (см. вопросы) | 14 |
+| Лодки «Следопыт» и «Охотник за тенями» | `boat_sledopyt.png`, `boat_okhotnik.png` (+ `_idle_sheet`) | 64x48, вид 45° (см. вопросы) | 14 |
 | Металлолом, прочность | `item_scrap.png`, `ui_icon_durability.png` | 32x32 | 14 |
 | Окно входа | `ui_input.png` (поле ввода) | на выбор | 16 |
 
