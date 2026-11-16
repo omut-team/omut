@@ -1,5 +1,6 @@
 using Omut.Fishing;
 using Omut.Inventory;
+using Omut.NPC;
 using Omut.Player;
 using Omut.UI;
 using UnityEngine;
@@ -20,6 +21,7 @@ namespace Omut.Core
         public Journal Journal { get; } = new Journal();
         public InventoryGrid Hold { get; private set; }
         public Wallet Wallet { get; private set; } = new Wallet();
+        public TackleBox Tackle { get; private set; } = new TackleBox();
 
         // Запасы: керосин для фонаря (0..100 %) и термосы с чаем.
         public float Kerosene { get; set; }
@@ -37,15 +39,64 @@ namespace Omut.Core
             ResetProgress();
             CatchCard.TryStore = StoreCatch;
 
-            hudLine = () => $"Монеты: <b>{Wallet.Money}</b>";
-            Hud.AddLine(hudLine);
+            FishingController.CurrentBait = () => Tackle.Current;
+            Merchant.AddMoreGoods = AddBaitGoods;
+
+            hudLines.Add(() => $"Монеты: <b>{Wallet.Money}</b>");
+            hudLines.Add(() => $"Наживка: <b>{BaitTitle(Tackle.Current)}</b>{(TackleBox.IsInfinite(Tackle.Current) ? "" : $" ({Tackle.Count(Tackle.Current)})")}  [Q]");
+            foreach (System.Func<string> line in hudLines)
+                Hud.AddLine(line);
         }
 
-        private System.Func<string> hudLine;
+        private readonly System.Collections.Generic.List<System.Func<string>> hudLines = new System.Collections.Generic.List<System.Func<string>>();
+
+        private void Update()
+        {
+            GameManager game = GameManager.Instance;
+            if (game != null && game.CurrentState == GameState.Sailing && Controls.Pressed(Controls.Bait))
+            {
+                Tackle.Next();
+                Notifications.Show("На крючке: " + BaitTitle(Tackle.Current));
+            }
+        }
+
+        public string BaitTitle(BaitType type)
+        {
+            BaitData data = database != null ? database.FindBait(type) : null;
+            return data != null ? data.displayName : type.ToString();
+        }
+
+        // Наживки в лавке Тараса.
+        private void AddBaitGoods(System.Collections.Generic.List<ShopGood> goods, GameSession session)
+        {
+            foreach (BaitData bait in database.baits)
+            {
+                BaitData b = bait;
+                if (b == null || b.infinite)
+                    continue;
+
+                goods.Insert(0, new ShopGood
+                {
+                    Title = $"{b.displayName} x{b.packSize}",
+                    Description = b.description,
+                    Price = b.packPrice,
+                    Icon = b.sprite,
+                    Owned = () => $"(у тебя {Tackle.Count(b.type)})",
+                    OnBuy = () => Tackle.Add(b.type, b.packSize)
+                });
+            }
+        }
+
+        private void OnBaitUsed(BaitType bait)
+        {
+            if (Tackle.Use(bait))
+                Notifications.Show($"{BaitTitle(bait)} кончилась. На крючке червь. Купи ещё у Тараса.", new Color(1f, 0.8f, 0.5f));
+        }
 
         private void OnDestroy()
         {
-            Hud.RemoveLine(hudLine);
+            foreach (System.Func<string> line in hudLines)
+                Hud.RemoveLine(line);
             if (Instance == this)
                 Instance = null;
         }
@@ -54,12 +105,14 @@ namespace Omut.Core
         {
             GameEvents.NewGameStarted += ResetProgress;
             GameEvents.FishCaught += OnFishCaught;
+            GameEvents.BaitUsed += OnBaitUsed;
         }
 
         private void OnDisable()
         {
             GameEvents.NewGameStarted -= ResetProgress;
             GameEvents.FishCaught -= OnFishCaught;
+            GameEvents.BaitUsed -= OnBaitUsed;
         }
 
         // Новая игра: всё с нуля.
@@ -71,6 +124,8 @@ namespace Omut.Core
             Wallet.Set(StartMoney, 0);
             Kerosene = 100f;
             Thermos = 1;
+            Tackle = new TackleBox();
+            Tackle.Add(BaitType.Spoon, 3);
         }
 
         // ---------- запасы (магазин Тараса) ----------

@@ -33,3 +33,7 @@ MonoBehaviour:
   items:
   - {fileID: 11400000, guid: edc6e7956ca668346a8daf85da23fca3, type: 2}
   - {fileID: 11400000, guid: 0131ec2fed5d6d244a0829355fcac48d, type: 2}
+  baits:
+  - {fileID: 11400000, guid: da08f5826b9d4f945b5dcae25b29e453, type: 2}
+  - {fileID: 11400000, guid: e8590b1a7c001e14a9c7d0eec1c2f80a, type: 2}
+  - {fileID: 11400000, guid: dd6c6c84675bfc84f8c9c462f8c6422a, type: 2}
