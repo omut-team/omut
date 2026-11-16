@@ -35,6 +35,8 @@ namespace Omut.EditorTools
         public static void BuildMainScene()
         {
             OmutDataBuilder.Build(false);
+            ArtImportSettings.FixPivots();
+            EnsureUnlitMaterial();
 
             var scene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
 
@@ -141,26 +143,30 @@ namespace Omut.EditorTools
 
             Tiled(dock, "Path", "tile_dock", new Vector2(-40.5f, 26f), new Vector2(3f, 4f), -18);
 
-            Solid(dock, "Hut", "obj_hut", new Vector2(-46.5f, 29.5f), new Vector2(2.6f, 1.2f), new Vector2(0f, -0.6f));
-            Solid(dock, "Garage", "obj_garage", new Vector2(-37f, 29.8f), new Vector2(2.6f, 1.2f), new Vector2(0f, -0.6f));
-            Solid(dock, "Lighthouse", "obj_lighthouse", new Vector2(-33.5f, 26.5f), new Vector2(1f, 1f), new Vector2(0f, -1.5f));
+            // Позиция = точка, где объект стоит на земле (низ картинки), вид 45°.
+            Solid(dock, "Hut", "obj_hut", new Vector2(-46.5f, 28.25f), new Vector2(2.6f, 1.2f), new Vector2(0f, 0.6f));
+            Solid(dock, "Garage", "obj_garage", new Vector2(-37f, 28.55f), new Vector2(2.6f, 1.2f), new Vector2(0f, 0.6f));
+            Solid(dock, "Lighthouse", "obj_lighthouse", new Vector2(-33.5f, 24.5f), new Vector2(1f, 1f), new Vector2(0f, 0.5f));
 
             BuildDockPeople(dock);
         }
 
         public static readonly Vector2 MooringPoint = new Vector2(-40.5f, 14.6f);
         public static readonly Vector2 PierTip = new Vector2(-40.5f, 16.7f);
-        public static readonly Vector2 HeroStart = new Vector2(-46.5f, 27.5f);
-        public static readonly Vector2 TarasPosition = new Vector2(-35.4f, 25.3f);
-        public static readonly Vector2 MikhalychPosition = new Vector2(-38.6f, 28.2f);
+        public static readonly Vector2 HeroStart = new Vector2(-46.5f, 26.8f);
+        public static readonly Vector2 TarasPosition = new Vector2(-35.4f, 24.6f);
+        public static readonly Vector2 MikhalychPosition = new Vector2(-38.6f, 27.5f);
+
+        // Все "стоящие" объекты на одном слое: сортировка по Y (вид 45°, Renderer2D: Custom Axis 0,1,0).
+        public const int StandingOrder = 5;
 
         // NPC на причале с маленьким коллайдером у ног (герой их обходит).
         public static GameObject Npc(Transform parent, string name, string sprite, Vector2 position)
         {
-            SpriteRenderer sr = Plain(parent, name, sprite, position, 3);
+            SpriteRenderer sr = Plain(parent, name, sprite, position, StandingOrder);
             var box = sr.gameObject.AddComponent<BoxCollider2D>();
             box.size = new Vector2(0.6f, 0.3f);
-            box.offset = new Vector2(0f, -0.6f);
+            box.offset = new Vector2(0f, 0.15f);
             return sr.gameObject;
         }
 
@@ -173,7 +179,7 @@ namespace Omut.EditorTools
             BuildMoreDockPeople(dock);
 
             // Сымон пешком.
-            SpriteRenderer hero = Plain(dock, "Hero", "hero_symon", HeroStart, 4);
+            SpriteRenderer hero = Plain(dock, "Hero", "hero_symon", HeroStart, StandingOrder);
             var walker = hero.gameObject.AddComponent<PlayerWalker>();
             SetRef(walker, "sprite", hero);
 
@@ -207,7 +213,7 @@ namespace Omut.EditorTools
             for (int i = 0; i < 70; i++)
             {
                 Vector2 p = RandomNearEdge(BayZone, 4f, random);
-                Plain(decor, "Reed", "env_reed", p, 1);
+                Plain(decor, "Reed", "env_reed", p, StandingOrder);
             }
 
             for (int i = 0; i < 45; i++)
@@ -218,20 +224,20 @@ namespace Omut.EditorTools
 
             for (int i = 0; i < 18; i++)
             {
-                SpriteRenderer snag = Solid(hazards, "Snag", "obj_snag", RandomIn(PoolZone, 4f, random), new Vector2(1.1f, 0.5f), Vector2.zero);
+                SpriteRenderer snag = Solid(hazards, "Snag", "obj_snag", RandomIn(PoolZone, 4f, random), new Vector2(1.1f, 0.5f), new Vector2(0f, 0.25f));
                 snag.gameObject.AddComponent<Hazard>();
             }
 
             for (int i = 0; i < 6; i++)
-                Solid(hazards, "Rock", "obj_reef_rock", RandomIn(PoolZone, 4f, random), new Vector2(0.8f, 0.6f), Vector2.zero);
+                Solid(hazards, "Rock", "obj_reef_rock", RandomIn(PoolZone, 4f, random), new Vector2(0.8f, 0.6f), new Vector2(0f, 0.3f));
 
             for (int i = 0; i < 45; i++)
             {
-                SpriteRenderer rock = Solid(hazards, "ReefRock", "obj_reef_rock", RandomIn(ReefZone, 2f, random), new Vector2(0.8f, 0.6f), Vector2.zero);
+                SpriteRenderer rock = Solid(hazards, "ReefRock", "obj_reef_rock", RandomIn(ReefZone, 2f, random), new Vector2(0.8f, 0.6f), new Vector2(0f, 0.3f));
                 rock.gameObject.AddComponent<Hazard>();
             }
 
-            Solid(hazards, "Biostation", "obj_biostation", new Vector2(40f, -2f), new Vector2(3.4f, 1.6f), new Vector2(0f, -0.4f));
+            Solid(hazards, "Biostation", "obj_biostation", new Vector2(40f, -3.5f), new Vector2(3.4f, 1.6f), new Vector2(0f, 0.8f));
         }
 
         private static Vector2 RandomIn(Rect area, float margin, System.Random random)
@@ -264,6 +270,8 @@ namespace Omut.EditorTools
                 SetRef(fishing, "bobberSprite", OmutDataBuilder.FindSprite("obj_bobber"));
                 SetRef(fishing, "biteSprite", OmutDataBuilder.FindSprite("fx_bite"));
                 SetRef(fishing, "lineSprite", OmutDataBuilder.FindSprite("fx_white"));
+                foreach (SpriteRenderer boatSprite in boat.GetComponentsInChildren<SpriteRenderer>())
+                    boatSprite.sortingOrder = StandingOrder;
                 var damage = EnsureComponent<BoatDamage>(boat.gameObject);
                 SetRef(damage, "sprite", boat.GetComponentInChildren<SpriteRenderer>());
                 SetupBoat(boat);
@@ -314,7 +322,7 @@ namespace Omut.EditorTools
         // Объект, в который упирается лодка (коллайдер у основания картинки).
         public static SpriteRenderer Solid(Transform parent, string name, string sprite, Vector2 position, Vector2 colliderSize, Vector2 colliderOffset)
         {
-            SpriteRenderer sr = Plain(parent, name, sprite, position, 2);
+            SpriteRenderer sr = Plain(parent, name, sprite, position, StandingOrder);
             var box = sr.gameObject.AddComponent<BoxCollider2D>();
             box.size = colliderSize;
             box.offset = colliderOffset;

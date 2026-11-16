@@ -36,6 +36,7 @@ namespace Omut.Tests
                 canvases[i].renderMode = RenderMode.ScreenSpaceCamera;
                 canvases[i].worldCamera = cam;
                 canvases[i].planeDistance = 1f + (100 - canvases[i].sortingOrder) * 0.01f;
+                canvases[i].sortingOrder += 1000; // интерфейс поверх тумана, как в игре
             }
 
             Canvas.ForceUpdateCanvases();
@@ -48,7 +49,11 @@ namespace Omut.Tests
             cam.targetTexture = null;
 
             for (int i = 0; i < canvases.Length; i++)
-                if (canvases[i].isRootCanvas) canvases[i].renderMode = modes[i];
+            {
+                if (!canvases[i].isRootCanvas) continue;
+                canvases[i].renderMode = modes[i];
+                canvases[i].sortingOrder -= 1000;
+            }
 
             Directory.CreateDirectory("Logs");
             File.WriteAllBytes($"Logs/shot_{name}.png", tex.EncodeToPNG());
@@ -79,7 +84,13 @@ namespace Omut.Tests
             foreach (string id in new[] { "pike", "crucian", "carp", "bream", "black_catfish" })
                 session.Hold.TryAdd(new CatchInfo(session.Database.FindFish(id), 3.3f, id == "black_catfish", Omut.World.ZoneId.Pool, 1));
 
-            Object.FindAnyObjectByType<Merchant>().Interact();
+            Merchant taras = Object.FindAnyObjectByType<Merchant>();
+            taras.Interact();
+            yield return new WaitForSeconds(0.2f);
+            yield return Shot("dialogue");
+            DialogueUI.Instance.Close();
+            yield return null;
+            ShopUI.Instance.OpenFor(taras);
             yield return new WaitForSeconds(0.2f);
             yield return Shot("shop");
             ShopUI.Instance.Close();
@@ -116,12 +127,28 @@ namespace Omut.Tests
             yield return new WaitForSeconds(0.2f);
             yield return Shot("catch");
 
-            if (DayNightCycle() != null)
-            {
-                DayNightCycle().Clock.SetTime(23, 0);
-                yield return new WaitForSeconds(0.3f);
-                yield return Shot("night");
-            }
+            Object.FindAnyObjectByType<CatchCard>().Dismiss();
+            yield return null;
+
+            // Ночь у причала с фонарём.
+            DayNightCycle().Clock.SetTime(23, 0);
+            Lantern.Instance.Fuel.SetOn(true);
+            yield return new WaitForSeconds(2.5f);
+            yield return Shot("night_lantern");
+
+            // Ночь без фонаря.
+            Lantern.Instance.Fuel.SetOn(false);
+            yield return new WaitForSeconds(0.3f);
+            yield return Shot("night_dark");
+
+            // Риф днём: вечный туман.
+            DayNightCycle().Clock.SetTime(12, 0);
+            var body = fishing.GetComponent<Rigidbody2D>();
+            fishing.transform.position = new Vector3(30f, 5f, 0f);
+            body.position = new Vector2(30f, 5f);
+            Object.FindAnyObjectByType<Omut.World.CameraFollow>().SnapToTarget();
+            yield return new WaitForSeconds(2.5f);
+            yield return Shot("reef_day");
         }
 
         private static Omut.World.DayNightCycle DayNightCycle() => Omut.World.DayNightCycle.Instance;

@@ -297,7 +297,7 @@ namespace Omut.Fishing
             bobber = new GameObject("Bobber").transform;
             bobberRenderer = bobber.gameObject.AddComponent<SpriteRenderer>();
             bobberRenderer.sprite = bobberSprite;
-            bobberRenderer.sortingOrder = 15;
+            bobberRenderer.sortingOrder = -4; // на воде: под лодкой и камнями, над кругами
 
             var icon = new GameObject("BiteIcon");
             icon.transform.SetParent(bobber, false);
@@ -305,12 +305,14 @@ namespace Omut.Fishing
             biteIcon = icon.AddComponent<SpriteRenderer>();
             biteIcon.sprite = biteSprite;
             biteIcon.sortingOrder = 230;
+            if (database != null && database.unlitMaterial != null)
+                biteIcon.sharedMaterial = database.unlitMaterial; // "!" видно и ночью в тумане
 
             var lineObject = new GameObject("FishingLine");
             line = lineObject.AddComponent<SpriteRenderer>();
             line.sprite = lineSprite;
             line.color = new Color(0.95f, 0.95f, 0.9f, 0.8f);
-            line.sortingOrder = 14;
+            line.sortingOrder = 6;
 
             HideTackle();
         }

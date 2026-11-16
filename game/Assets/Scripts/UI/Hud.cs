@@ -53,7 +53,7 @@ namespace Omut.UI
 
             Image back = UiFactory.Panel(canvas.transform, "Panel", UiFactory.Theme.Hud);
             panel = back.rectTransform;
-            UiFactory.Place(panel, new Vector2(0f, 1f), new Vector2(470f, 100f), new Vector2(20f, -20f));
+            UiFactory.Place(panel, new Vector2(0f, 1f), new Vector2(560f, 100f), new Vector2(20f, -20f));
             panelText = UiFactory.HudLabel(panel, "", 28, TextAnchor.UpperLeft);
             UiFactory.Stretch(panelText.rectTransform, 14f);
             panelText.supportRichText = true;
@@ -82,7 +82,7 @@ namespace Omut.UI
                 string result = sb.ToString().TrimEnd();
                 panelText.text = result;
                 int count = result.Length == 0 ? 0 : result.Split('\n').Length;
-                panel.sizeDelta = new Vector2(470f, 28f + count * 36f);
+                panel.sizeDelta = new Vector2(560f, 28f + count * 36f);
                 panel.gameObject.SetActive(count > 0);
             }
 

@@ -20,16 +20,22 @@ namespace Omut.Fishing
         public float Radius => radius;
         public bool IsAlive => age < lifetime;
 
-        // Видна ли метка поверх тумана (эхолот, этап 19).
+        // Видна ли метка поверх тумана (эхолот у «Охотника»).
         public static bool ShowThroughFog { get; set; }
+
+        // Материал без освещения: метка эхолота видна и в темноте. Ставит FogController.
+        public static Material UnlitMaterial { get; set; }
+
+        private Material litMaterial;
 
         public void Setup(Sprite sprite, float spotRadius, float spotLifetime)
         {
             radius = spotRadius;
             lifetime = spotLifetime;
 
-            ripple = CreateRipple("Ripple", sprite, 5);
-            innerRipple = CreateRipple("RippleInner", sprite, 5);
+            ripple = CreateRipple("Ripple", sprite, -5);
+            innerRipple = CreateRipple("RippleInner", sprite, -5);
+            litMaterial = ripple.sharedMaterial;
         }
 
         private SpriteRenderer CreateRipple(string name, Sprite sprite, int order)
@@ -63,9 +69,12 @@ namespace Omut.Fishing
             AnimateRipple(ripple, (age * 0.6f) % 1f, fade);
             AnimateRipple(innerRipple, (age * 0.6f + 0.5f) % 1f, fade);
 
-            int order = ShowThroughFog ? 220 : 5;
+            int order = ShowThroughFog ? 220 : -5;
+            Material material = ShowThroughFog && UnlitMaterial != null ? UnlitMaterial : litMaterial;
             ripple.sortingOrder = order;
             innerRipple.sortingOrder = order;
+            ripple.sharedMaterial = material;
+            innerRipple.sharedMaterial = material;
         }
 
         private void AnimateRipple(SpriteRenderer sr, float t, float fade)

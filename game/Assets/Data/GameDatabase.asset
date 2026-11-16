@@ -62,3 +62,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2d3a0801f90ee0f4680a29409d3dbacd, type: 2}
   - {fileID: 11400000, guid: 6c5f96f38ed2e97479a7148be2562fd8, type: 2}
   - {fileID: 11400000, guid: 0dd3717dca3f3ec409c5147c9e68af26, type: 2}
+  unlitMaterial: {fileID: 2100000, guid: b943546ccb44f9f40a57ea74b440ba07, type: 2}
