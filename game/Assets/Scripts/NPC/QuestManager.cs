@@ -95,6 +95,19 @@ namespace Omut.NPC
             }
         }
 
+        // Засчитать уже пойманное (например, караси лежали в трюме ещё до того, как взял задание).
+        public void SetProgressAtLeast(QuestData q, int amount)
+        {
+            if (q == null || !active.Contains(q.id))
+                return;
+            int now = progress.TryGetValue(q.id, out int n) ? n : 0;
+            if (amount > now)
+            {
+                progress[q.id] = Math.Min(q.count, amount);
+                ProgressChanged?.Invoke(q);
+            }
+        }
+
         // Сдать. false = ещё не выполнено. Награду выдаёт вызывающий (GameSession).
         public bool TryComplete(QuestData q, IQuestContext context)
         {

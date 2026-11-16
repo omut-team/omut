@@ -77,15 +77,17 @@ namespace Omut.UI
         private static string GiverName(NpcId id) => id == NpcId.Taras ? "дед Тарас" : "Михалыч";
 
         // Описание задания короче, чтобы влезло в строку.
-        private static string Short(QuestData q)
+        // Берём первое предложение описания: "Поймать 3 карасей в заливе" -> "Поймай 3 карасей в заливе".
+        public static string Short(QuestData q)
         {
-            switch (q.goal)
-            {
-                case QuestGoal.CatchFish: return $"Поймай: {q.title.ToLower()}";
-                case QuestGoal.CatchAtNight: return "Поймай рыбу ночью";
-                case QuestGoal.EarnMoney: return "Заработай монет";
-                default: return q.title;
-            }
+            string text = string.IsNullOrEmpty(q.description) ? q.title : q.description;
+            int dot = text.IndexOf('.');
+            if (dot > 0)
+                text = text.Substring(0, dot);
+            if (text.StartsWith("Поймать")) text = "Поймай" + text.Substring(7);
+            else if (text.StartsWith("Принести")) text = "Принеси" + text.Substring(8);
+            else if (text.StartsWith("Заработать")) text = "Заработай" + text.Substring(10);
+            return text;
         }
 
         // Где выполнять задание: зона, где водится нужная рыба.

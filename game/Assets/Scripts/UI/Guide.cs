@@ -129,6 +129,8 @@ namespace Omut.UI
             Vector2 dir = local.normalized;
             float scale = Mathf.Min(Mathf.Abs(half.x / Mathf.Max(0.001f, Mathf.Abs(dir.x))), Mathf.Abs(half.y / Mathf.Max(0.001f, Mathf.Abs(dir.y))));
             Vector2 edge = dir * scale;
+            // Внизу панель предметов: стрелку держим выше неё.
+            edge.y = Mathf.Max(edge.y, -canvasRect.rect.size.y * 0.5f + 190f);
             float bob = Mathf.Sin(Time.unscaledTime * 5f) * 6f;
 
             arrow.anchoredPosition = edge + dir * bob;

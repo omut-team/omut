@@ -189,8 +189,8 @@ namespace Omut.UI
                 bool wasHolding = HoldsLantern;
                 Selected = LanternSlot;
                 ShowCaption(Names[slot]);
-                // В лодке: взял фонарь, он и зажёгся. Нажал ещё раз: погасил.
-                if (!PlayerWalker.OnFoot && Lantern.Instance != null && (wasHolding || !Lantern.Instance.IsOn))
+                // Взял фонарь, он и зажёгся. Нажал ещё раз: погасил.
+                if (Lantern.Instance != null && (wasHolding || !Lantern.Instance.IsOn))
                     Lantern.Instance.Toggle();
             }
             else if (slot == ThermosSlot)
@@ -203,6 +203,17 @@ namespace Omut.UI
                 if (map != null)
                     map.Toggle();
             }
+        }
+
+        // Фонарь зажгли клавишей F: он в руке. Погасили: снова удочка с текущей наживкой.
+        public void TakeInHand(bool lantern)
+        {
+            GameSession session = GameSession.Instance;
+            if (lantern)
+                Selected = LanternSlot;
+            else if (HoldsLantern && session != null)
+                Selected = RodIndex(session.Tackle.Current);
+            ShowCaption(lantern ? "Фонарь горит" : Names[Selected]);
         }
 
         private void ShowCaption(string text)
