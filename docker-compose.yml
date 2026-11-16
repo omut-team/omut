@@ -17,6 +17,7 @@ services:
     build: ./server/Omut.Api
     environment:
       ConnectionStrings__Default: Host=db;Database=omut;Username=omut;Password=${POSTGRES_PASSWORD:-omut_dev}
+      Jwt__Key: ${JWT_KEY:-omut-dev-key-only-for-local-play-change-me!!}
     depends_on:
       db:
         condition: service_healthy
