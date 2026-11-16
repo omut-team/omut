@@ -111,6 +111,28 @@ namespace Omut.Player
             cameraFollow.SnapToTarget();
         }
 
+        // Загрузка сохранения: где лодка и где Сымон.
+        public void Restore(bool onFoot, Vector2 boatPosition, Vector2 walkerPosition)
+        {
+            Rigidbody2D body = boat.GetComponent<Rigidbody2D>();
+            body.linearVelocity = Vector2.zero;
+            boat.transform.position = boatPosition == Vector2.zero ? (Vector2)transform.position : boatPosition;
+
+            PlayerWalker.OnFoot = onFoot;
+            if (onFoot)
+            {
+                walker.Show(PlayerWalker.CanStand(walkerPosition) ? walkerPosition : (Vector2)walkPoint.position);
+                cameraFollow.Target = walker.transform;
+            }
+            else
+            {
+                walker.Hide();
+                cameraFollow.Target = boat.transform;
+            }
+
+            cameraFollow.SnapToTarget();
+        }
+
         // Обморок или потопление: проснулись на причале.
         public void WakeUpAtDock()
         {

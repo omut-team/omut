@@ -11,7 +11,7 @@ namespace Omut.Core
     // Сами расчёты лежат в обычных C#-классах (Journal, InventoryGrid, Wallet...), а этот объект
     // их хранит, связывает с событиями GameEvents и отдаёт остальным скриптам.
     // Лежит в сцене на объекте Systems (ставит сборщик сцены).
-    public class GameSession : MonoBehaviour
+    public partial class GameSession : MonoBehaviour
     {
         public static GameSession Instance { get; private set; }
 
@@ -33,6 +33,9 @@ namespace Omut.Core
         // Лодка, на которой плаваем сейчас (меняется на верфи, этап 14).
         public BoatData CurrentBoat { get; private set; }
 
+        // Сколько рыбы поймано за игру (для рекордов).
+        public int TotalCaught { get; private set; }
+
         private void Awake()
         {
             Instance = this;
@@ -40,6 +43,7 @@ namespace Omut.Core
             CatchCard.TryStore = StoreCatch;
 
             FishingController.CurrentBait = () => Tackle.Current;
+            HookSaving();
             Merchant.AddMoreGoods = AddBaitGoods;
 
             hudLines.Add(() => $"Монеты: <b>{Wallet.Money}</b>");
@@ -106,6 +110,9 @@ namespace Omut.Core
             GameEvents.NewGameStarted += ResetProgress;
             GameEvents.FishCaught += OnFishCaught;
             GameEvents.BaitUsed += OnBaitUsed;
+            GameEvents.ContinueRequested += OnContinue;
+            GameEvents.NewDayStarted += OnNewDayAutoSave;
+            GameEvents.DockChanged += OnDockAutoSave;
         }
 
         private void OnDisable()
@@ -113,6 +120,9 @@ namespace Omut.Core
             GameEvents.NewGameStarted -= ResetProgress;
             GameEvents.FishCaught -= OnFishCaught;
             GameEvents.BaitUsed -= OnBaitUsed;
+            GameEvents.ContinueRequested -= OnContinue;
+            GameEvents.NewDayStarted -= OnNewDayAutoSave;
+            GameEvents.DockChanged -= OnDockAutoSave;
         }
 
         // Новая игра: всё с нуля.
@@ -126,7 +136,22 @@ namespace Omut.Core
             Thermos = 1;
             Tackle = new TackleBox();
             Tackle.Add(BaitType.Spoon, 3);
+            TotalCaught = 0;
         }
+
+        // Пересесть на другую лодку: другой размер трюма. Что не влезло, остаётся на берегу (продаётся Тарасу автоматически).
+        public void SetBoat(BoatData boat)
+        {
+            CurrentBoat = boat;
+            System.Collections.Generic.List<GridItem> overflow = Hold.Resize(boat.holdWidth, boat.holdHeight);
+            foreach (GridItem item in overflow)
+                Wallet.Earn(item.catchInfo.price);
+            if (overflow.Count > 0)
+                Notifications.Show($"Не влезло в новый трюм: {overflow.Count} шт., Тарас купил их сразу.");
+            BoatChanged?.Invoke(boat);
+        }
+
+        public static event System.Action<BoatData> BoatChanged;
 
         // ---------- запасы (магазин Тараса) ----------
 
@@ -159,6 +184,7 @@ namespace Omut.Core
 
         private void OnFishCaught(CatchInfo info)
         {
+            TotalCaught++;
             info.isNewRecord = Journal.Register(info);
             if (info.isNewRecord)
                 Notifications.Show($"Новая запись в журнале: {info.Title} ({Journal.CaughtCount} из {Journal.TotalEntries})", UiFactory.Theme.Gold);

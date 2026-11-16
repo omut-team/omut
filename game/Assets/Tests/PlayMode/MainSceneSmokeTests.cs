@@ -19,10 +19,19 @@ namespace Omut.Tests
         [UnitySetUp]
         public IEnumerator LoadMain()
         {
+            // Автосохранения в тестах не должны попадать в настоящую папку игрока.
+            SaveSystem.FolderOverride = System.IO.Path.Combine(Application.temporaryCachePath, "omut_tests");
             GameManager.Instance?.ResetToMenu();
             SceneManager.LoadScene("Main");
             yield return null;
             yield return null;
+        }
+
+        [TearDown]
+        public void CleanSaves()
+        {
+            SaveSystem.Delete();
+            SaveSystem.FolderOverride = null;
         }
 
         [UnityTest]
@@ -163,6 +172,40 @@ namespace Omut.Tests
             DockingZone.Instance.Disembark();
             yield return null;
             Assert.IsTrue(PlayerWalker.OnFoot);
+        }
+
+        [UnityTest]
+        public IEnumerator SaveAndLoad_RestoresProgress()
+        {
+            try
+            {
+                GameEvents.RaiseNewGameStarted();
+                GameManager.Instance.StartGame();
+                yield return new WaitForSeconds(0.3f);
+
+                GameSession session = GameSession.Instance;
+                session.Wallet.Earn(500);
+                session.Hold.TryAdd(new CatchInfo(session.Database.FindFish("pike"), 6f, true, Omut.World.ZoneId.Pool, 1));
+                session.Journal.Register(new CatchInfo(session.Database.FindFish("pike"), 6f, true, Omut.World.ZoneId.Pool, 1));
+                session.Tackle.Add(BaitType.Phosphor, 2);
+                int money = session.Wallet.Money;
+                Assert.IsTrue(session.SaveGame());
+
+                GameEvents.RaiseNewGameStarted();
+                yield return null;
+                Assert.AreEqual(0, session.Hold.Count);
+
+                GameEvents.RaiseContinueRequested();
+                yield return null;
+                Assert.AreEqual(money, session.Wallet.Money);
+                Assert.AreEqual(1, session.Hold.Count);
+                Assert.IsTrue(session.Journal.IsCaught("pike"));
+                Assert.AreEqual(2, session.Tackle.Count(BaitType.Phosphor));
+            }
+            finally
+            {
+                SaveSystem.Delete();
+            }
         }
 }
 }
