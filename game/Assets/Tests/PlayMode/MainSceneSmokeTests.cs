@@ -2,6 +2,7 @@ using System.Collections;
 using NUnit.Framework;
 using Omut.Core;
 using Omut.Fishing;
+using Omut.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -95,6 +96,27 @@ namespace Omut.Tests
             GameEvents.FishCaught -= onCaught;
             yield return null;
             Assert.AreEqual(GameState.Sailing, GameManager.Instance.CurrentState);
+        }
+
+        [UnityTest]
+        public IEnumerator AllWindows_OpenAndClose_WithoutErrors()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance.StartGame();
+            yield return new WaitForSeconds(0.3f);
+
+            GameWindow[] windows = Object.FindObjectsByType<GameWindow>(FindObjectsSortMode.None);
+            Assert.Greater(windows.Length, 0);
+
+            foreach (GameWindow window in windows)
+            {
+                Assert.IsTrue(window.Open(), "Не открылось окно " + window.GetType().Name);
+                yield return null;
+                yield return null;
+                window.Close();
+                yield return null;
+                Assert.AreEqual(GameState.Sailing, GameManager.Instance.CurrentState, window.GetType().Name);
+            }
         }
 }
 }

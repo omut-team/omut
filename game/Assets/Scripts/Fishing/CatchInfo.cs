@@ -16,6 +16,9 @@ namespace Omut.Fishing
 
         [NonSerialized] public FishData fish;
 
+        // Первый раз поймали этот вид (ставит журнал).
+        [NonSerialized] public bool isNewRecord;
+
         public CatchInfo(FishData fish, float weight, bool caughtAtNight, ZoneId zone, int day)
         {
             this.fish = fish;
