@@ -37,24 +37,29 @@ namespace Omut.UI
         {
             RectTransform root = UiFactory.Stretch(UiFactory.Rect(canvas, "Dialogue"));
 
-            Image panel = UiFactory.Panel(root, "Panel", UiFactory.Theme.Paper);
-            UiFactory.Place(panel.rectTransform, new Vector2(0.5f, 0f), new Vector2(1700f, 400f), new Vector2(0f, 30f));
-            panel.gameObject.AddComponent<Outline>().effectColor = UiFactory.Theme.Ink;
+            Image panel = UiFactory.PaperPanel(root, "Panel");
+            UiFactory.Place(panel.rectTransform, new Vector2(0.5f, 0f), new Vector2(1760f, 410f), new Vector2(0f, 24f));
 
-            portrait = UiFactory.Icon(panel.transform, null, new Vector2(240f, 240f));
-            UiFactory.Place(portrait.rectTransform, new Vector2(0f, 1f), new Vector2(240f, 240f), new Vector2(30f, -30f));
+            // Портрет в своей деревянной рамке.
+            Image portraitFrame = UiFactory.SlotPanel(panel.transform, "PortraitFrame");
+            UiFactory.Place(portraitFrame.rectTransform, new Vector2(0f, 1f), new Vector2(260f, 260f), new Vector2(56f, -56f));
+            portrait = UiFactory.Icon(portraitFrame.transform, null, new Vector2(224f, 224f));
+            UiFactory.Place(portrait.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(224f, 224f), Vector2.zero);
 
-            speakerText = UiFactory.Label(panel.transform, "", 34, TextAnchor.UpperLeft, UiFactory.Theme.Accent);
+            speakerText = UiFactory.Label(panel.transform, "", 36, TextAnchor.UpperLeft, UiFactory.Theme.Accent);
+            speakerText.font = UiFactory.TitleFont;
             speakerText.fontStyle = FontStyle.Bold;
-            UiFactory.Place(speakerText.rectTransform, new Vector2(0f, 1f), new Vector2(900f, 50f), new Vector2(300f, -26f));
+            UiFactory.Place(speakerText.rectTransform, new Vector2(0f, 1f), new Vector2(860f, 50f), new Vector2(350f, -48f));
 
-            bodyText = UiFactory.Label(panel.transform, "", 32, TextAnchor.UpperLeft, UiFactory.Theme.Ink);
-            UiFactory.Place(bodyText.rectTransform, new Vector2(0f, 1f), new Vector2(880f, 300f), new Vector2(300f, -80f));
+            bodyText = UiFactory.Label(panel.transform, "", 31, TextAnchor.UpperLeft, UiFactory.Theme.Ink);
+            bodyText.font = UiFactory.TitleFont;
+            bodyText.lineSpacing = 1.1f;
+            UiFactory.Place(bodyText.rectTransform, new Vector2(0f, 1f), new Vector2(860f, 290f), new Vector2(350f, -104f));
             bodyText.supportRichText = true;
 
             options = UiFactory.Rect(panel.transform, "Options");
-            UiFactory.Place(options, new Vector2(1f, 1f), new Vector2(480f, 360f), new Vector2(-24f, -20f));
-            UiFactory.Column(options, 10f, TextAnchor.UpperRight);
+            UiFactory.Place(options, new Vector2(1f, 1f), new Vector2(500f, 330f), new Vector2(-50f, -48f));
+            UiFactory.Column(options, 8f, TextAnchor.UpperRight);
 
             return root;
         }
@@ -116,8 +121,7 @@ namespace Omut.UI
             }
 
             DialogueLine line = queue[lineIndex];
-            SetSpeaker(line.speaker);
-            bodyText.text = line.text;
+            Show(line.speaker, line.text);
 
             ClearOptions();
             AddOption(lineIndex == queue.Count - 1 ? "Дальше" : "Дальше  (Space)", NextLine);
@@ -147,8 +151,7 @@ namespace Omut.UI
             }
 
             GameSession session = GameSession.Instance;
-            SetSpeaker(npc.DisplayName);
-            bodyText.text = greeting ?? "Чего тебе, внук Язэпа?";
+            Show(npc.DisplayName, greeting ?? "Чего тебе, внук Язэпа?");
             ClearOptions();
 
             if (session != null)
@@ -180,8 +183,7 @@ namespace Omut.UI
         // Короткий ответ NPC и кнопка "Назад" в меню.
         public void Say(string text, Action back = null)
         {
-            SetSpeaker(npc != null ? npc.DisplayName : "");
-            bodyText.text = text;
+            Show(npc != null ? npc.DisplayName : "", text);
             ClearOptions();
             AddOption("Назад", back ?? (() => ShowMenu("Что-нибудь ещё?")));
         }
@@ -189,14 +191,21 @@ namespace Omut.UI
         // Вопрос с ответами.
         public void Ask(string text, params (string label, Action action)[] answers)
         {
-            SetSpeaker(npc != null ? npc.DisplayName : "");
-            bodyText.text = text;
+            Show(npc != null ? npc.DisplayName : "", text);
             ClearOptions();
             foreach ((string label, Action action) in answers)
                 AddOption(label, action);
         }
 
         // ---------- помощники ----------
+
+        // Показать реплику и озвучить её.
+        private void Show(string speaker, string text)
+        {
+            SetSpeaker(speaker);
+            bodyText.text = text;
+            AudioManager.Instance?.PlayVoice(speaker, text);
+        }
 
         private void SetSpeaker(string speaker)
         {
@@ -208,7 +217,7 @@ namespace Omut.UI
 
         private void AddOption(string label, Action action)
         {
-            Button button = UiFactory.Button(options, label, () => action(), new Vector2(470f, 58f), 24);
+            Button button = UiFactory.Button(options, label, () => action(), new Vector2(490f, 60f), 25);
             button.GetComponentInChildren<Text>().alignment = TextAnchor.MiddleCenter;
         }
 
@@ -216,6 +225,7 @@ namespace Omut.UI
 
         protected override void OnClosed()
         {
+            AudioManager.Instance?.StopVoice();
             queue = null;
             afterLines = null;
         }

@@ -74,7 +74,7 @@ namespace Omut.UI
             subtitle.gameObject.SetActive(!art);
 
             buttons = UiFactory.Rect(root, "Buttons");
-            UiFactory.Place(buttons, new Vector2(0.5f, 1f), new Vector2(520f, 700f), new Vector2(0f, art ? -330f : -360f));
+            UiFactory.Place(buttons, new Vector2(0.5f, 1f), new Vector2(520f, 700f), new Vector2(0f, art ? -318f : -360f));
             UiFactory.Column(buttons, art ? 8f : 16f);
 
             continueButton = UiFactory.Button(buttons, "Продолжить", OnContinue, new Vector2(440f, 70f), 34);
@@ -102,15 +102,18 @@ namespace Omut.UI
         // Кнопка-дощечка как на макете Ульяны: бумага в деревянной рамке, тёмные буквы.
         private void StylePlank(Button button)
         {
+            Text label = button.GetComponentInChildren<Text>();
             var image = button.GetComponent<Image>();
             image.sprite = buttonSprite;
             image.type = Image.Type.Simple;
+            label.rectTransform.offsetMin = new Vector2(60f, 4f);
+            label.rectTransform.offsetMax = new Vector2(-60f, -4f);
             image.color = Color.white;
             var rect = (RectTransform)button.transform;
-            rect.sizeDelta = new Vector2(500f, 88f);
+            rect.sizeDelta = new Vector2(480f, 82f);
             var layout = button.GetComponent<LayoutElement>();
-            layout.preferredWidth = 500f;
-            layout.preferredHeight = 88f;
+            layout.preferredWidth = 480f;
+            layout.preferredHeight = 82f;
 
             ColorBlock colors = button.colors;
             colors.normalColor = new Color(0.92f, 0.9f, 0.86f);
@@ -119,10 +122,11 @@ namespace Omut.UI
             colors.pressedColor = new Color(0.75f, 0.7f, 0.62f);
             button.colors = colors;
 
-            Text label = button.GetComponentInChildren<Text>();
             label.color = UiFactory.Theme.Ink;
+            label.font = UiFactory.BoldFont;
             label.fontStyle = FontStyle.Bold;
-            label.fontSize = 32;
+            label.fontSize = 30;
+            label.resizeTextForBestFit = false;
             label.text = label.text.ToUpperInvariant();
         }
 

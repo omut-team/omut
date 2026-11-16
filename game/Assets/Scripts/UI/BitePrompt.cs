@@ -21,7 +21,7 @@ namespace Omut.UI
             UiFactory.Place(big.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(1200f, 100f), new Vector2(0f, 180f));
 
             hint = UiFactory.HudLabel(canvas.transform, "", 28, TextAnchor.MiddleCenter);
-            UiFactory.Place(hint.rectTransform, new Vector2(0.5f, 0f), new Vector2(1400f, 44f), new Vector2(0f, 20f));
+            UiFactory.Place(hint.rectTransform, new Vector2(0.5f, 0f), new Vector2(1400f, 44f), new Vector2(0f, 160f));
         }
 
         private void Update()

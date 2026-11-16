@@ -16,7 +16,7 @@ namespace Omut.UI
         private static string prompt;
         private static int promptPriority = int.MinValue;
 
-        private RectTransform panel;
+        private Image panel;
         private Text panelText;
         private Text promptText;
 
@@ -49,18 +49,17 @@ namespace Omut.UI
 
         private void Awake()
         {
-            Canvas canvas = UiFactory.CreateCanvas("HudCanvas", 20, transform);
-
-            Image back = UiFactory.Panel(canvas.transform, "Panel", UiFactory.Theme.Hud);
-            panel = back.rectTransform;
-            UiFactory.Place(panel, new Vector2(0f, 1f), new Vector2(560f, 100f), new Vector2(20f, -20f));
-            panelText = UiFactory.HudLabel(panel, "", 28, TextAnchor.UpperLeft);
-            UiFactory.Stretch(panelText.rectTransform, 14f);
+            panel = HudLayout.AddPanel(HudLayout.Left, "Stats", 470f, 100f);
+            panel.transform.SetAsFirstSibling(); // монеты всегда сверху, страх под ними
+            panelText = UiFactory.HudLabel(panel.transform, "", 27, TextAnchor.UpperLeft);
+            UiFactory.Stretch(panelText.rectTransform, 22f);
             panelText.supportRichText = true;
+            panelText.lineSpacing = 1.1f;
 
-            promptText = UiFactory.HudLabel(canvas.transform, "", 38, TextAnchor.MiddleCenter);
+            Canvas canvas = UiFactory.CreateCanvas("PromptCanvas", 22, transform);
+            promptText = UiFactory.HudLabel(canvas.transform, "", 36, TextAnchor.MiddleCenter);
             promptText.color = UiFactory.Theme.Gold;
-            UiFactory.Place(promptText.rectTransform, new Vector2(0.5f, 0f), new Vector2(1400f, 60f), new Vector2(0f, 90f));
+            UiFactory.Place(promptText.rectTransform, new Vector2(0.5f, 0f), new Vector2(1400f, 60f), new Vector2(0f, 210f));
         }
 
         private void LateUpdate()
@@ -82,7 +81,7 @@ namespace Omut.UI
                 string result = sb.ToString().TrimEnd();
                 panelText.text = result;
                 int count = result.Length == 0 ? 0 : result.Split('\n').Length;
-                panel.sizeDelta = new Vector2(560f, 28f + count * 36f);
+                HudLayout.SetHeight(panel, count == 0 ? 0f : panelText.preferredHeight + 44f);
                 panel.gameObject.SetActive(count > 0);
             }
 

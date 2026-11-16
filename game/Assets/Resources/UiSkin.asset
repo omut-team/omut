@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eeac3dfac155c924c8a26e2b44c2744d, type: 3}
+  m_Name: UiSkin
+  m_EditorClassIdentifier: Omut::Omut.UI.UiSkin
+  bodyFont: {fileID: 12800000, guid: 73bda495a24c91543898d778d44e0da4, type: 3}
+  boldFont: {fileID: 12800000, guid: d44e29c372dfb574b8a33b410df21fcb, type: 3}
+  titleFont: {fileID: 12800000, guid: 484ca8ae00b090248ba5053ed3442038, type: 3}
+  panel: {fileID: 21300000, guid: 88fdf491a7dfac2428b40ed211059289, type: 3}
+  plank: {fileID: 21300000, guid: 78d100accc8ce2e4f92d6f44d6f8b5d6, type: 3}
+  button: {fileID: 21300000, guid: f0299393b0b3df841823b7a0924dda11, type: 3}
+  slot: {fileID: 21300000, guid: 4de7c63fb8dac45419ec132ada9cbf80, type: 3}
+  slotSelected: {fileID: 21300000, guid: 16fb8acc7b5f6cc47b0bb0fe22f944c7, type: 3}
+  hud: {fileID: 21300000, guid: fa9b17f97a385b547bb0bb5220879558, type: 3}
+  bar: {fileID: 21300000, guid: fbc2d617d6ba12b4495522e7af4be53f, type: 3}
+  tag: {fileID: 21300000, guid: 8a39788ef3f7f4546916326107479990, type: 3}
+  markQuest: {fileID: 21300000, guid: 6f73728302b7edd4692216b5e7198ab2, type: 3}
+  markTurnIn: {fileID: 21300000, guid: 8687b6a841a16da44ada2bf1425a7e26, type: 3}
+  arrow: {fileID: 21300000, guid: ee2c911a159c33642bd87a83f19ec62a, type: 3}
