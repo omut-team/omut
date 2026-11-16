@@ -33,6 +33,13 @@ namespace Omut.Core
             flags.Clear();
             LorePieces = 0;
             Quests = new QuestManager(database != null ? database.quests : new List<QuestData>());
+            // Поймал нужную рыбу: сразу видно, сколько осталось.
+            Quests.ProgressChanged += q =>
+            {
+                int done = Quests.Progress(q, this);
+                Notifications.Show(done >= q.count ? $"Задание «{q.title}» выполнено! Сдай: {(q.giver == NpcId.Taras ? "дед Тарас" : "Михалыч")}"
+                    : $"{q.title}: {done} из {q.count}", UiFactory.Theme.Gold);
+            };
         }
 
         private void CaptureQuests(SaveData data)
@@ -87,6 +94,9 @@ namespace Omut.Core
                     ("Возьмусь", () =>
                     {
                         Quests.Accept(quest);
+                        // Нужная рыба уже в трюме: засчитываем сразу, чтобы не ловить заново.
+                        if (quest.goal == QuestGoal.CatchFish)
+                            Quests.SetProgressAtLeast(quest, Hold.CountOf(quest.fishId));
                         Notifications.Show("Новое задание: " + quest.title, UiFactory.Theme.Gold);
                         ui.ShowMenu("Договорились.");
                     }),

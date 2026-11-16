@@ -375,5 +375,26 @@ namespace Omut.Tests
             Object.FindAnyObjectByType<BagUI>().Close();
             Assert.AreEqual(GameState.Sailing, GameManager.Instance.CurrentState);
         }
+
+        // Фонарь зажигается и на берегу (F), сам оказывается в руке и плавно разгорается.
+        [UnityTest]
+        public IEnumerator Lantern_WorksOnFoot_AndGoesToHand()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance.StartGame();
+            yield return null;
+            Assert.IsTrue(PlayerWalker.OnFoot, "Игра начинается на берегу");
+
+            if (Lantern.Instance.IsOn)
+                Lantern.Instance.Toggle();
+            Lantern.Instance.Toggle();
+            Assert.IsTrue(Lantern.Instance.IsOn);
+            Assert.IsTrue(Hotbar.HoldsLantern);
+            yield return new WaitForSeconds(0.5f);
+
+            Lantern.Instance.Toggle();
+            Assert.IsFalse(Lantern.Instance.IsOn);
+            Assert.IsFalse(Hotbar.HoldsLantern, "Погасил: снова удочка");
+        }
     }
 }

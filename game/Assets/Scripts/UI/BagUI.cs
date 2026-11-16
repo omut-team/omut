@@ -93,7 +93,8 @@ namespace Omut.UI
                 if (item.catchInfo.fishId == "scrap")
                     scrap++;
 
-            Add("Удочка", "", "Старая удочка деда. Space: заброс, ЛКМ: тянуть.", rodSprite, 0);
+            int rodSlot = Mathf.Max(0, System.Array.IndexOf(new[] { BaitType.Worm, BaitType.Spoon, BaitType.Phosphor }, tackle.Current));
+            Add("Удочка", "", "Старая удочка деда. Space: заброс, ЛКМ: тянуть.", rodSprite, rodSlot);
             Add("Червь", "∞", "Берут все мирные рыбы. Не кончается.", Bait(0), 0);
             Add("Блесна", tackle.Count(BaitType.Spoon).ToString(), "На хищника: окунь, щука, судак. Тарас продаёт по 5 штук.", Bait(1), 1);
             Add("Фосфорная блесна", tackle.Count(BaitType.Phosphor).ToString(), "Светится. Только ночью, на мутантов в тумане.", Bait(2), 2);

@@ -72,7 +72,8 @@ namespace Omut.Player
                 Fuel.Set(session.Kerosene);
 
             bool playing = game != null && game.CurrentState != GameState.Menu && game.CurrentState != GameState.Paused;
-            if (playing && !PlayerWalker.OnFoot && game.CurrentState == GameState.Sailing && Controls.Pressed(Controls.Lantern))
+            // F работает и в лодке, и на берегу (фонарь в руке).
+            if (playing && game.CurrentState == GameState.Sailing && Controls.Pressed(Controls.Lantern))
                 Toggle();
 
             if (playing && Fuel.Burn(Time.deltaTime))
@@ -94,25 +95,96 @@ namespace Omut.Player
 
             Fuel.Toggle();
             GameEvents.RaisePlaySound("lantern");
+            // Зажёг: фонарь сам оказывается в руке. Погасил: снова удочка.
+            Hotbar.Instance?.TakeInHand(IsOn);
+        }
+
+        // ---------- анимация огня ----------
+
+        private float glow;          // 0 = погашен, 1 = горит (плавно разгорается и гаснет)
+        private SpriteRenderer boatGlow;
+        private SpriteRenderer handGlow;
+        private static Sprite glowSprite;
+
+        // Тёплое пятно света у фонаря: видно даже днём, мерцает как огонь.
+        private SpriteRenderer CreateGlow(Transform parent, Vector2 position)
+        {
+            if (parent == null)
+                return null;
+            if (glowSprite == null)
+            {
+                const int size = 32;
+                var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { filterMode = FilterMode.Bilinear };
+                for (int y = 0; y < size; y++)
+                for (int x = 0; x < size; x++)
+                {
+                    float d = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(size / 2f, size / 2f)) / (size / 2f);
+                    float a = Mathf.Clamp01(1f - d);
+                    texture.SetPixel(x, y, new Color(1f, 1f, 1f, a * a));
+                }
+                texture.Apply();
+                glowSprite = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 32f);
+            }
+
+            var go = new GameObject("FlameGlow");
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = position;
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = glowSprite;
+            sr.sortingOrder = 3;
+            GameSession session = GameSession.Instance;
+            if (session != null && session.Database != null && session.Database.unlitMaterial != null)
+                sr.sharedMaterial = session.Database.unlitMaterial;
+            return sr;
+        }
+
+        private void AnimateGlow(SpriteRenderer sr, bool visible, float flicker)
+        {
+            if (sr == null)
+                return;
+            sr.enabled = visible && glow > 0.01f;
+            sr.color = new Color(1f, 0.78f, 0.35f, 0.75f * glow);
+            sr.transform.localScale = Vector3.one * (0.9f + 0.6f * glow) * flicker;
         }
 
         private void UpdateLights(GameSession session)
         {
+            glow = Mathf.MoveTowards(glow, IsOn ? 1f : 0f, Time.deltaTime * 4f);
+            float flicker = 1f + Mathf.Sin(Time.time * 11f) * 0.05f + Mathf.Sin(Time.time * 23f) * 0.03f;
+            if (boatGlow == null && lanternLight != null)
+                boatGlow = CreateGlow(lanternLight.transform, Vector2.zero);
+            if (handGlow == null && walkerLight != null)
+                handGlow = CreateGlow(walkerLight.transform, new Vector2(0.3f, -0.05f));
+            AnimateGlow(boatGlow, !PlayerWalker.OnFoot, flicker);
+            AnimateGlow(handGlow, PlayerWalker.OnFoot && Hotbar.HoldsLantern, flicker);
+
             float radius = session != null && session.CurrentBoat != null ? session.CurrentBoat.lightRadius : 2.5f;
             bool dark = DayNightCycle.Instance == null || DayNightCycle.Instance.Clock.Phase == DayPhase.Night
                         || DayNightCycle.Instance.Clock.Phase == DayPhase.Evening || FogController.InEternalFog;
 
             if (lanternLight != null)
             {
-                bool lit = !PlayerWalker.OnFoot && dark;
+                // Свет разгорается плавно (glow) и мерцает как огонь.
+                bool lit = !PlayerWalker.OnFoot && (dark || glow > 0.01f);
                 lanternLight.enabled = lit;
-                lanternLight.pointLightOuterRadius = IsOn ? radius : moonRadius;
-                lanternLight.pointLightInnerRadius = IsOn ? radius * 0.35f : 0f;
-                lanternLight.intensity = IsOn ? 1.1f + Mathf.Sin(Time.time * 9f) * 0.04f : 0.35f; // лёгкое мерцание огня
+                lanternLight.pointLightOuterRadius = Mathf.Lerp(moonRadius, radius, glow);
+                lanternLight.pointLightInnerRadius = radius * 0.35f * glow;
+                lanternLight.intensity = Mathf.Lerp(dark ? 0.35f : 0f, 1.1f * flicker, glow);
             }
 
             if (walkerLight != null)
-                walkerLight.enabled = PlayerWalker.OnFoot && dark;
+            {
+                // На берегу: в темноте немного видно и так, с фонарём в руке свет шире и мерцает.
+                walkerLight.enabled = PlayerWalker.OnFoot && (dark || glow > 0.01f);
+                walkerLight.pointLightOuterRadius = Mathf.Lerp(2.2f, 4f, glow);
+                walkerLight.intensity = Mathf.Lerp(dark ? 0.7f : 0f, 1f * flicker, glow);
+                if (handGlow != null)
+                {
+                    SpriteRenderer body = walkerLight.transform.parent != null ? walkerLight.transform.parent.GetComponent<SpriteRenderer>() : null;
+                    bool left = body != null && body.flipX;
+                    handGlow.transform.localPosition = new Vector2(left ? -0.3f : 0.3f, -0.05f);
+                }
+            }
         }
 
         // Светит ли что-то рядом с этой точкой (для паники): фонарь лодки.
