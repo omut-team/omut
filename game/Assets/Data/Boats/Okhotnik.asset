@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Okhotnik
   m_EditorClassIdentifier: Omut::Omut.Player.BoatData
   displayName: "\u041E\u0445\u043E\u0442\u043D\u0438\u043A \u0437\u0430 \u0442\u0435\u043D\u044F\u043C\u0438"
-  sprite: {fileID: 21300000, guid: b1b317d824d604a4d8323b9706b8aa46, type: 3}
+  sprite: {fileID: 21300000, guid: 91c14023351ff2a40b3c779abd195e93, type: 3}
   price: 3500
   scrapPrice: 6
   maxSpeed: 4.2

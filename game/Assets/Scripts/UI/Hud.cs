@@ -59,7 +59,7 @@ namespace Omut.UI
             Canvas canvas = UiFactory.CreateCanvas("PromptCanvas", 22, transform);
             promptText = UiFactory.HudLabel(canvas.transform, "", 36, TextAnchor.MiddleCenter);
             promptText.color = UiFactory.Theme.Gold;
-            UiFactory.Place(promptText.rectTransform, new Vector2(0.5f, 0f), new Vector2(1400f, 60f), new Vector2(0f, 150f));
+            UiFactory.Place(promptText.rectTransform, new Vector2(0.5f, 0f), new Vector2(1400f, 60f), new Vector2(0f, 210f));
         }
 
         private void LateUpdate()
@@ -81,7 +81,7 @@ namespace Omut.UI
                 string result = sb.ToString().TrimEnd();
                 panelText.text = result;
                 int count = result.Length == 0 ? 0 : result.Split('\n').Length;
-                HudLayout.SetHeight(panel, 40f + count * 34f);
+                HudLayout.SetHeight(panel, count == 0 ? 0f : panelText.preferredHeight + 44f);
                 panel.gameObject.SetActive(count > 0);
             }
 

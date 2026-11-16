@@ -33,6 +33,7 @@ namespace Omut.Core
         private AudioSource musicA;
         private AudioSource musicB;
         private AudioSource sfx;
+        private AudioSource voice;
         private bool nightPlaying;
         private float crossfade = 1f;
 
@@ -45,6 +46,7 @@ namespace Omut.Core
             musicA = CreateSource(true);
             musicB = CreateSource(true);
             sfx = CreateSource(false);
+            voice = CreateSource(false);
 
             foreach (NamedClip named in clips)
             {
@@ -102,6 +104,67 @@ namespace Omut.Core
 
             if (clip != null)
                 sfx.PlayOneShot(clip, SfxVolume);
+        }
+
+        private float VoiceVolume => SettingsManager.Instance != null ? SettingsManager.Instance.Data.voiceVolume : 1f;
+
+        // Реплика вслух: записанный голос (Resources/Voice) или "бормотание", если файла нет.
+        public void PlayVoice(string speaker, string text)
+        {
+            CancelInvoke(nameof(StopVoice));
+            voice.Stop();
+            if (string.IsNullOrEmpty(text) || VoiceVolume <= 0.001f)
+                return;
+
+            AudioClip clip = Resources.Load<AudioClip>(VoiceLines.Folder + "/" + VoiceLines.ClipName(speaker, text));
+            voice.pitch = 1f;
+            if (clip == null)
+            {
+                clip = Babble(VoiceLines.Syllables(text));
+                voice.pitch = VoiceLines.Pitch(speaker);
+            }
+
+            voice.clip = clip;
+            voice.volume = VoiceVolume;
+            voice.Play();
+        }
+
+        public void StopVoice() => voice.Stop();
+
+        public bool VoicePlaying => voice != null && voice.isPlaying;
+
+        private AudioClip babble;
+
+        // Короткие "слоги" разной высоты, как в Animal Crossing. Не дольше 4 секунд.
+        private AudioClip Babble(int syllables)
+        {
+            const int rate = 22050;
+            const float syllable = 0.09f;
+            int count = Mathf.Clamp(syllables, 2, 40);
+            if (babble == null)
+            {
+                var data = new float[(int)(rate * syllable * 40)];
+                var random = new System.Random(7);
+                for (int s = 0; s < 40; s++)
+                {
+                    float freq = 180f + (float)random.NextDouble() * 140f;
+                    int start = (int)(s * syllable * rate);
+                    int length = (int)(syllable * rate * 0.8f);
+                    for (int i = 0; i < length; i++)
+                    {
+                        float t = i / (float)rate;
+                        float env = Mathf.Sin(Mathf.PI * i / length);
+                        data[start + i] = env * 0.35f * (Mathf.Sin(2f * Mathf.PI * freq * t) + 0.3f * Mathf.Sin(4f * Mathf.PI * freq * t));
+                    }
+                }
+
+                babble = AudioClip.Create("babble", data.Length, 1, rate, false);
+                babble.SetData(data, 0);
+            }
+
+            // Обрезать до нужного числа слогов: отдельный клип на каждую длину не нужен, хватит остановить вовремя.
+            Invoke(nameof(StopVoice), count * syllable);
+            return babble;
         }
 
         public bool HasSound(string id) => cache.ContainsKey(id) || Array.IndexOf(ProceduralSounds.Ids, id) >= 0;

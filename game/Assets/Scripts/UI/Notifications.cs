@@ -30,7 +30,7 @@ namespace Omut.UI
             instance = this;
             Canvas canvas = UiFactory.CreateCanvas("NotificationsCanvas", 80, transform);
             column = UiFactory.Rect(canvas.transform, "Lines");
-            UiFactory.Place(column, new Vector2(0.5f, 0f), new Vector2(1400f, 260f), new Vector2(0f, 150f));
+            UiFactory.Place(column, new Vector2(0.5f, 0f), new Vector2(1400f, 260f), new Vector2(0f, 260f));
             VerticalLayoutGroup layout = UiFactory.Column(column, 4f, TextAnchor.LowerCenter);
             layout.childControlHeight = false;
 

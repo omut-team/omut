@@ -131,11 +131,7 @@ def boat(name, hull, deck, cabin, lamp, folder=None):
         save(img, 'boat_' + name)
 
 
-boat('sledopyt', (60, 90, 120), (170, 150, 110), (200, 200, 190), (255, 240, 170))
-boat('okhotnik', (40, 40, 50), (90, 80, 70), (60, 70, 80), (255, 230, 120))
-# Заглушка баркаса лежит в Art/Boats (её заменит рисунок Ульяны с тем же именем).
-boat('barkas', (120, 80, 45), (170, 130, 80), (140, 100, 60), (230, 80, 50),
-     os.path.join(os.path.dirname(__file__), '..', 'game', 'Assets', 'Art', 'Boats'))
+# Лодки теперь рисует Ульяна (design/export/boats -> tools/make_boats.py), заглушки не нужны.
 
 
 # ---------- люди 32x48 и портреты 96x96 ----------

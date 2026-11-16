@@ -68,6 +68,7 @@ namespace Omut.EditorTools
         {
             OmutDataBuilder.Build(true);
             BuildMainScene();
+            OmutVoiceExport.Export();
         }
 
         public static Omut.Core.GameDatabase Database =>

@@ -165,6 +165,7 @@ namespace Omut.EditorTools
             SetRef(chest.gameObject.AddComponent<DockChest>(), "sprite", chest);
 
             Transform hero = dock.Find("Hero");
+            EnsureComponent<HeldItemView>(hero.gameObject).Setup(hero.GetComponent<SpriteRenderer>());
             Light2D heroLight = PointLight(hero, "WalkerLight", new Vector2(0f, 0.6f), 2.2f, 0.7f, new Color(1f, 0.85f, 0.6f));
             heroLight.enabled = false;
         }
@@ -183,9 +184,15 @@ namespace Omut.EditorTools
                 capsule.offset = new Vector2(0f, 0.35f);
             }
 
-            Light2D light = PointLight(boat.transform, "LanternLight", new Vector2(0.3f, 0.7f), 2.5f, 1.1f, new Color(1f, 0.85f, 0.55f));
+            // Фонарь на мачте лодки Ульяны (справа сверху).
+            Light2D light = PointLight(boat.transform, "LanternLight", new Vector2(0.75f, 1.0f), 2.5f, 1.1f, new Color(1f, 0.85f, 0.55f));
             Lantern lantern = EnsureComponent<Lantern>(boat.gameObject);
             SetRef(lantern, "lanternLight", light);
+
+            // Сымон сидит в лодке с удочкой.
+            EnsureComponent<BoatRider>(boat.gameObject).Setup(boat.GetComponentInChildren<SpriteRenderer>(),
+                OmutDataBuilder.FindSprite("hero_symon_sit"), OmutDataBuilder.FindSprite("item_rod"));
+            EditorUtility.SetDirty(boat);
         }
 
         static partial void BuildMoreDockPeople(Transform dock)
@@ -213,6 +220,18 @@ namespace Omut.EditorTools
             EnsureComponent<CreditsUI>(ui);
             SetRef(EnsureComponent<DialogueUI>(ui), "heroPortrait", OmutDataBuilder.FindSprite("hero_symon_portrait"));
             EnsureComponent<InventoryUI>(ui);
+
+            // Подсказки: цели справа, стрелка к цели, таблички над жителями.
+            EnsureComponent<Guide>(ui);
+
+            // Панель предметов (1-6) и сумка (B).
+            Sprite[] baits = { OmutDataBuilder.FindSprite("item_worm"), OmutDataBuilder.FindSprite("item_spoon"), OmutDataBuilder.FindSprite("item_phosphor_spoon") };
+            EnsureComponent<Hotbar>(ui).SetSprites(OmutDataBuilder.FindSprite("item_rod"), OmutDataBuilder.FindSprite("item_lantern"),
+                OmutDataBuilder.FindSprite("item_thermos"), OmutDataBuilder.FindSprite("item_map"), baits);
+            EnsureComponent<BagUI>(ui).SetSprites(OmutDataBuilder.FindSprite("item_rod"), OmutDataBuilder.FindSprite("item_lantern"),
+                OmutDataBuilder.FindSprite("item_thermos"), OmutDataBuilder.FindSprite("item_map"), OmutDataBuilder.FindSprite("item_scrap"),
+                OmutDataBuilder.FindSprite("item_diary_page"), OmutDataBuilder.FindSprite("item_coin"), baits);
+            EditorUtility.SetDirty(ui);
         }
     }
 }

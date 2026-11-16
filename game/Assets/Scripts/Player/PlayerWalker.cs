@@ -82,11 +82,15 @@ namespace Omut.Player
         {
             Vector2 position = transform.position;
 
+            // Если уже стоим внутри чего-то (вышли из лодки рядом с NPC, сундуком), даём выйти,
+            // иначе Сымон застрял бы навсегда: проверяем только землю под ногами.
+            bool stuck = !CanStand(position);
+
             Vector2 tryX = position + new Vector2(delta.x, 0f);
-            if (CanStand(tryX)) position = tryX;
+            if (stuck ? WalkableGround.IsWalkable(tryX, 0f) : CanStand(tryX)) position = tryX;
 
             Vector2 tryY = position + new Vector2(0f, delta.y);
-            if (CanStand(tryY)) position = tryY;
+            if (stuck ? WalkableGround.IsWalkable(tryY, 0f) : CanStand(tryY)) position = tryY;
 
             transform.position = position;
 

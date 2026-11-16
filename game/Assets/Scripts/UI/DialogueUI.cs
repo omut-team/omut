@@ -121,8 +121,7 @@ namespace Omut.UI
             }
 
             DialogueLine line = queue[lineIndex];
-            SetSpeaker(line.speaker);
-            bodyText.text = line.text;
+            Show(line.speaker, line.text);
 
             ClearOptions();
             AddOption(lineIndex == queue.Count - 1 ? "Дальше" : "Дальше  (Space)", NextLine);
@@ -152,8 +151,7 @@ namespace Omut.UI
             }
 
             GameSession session = GameSession.Instance;
-            SetSpeaker(npc.DisplayName);
-            bodyText.text = greeting ?? "Чего тебе, внук Язэпа?";
+            Show(npc.DisplayName, greeting ?? "Чего тебе, внук Язэпа?");
             ClearOptions();
 
             if (session != null)
@@ -185,8 +183,7 @@ namespace Omut.UI
         // Короткий ответ NPC и кнопка "Назад" в меню.
         public void Say(string text, Action back = null)
         {
-            SetSpeaker(npc != null ? npc.DisplayName : "");
-            bodyText.text = text;
+            Show(npc != null ? npc.DisplayName : "", text);
             ClearOptions();
             AddOption("Назад", back ?? (() => ShowMenu("Что-нибудь ещё?")));
         }
@@ -194,14 +191,21 @@ namespace Omut.UI
         // Вопрос с ответами.
         public void Ask(string text, params (string label, Action action)[] answers)
         {
-            SetSpeaker(npc != null ? npc.DisplayName : "");
-            bodyText.text = text;
+            Show(npc != null ? npc.DisplayName : "", text);
             ClearOptions();
             foreach ((string label, Action action) in answers)
                 AddOption(label, action);
         }
 
         // ---------- помощники ----------
+
+        // Показать реплику и озвучить её.
+        private void Show(string speaker, string text)
+        {
+            SetSpeaker(speaker);
+            bodyText.text = text;
+            AudioManager.Instance?.PlayVoice(speaker, text);
+        }
 
         private void SetSpeaker(string speaker)
         {
@@ -221,6 +225,7 @@ namespace Omut.UI
 
         protected override void OnClosed()
         {
+            AudioManager.Instance?.StopVoice();
             queue = null;
             afterLines = null;
         }

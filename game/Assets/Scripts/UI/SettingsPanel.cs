@@ -17,6 +17,7 @@ namespace Omut.UI
         private Slider master;
         private Slider music;
         private Slider sfx;
+        private Slider voice;
         private Toggle fullscreen;
         private Toggle vSync;
         private Text resolutionText;
@@ -26,7 +27,7 @@ namespace Omut.UI
         public SettingsPanel(Transform parent, Action onClose)
         {
             this.onClose = onClose;
-            root = UiFactory.Window(parent, "Settings", new Vector2(900f, 640f), "Настройки", out _);
+            root = UiFactory.Window(parent, "Settings", new Vector2(900f, 720f), "Настройки", out _);
             root = (RectTransform)root.parent; // прячем вместе с затемнением
 
             CollectResolutions();
@@ -42,6 +43,7 @@ namespace Omut.UI
             master.SetValueWithoutNotify(editing.masterVolume);
             music.SetValueWithoutNotify(editing.musicVolume);
             sfx.SetValueWithoutNotify(editing.sfxVolume);
+            voice.SetValueWithoutNotify(editing.voiceVolume);
             fullscreen.SetIsOnWithoutNotify(editing.fullscreen);
             vSync.SetIsOnWithoutNotify(editing.vSync);
             resolutionIndex = FindResolution(editing.resolutionWidth, editing.resolutionHeight);
@@ -66,6 +68,7 @@ namespace Omut.UI
             master = UiFactory.Slider(column, "Общая громкость", 1f, v => editing.masterVolume = v);
             music = UiFactory.Slider(column, "Музыка", 1f, v => editing.musicVolume = v);
             sfx = UiFactory.Slider(column, "Звуки", 1f, v => editing.sfxVolume = v);
+            voice = UiFactory.Slider(column, "Голоса", 1f, v => editing.voiceVolume = v);
             fullscreen = UiFactory.Toggle(column, "Полный экран", true, v => editing.fullscreen = v);
             vSync = UiFactory.Toggle(column, "Вертикальная синхронизация (VSync)", true, v => editing.vSync = v);
             resolutionText = UiFactory.Selector(column, "Разрешение", "", () => StepResolution(-1), () => StepResolution(1));

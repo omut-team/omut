@@ -95,7 +95,7 @@ namespace Omut.Player
             return new PanicConditions(night, FogController.InEternalFog, lantern, safe, multiplier);
         }
 
-        private static void DrinkTea(GameSession session)
+        public static void DrinkTea(GameSession session)
         {
             if (session.Thermos <= 0)
             {
