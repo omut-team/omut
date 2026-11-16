@@ -47,6 +47,7 @@ namespace Omut.Core
             Merchant.AddMoreGoods = AddBaitGoods;
 
             hudLines.Add(() => $"Монеты: <b>{Wallet.Money}</b>");
+            hudLines.Add(BoatHudLine);
             hudLines.Add(QuestHudLine);
             hudLines.Add(() => $"Наживка: <b>{BaitTitle(Tackle.Current)}</b>{(TackleBox.IsInfinite(Tackle.Current) ? "" : $" ({Tackle.Count(Tackle.Current)})")}  [Q]");
             foreach (System.Func<string> line in hudLines)
@@ -139,12 +140,16 @@ namespace Omut.Core
             Tackle.Add(BaitType.Spoon, 3);
             TotalCaught = 0;
             ResetQuests();
+            ResetBoats();
+            BoatChanged?.Invoke(CurrentBoat);
         }
 
         // Пересесть на другую лодку: другой размер трюма. Что не влезло, остаётся на берегу (продаётся Тарасу автоматически).
         public void SetBoat(BoatData boat)
         {
             CurrentBoat = boat;
+            AddOwnedBoat(boat);
+            Boat.SetMax(boat.durability, true);
             System.Collections.Generic.List<GridItem> overflow = Hold.Resize(boat.holdWidth, boat.holdHeight);
             foreach (GridItem item in overflow)
                 Wallet.Earn(item.catchInfo.price);

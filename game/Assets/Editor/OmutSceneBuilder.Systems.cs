@@ -32,7 +32,7 @@ namespace Omut.EditorTools
                 new System.Collections.Generic.List<string> { "Ну что, лодка цела?", "Железо привёз?", "Мотор слышу издалека. Заходи." });
         }
 
-        private static Omut.NPC.Npc AddMikhalych(GameObject go) => go.AddComponent<Omut.NPC.Npc>();
+        private static Omut.NPC.Npc AddMikhalych(GameObject go) => go.AddComponent<Omut.NPC.Shipyard>();
 
         static partial void BuildUi(GameObject ui)
         {
@@ -40,6 +40,7 @@ namespace Omut.EditorTools
             EnsureComponent<ShopUI>(ui);
             EnsureComponent<JournalUI>(ui);
             EnsureComponent<QuestLogUI>(ui);
+            EnsureComponent<ShipyardUI>(ui);
             SetRef(EnsureComponent<DialogueUI>(ui), "heroPortrait", OmutDataBuilder.FindSprite("hero_symon_portrait"));
             EnsureComponent<InventoryUI>(ui);
         }
