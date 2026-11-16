@@ -101,6 +101,9 @@ namespace Omut.World
                 PhaseChanged?.Invoke(before, Phase);
         }
 
+        // Номер дня (из сохранения).
+        public void SetDay(int day) => Day = Math.Max(1, day);
+
         public static DayPhase GetPhase(float minutes)
         {
             minutes = Wrap(minutes);
