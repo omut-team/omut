@@ -15,6 +15,9 @@ namespace Omut.UI
             "Правило озера: в 20:00 бьёт колокол маяка. После него безопасно только у света.\n\n" +
             "Групповой проект по ТРПО, группа ПО-2409, 2026.";
 
+        [Tooltip("Фон главного меню (Ульяна: Art/UI/ui_menu_bg)")]
+        [SerializeField] private Sprite background;
+
         private Canvas canvas;
         private RectTransform root;
         private RectTransform buttons;
@@ -40,7 +43,18 @@ namespace Omut.UI
 
         private void Build()
         {
-            Image shade = UiFactory.Panel(canvas.transform, "MainMenu", new Color(0.03f, 0.07f, 0.09f, 0.72f));
+            if (background != null)
+            {
+                Image bg = UiFactory.Panel(canvas.transform, "Background", Color.white);
+                bg.sprite = background;
+                UiFactory.Stretch(bg.rectTransform);
+                // Растянуть по экрану без искажения (лишнее обрезается).
+                var fitter = bg.gameObject.AddComponent<AspectRatioFitter>();
+                fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+                fitter.aspectRatio = background.rect.width / background.rect.height;
+            }
+
+            Image shade = UiFactory.Panel(canvas.transform, "MainMenu", new Color(0.03f, 0.07f, 0.09f, background != null ? 0.45f : 0.72f));
             root = UiFactory.Stretch(shade.rectTransform);
 
             Text title = UiFactory.HudLabel(root, "ОМУТ", 150, TextAnchor.MiddleCenter);

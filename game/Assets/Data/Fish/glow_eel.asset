@@ -19,7 +19,7 @@ MonoBehaviour:
     \u0438\u0437\u043D\u0443\u0442\u0440\u0438. \u0422\u044F\u043D\u0435\u0442 \u043D\u0430\u043E\u0431\u043E\u0440\u043E\u0442:
     \u0447\u0435\u043C \u0441\u0438\u043B\u044C\u043D\u0435\u0435 \u0434\u0435\u0440\u0436\u0438\u0448\u044C,
     \u0442\u0435\u043C \u043B\u0435\u0433\u0447\u0435 \u0435\u043C\u0443 \u0443\u0439\u0442\u0438."
-  sprite: {fileID: 21300000, guid: 1b7bea862bf61174b9ecf03d5ead218e, type: 3}
+  sprite: {fileID: 21300000, guid: 64da42cbd4b0bf144929e49febf52aff, type: 3}
   minWeight: 3
   maxWeight: 7.2
   pricePerKg: 40
