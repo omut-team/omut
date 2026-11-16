@@ -37,3 +37,26 @@ MonoBehaviour:
   - {fileID: 11400000, guid: da08f5826b9d4f945b5dcae25b29e453, type: 2}
   - {fileID: 11400000, guid: e8590b1a7c001e14a9c7d0eec1c2f80a, type: 2}
   - {fileID: 11400000, guid: dd6c6c84675bfc84f8c9c462f8c6422a, type: 2}
+  quests:
+  - {fileID: 11400000, guid: 66b8c3f2074c69247a6b8a99b3eca686, type: 2}
+  - {fileID: 11400000, guid: 681503d6d467f624fb1913fd3f6d8886, type: 2}
+  - {fileID: 11400000, guid: 780ae2c10cc00a742beee80f05be15c9, type: 2}
+  - {fileID: 11400000, guid: 399e0797f5b0f1a4ea7a06582d43aeca, type: 2}
+  - {fileID: 11400000, guid: f419becb6eda5004cb8df27acc95b6f5, type: 2}
+  notes:
+  - {fileID: 11400000, guid: 8f21b0029df29b64bba7a3cd4781315a, type: 2}
+  - {fileID: 11400000, guid: 2009f0b070db3ee40acc45b60bf14792, type: 2}
+  - {fileID: 11400000, guid: 85f265b2c8e00684c9a56856c470571b, type: 2}
+  - {fileID: 11400000, guid: 756ecafa63a62b440bb5ea65d405511d, type: 2}
+  - {fileID: 11400000, guid: d77342e176997584aabdc3fae329fc61, type: 2}
+  - {fileID: 11400000, guid: bd0aa539f9a181741b38006cb89266aa, type: 2}
+  - {fileID: 11400000, guid: 765206d166e4b5d45b80592a52f0a770, type: 2}
+  - {fileID: 11400000, guid: f78ac83504962604ebd4bae7a24caa22, type: 2}
+  - {fileID: 11400000, guid: 1d01e86e2ea5f3c4f9ed1a2ed1c81f90, type: 2}
+  - {fileID: 11400000, guid: 09fc41ff77b1a6e47982dfcccf3b215c, type: 2}
+  - {fileID: 11400000, guid: be246087b0274f54c965252e43f252d0, type: 2}
+  - {fileID: 11400000, guid: 61e47444ab1b7d74383b6270f54dfa4d, type: 2}
+  dialogues:
+  - {fileID: 11400000, guid: 2d3a0801f90ee0f4680a29409d3dbacd, type: 2}
+  - {fileID: 11400000, guid: 6c5f96f38ed2e97479a7148be2562fd8, type: 2}
+  - {fileID: 11400000, guid: 0dd3717dca3f3ec409c5147c9e68af26, type: 2}

@@ -153,6 +153,12 @@ namespace Omut.Tests
             taras.Interact();
             yield return null;
             Assert.AreEqual(GameState.Shop, GameManager.Instance.CurrentState);
+            Assert.IsTrue(DialogueUI.Instance.IsOpen);
+            DialogueUI.Instance.ShowMenu("тест");
+            yield return null;
+            DialogueUI.Instance.Close();
+            yield return null;
+            ShopUI.Instance.OpenFor(taras);
             yield return null;
             ShopUI.Instance.Close();
             yield return null;

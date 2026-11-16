@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84eb24b8ccc6d974cafcf98a62ef191d, type: 3}
+  m_Name: diary3
+  m_EditorClassIdentifier: Omut::Omut.NPC.NoteData
+  id: diary3
+  kind: 1
+  order: 3
+  title: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 3"
+  text: "\u041D\u0430\u0448\u0451\u043B \u0432 \u0442\u0438\u043D\u0435 \u044F\u0449\u0438\u043A
+    \u0441 \u0431\u0443\u043C\u0430\u0433\u0430\u043C\u0438 \u0441\u0442\u0430\u043D\u0446\u0438\u0438.
+    \u041E\u043F\u044B\u0442 \u043D\u0430\u0437\u044B\u0432\u0430\u043B\u0441\u044F
+    \xAB\u041E\u043C\u0443\u0442\xBB: \u0440\u044B\u0431\u0443 \u043A\u043E\u0440\u043C\u0438\u043B\u0438,
+    \u0447\u0442\u043E\u0431\u044B \u0440\u043E\u0441\u043B\u0430 \u0431\u044B\u0441\u0442\u0440\u0435\u0435.
+    \u0421\u0430\u043C\u0443\u044E \u043F\u0435\u0440\u0432\u0443\u044E \u043D\u0430\u0437\u0432\u0430\u043B\u0438
+    \u0425\u043E\u0437\u044F\u0438\u043D\u043E\u043C."
