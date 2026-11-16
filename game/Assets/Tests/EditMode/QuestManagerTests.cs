@@ -116,6 +116,22 @@ namespace Omut.Tests
         }
 
         [Test]
+        public void SetProgressAtLeast_CountsFishAlreadyInHold()
+        {
+            QuestManager m = Manager();
+            int changed = 0;
+            m.ProgressChanged += _ => changed++;
+            m.SetProgressAtLeast(q1, 2);
+            Assert.AreEqual(0, m.Progress(q1, new Context()), "Не взятое задание не засчитывается");
+
+            m.Accept(q1);
+            m.SetProgressAtLeast(q1, 2);
+            m.SetProgressAtLeast(q1, 1);
+            Assert.AreEqual(2, m.Progress(q1, new Context()));
+            Assert.AreEqual(1, changed);
+        }
+
+        [Test]
         public void NightQuest_OnlyNightCatches()
         {
             QuestManager m = Manager();

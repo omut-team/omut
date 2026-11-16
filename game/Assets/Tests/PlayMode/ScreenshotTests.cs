@@ -127,8 +127,8 @@ namespace Omut.Tests
             fishing.SetState(fishing.Charging);
             fishing.CastPower = 0.6f;
             yield return null;
-            fishing.ShowBobber(fishing.transform.position + new Vector3(2f, -3f));
-            fishing.Landed(fishing.transform.position + new Vector3(2f, -3f));
+            fishing.ShowBobber(fishing.transform.position + new Vector3(3f, 0.5f));
+            fishing.Landed(fishing.transform.position + new Vector3(3f, 0.5f));
             FishingController.ForcedFish = () => fishing.Database.FindFish("pike");
             fishing.RepickFish();
             FishingController.ForcedFish = () => null;
@@ -157,8 +157,8 @@ namespace Omut.Tests
             // Риф днём: вечный туман.
             DayNightCycle().Clock.SetTime(12, 0);
             var body = fishing.GetComponent<Rigidbody2D>();
-            fishing.transform.position = new Vector3(30f, 5f, 0f);
-            body.position = new Vector2(30f, 5f);
+            fishing.transform.position = new Vector3(-3.3f, 15.6f, 0f);
+            body.position = new Vector2(-3.3f, 15.6f);
             Object.FindAnyObjectByType<Omut.World.CameraFollow>().SnapToTarget();
             yield return new WaitForSeconds(2.5f);
             yield return Shot("reef_day");

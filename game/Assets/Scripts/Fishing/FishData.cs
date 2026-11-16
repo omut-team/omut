@@ -19,7 +19,10 @@ namespace Omut.Fishing
         Worm,       // червь: мирная рыба
         Spoon,      // блесна: хищники
         Phosphor,   // фосфорная блесна: только ночные мутанты
-        Any
+        Any,
+        Maggot,     // опарыш (Лиза): как червь, но клюёт быстрее
+        Dough,      // тесто с анисом: как червь, любимое у карпа
+        Leech       // светящаяся пиявка: как фосфорная блесна, любимая у чёрного сома
     }
 
     // Когда клюёт. Можно несколько сразу: Day | Dusk.
@@ -98,7 +101,19 @@ namespace Omut.Fishing
         // Подходит ли время суток.
         public bool BitesAt(DayPhase phase) => (time & ToFishTime(phase)) != 0;
 
-        public bool BitesOn(BaitType usedBait) => bait == BaitType.Any || bait == usedBait;
+        public bool BitesOn(BaitType usedBait) => bait == BaitType.Any || bait == Kind(usedBait);
+
+        // На что похожа наживка для рыбы: опарыш и тесто как червь, пиявка как фосфорная блесна.
+        public static BaitType Kind(BaitType b)
+        {
+            switch (b)
+            {
+                case BaitType.Maggot:
+                case BaitType.Dough: return BaitType.Worm;
+                case BaitType.Leech: return BaitType.Phosphor;
+                default: return b;
+            }
+        }
 
         public static FishTime ToFishTime(DayPhase phase)
         {

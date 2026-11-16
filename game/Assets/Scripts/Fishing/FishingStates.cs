@@ -219,7 +219,8 @@ namespace Omut.Fishing
         {
             FishData fish = c.HookedFish;
             float extra = fish.isBoss ? 0.6f : 1f;
-            c.Reel = new TensionModel(FishBehaviours.Create(fish.behaviour), fish.strength, extra);
+            float pull = FishingController.CurrentRod()?.pull ?? 1f;
+            c.Reel = new TensionModel(FishBehaviours.Create(fish.behaviour), fish.strength * pull, extra);
             c.Sfx("hook");
             GameEvents.RaiseFishHooked(fish);
         }

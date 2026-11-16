@@ -144,24 +144,32 @@ namespace Omut.EditorTools
         {
             Transform dock = world.Find("Dock");
             Transform lighthouse = dock.Find("Lighthouse");
-            Light2D beacon = PointLight(lighthouse, "Beacon", new Vector2(0f, 3.3f), 11f, 1.3f, new Color(1f, 0.9f, 0.65f));
+            Light2D beacon = PointLight(lighthouse, "Beacon", new Vector2(0f, 9.3f), 11f, 1.3f, new Color(1f, 0.9f, 0.65f));
             beacon.gameObject.AddComponent<NightLight>().Setup(true, 9f, 0f);
 
-            Light2D hut = PointLight(dock.Find("Hut"), "Windows", new Vector2(0f, 0.9f), 3f, 0.9f, new Color(1f, 0.75f, 0.45f));
+            Light2D hut = PointLight(dock.Find("Hut"), "Windows", new Vector2(0f, 1.2f), 4f, 0.9f, new Color(1f, 0.75f, 0.45f));
             hut.gameObject.AddComponent<NightLight>().Setup(false, 0f, 0.2f);
 
-            Light2D garage = PointLight(dock.Find("Garage"), "Lamp", new Vector2(0f, 1.6f), 2.5f, 0.8f, new Color(0.9f, 0.9f, 1f));
+            Light2D garage = PointLight(dock.Find("Garage"), "Lamp", new Vector2(0f, 0.8f), 3.5f, 0.9f, new Color(1f, 0.8f, 0.5f));
             garage.gameObject.AddComponent<NightLight>().Setup(false, 0f, 0.1f);
+
+            // Фонари на мостках, как на карте Ульяны.
+            Vector2[] lamps = { new Vector2(1.3f, -11.6f), new Vector2(5.8f, -11.6f), new Vector2(-5.2f, -18.0f), new Vector2(16.7f, -14.0f) };
+            for (int i = 0; i < lamps.Length; i++)
+            {
+                Light2D lamp = PointLight(dock, "PierLamp" + i, lamps[i], 2.6f, 0.9f, new Color(1f, 0.8f, 0.5f));
+                lamp.gameObject.AddComponent<NightLight>().Setup(false, 0f, 0.15f);
+            }
 
             // Водоворот Хозяина Омута в центре омута (появляется ночью после письма деда).
             var boss = new GameObject("BossWhirlpool");
             boss.transform.SetParent(world, false);
-            boss.transform.position = new Vector3(6f, 0f, 0f);
+            boss.transform.position = BossCenter;
             BossEncounter encounter = boss.AddComponent<BossEncounter>();
             SetRef(encounter, "rippleSprite", OmutDataBuilder.FindSprite("fx_ripple"));
             SetRef(encounter, "unlitMaterial", Database.unlitMaterial);
 
-            SpriteRenderer chest = Solid(dock, "DockChest", "obj_dock_chest", new Vector2(-43.3f, 24.3f), new Vector2(1.3f, 0.5f), new Vector2(0f, 0.25f));
+            SpriteRenderer chest = Solid(dock, "DockChest", "obj_dock_chest", ChestPosition, new Vector2(1.3f, 0.5f), new Vector2(0f, 0.25f));
             SetRef(chest.gameObject.AddComponent<DockChest>(), "sprite", chest);
 
             Transform hero = dock.Find("Hero");
@@ -191,7 +199,7 @@ namespace Omut.EditorTools
 
             // Сымон сидит в лодке с удочкой.
             EnsureComponent<BoatRider>(boat.gameObject).Setup(boat.GetComponentInChildren<SpriteRenderer>(),
-                OmutDataBuilder.FindSprite("hero_symon_sit"), OmutDataBuilder.FindSprite("item_rod"));
+                OmutDataBuilder.FindSprite("hero_symon_sit"), OmutDataBuilder.FindSprite("item_rod_bamboo"));
             EditorUtility.SetDirty(boat);
         }
 
@@ -201,6 +209,32 @@ namespace Omut.EditorTools
             AddMikhalych(mikhalych).Setup(Omut.NPC.NpcId.Mikhalych, "Михалыч", OmutDataBuilder.FindSprite("npc_mikhalych_portrait"),
                 Database.FindDialogue("mikhalych_first"),
                 new System.Collections.Generic.List<string> { "Ну что, лодка цела?", "Железо привёз?", "Мотор слышу издалека. Заходи." });
+
+            // Персонажи Ульяны: соседка пани Ядвига гуляет у дома, дед Язэп появляется после финала.
+            GameObject yadviga = Npc(dock, "Yadviga", "npc_yadviga", YadvigaPosition);
+            yadviga.AddComponent<Omut.NPC.Npc>().Setup(Omut.NPC.NpcId.Yadviga, "Пани Ядвига", OmutDataBuilder.FindSprite("npc_yadviga_portrait"),
+                Database.FindDialogue("yadviga_first"),
+                new System.Collections.Generic.List<string> { "Чай пил сегодня?", "Тарас опять ворчит? Он добрый, просто старый.", "Язэп любил вечером сидеть на мостках.", "Береги себя на воде, детка." });
+
+            GameObject yazep = Npc(dock, "Yazep", "npc_yazep", YazepPosition);
+            yazep.AddComponent<Omut.NPC.Yazep>().Setup(Omut.NPC.NpcId.Yazep, "Язэп", OmutDataBuilder.FindSprite("npc_yazep_portrait"),
+                Database.FindDialogue("yazep_first"),
+                new System.Collections.Generic.List<string> { "Озеро стало тише. Слышишь?", "Тарас всё не простит мне ту щуку.", "Лови, внук. А я посижу, посмотрю." });
+
+            Animate(dock.Find("Taras").gameObject, "npc_taras", Vector2.zero, "");
+            Animate(mikhalych, "npc_mikhalych", Vector2.zero, "");
+            Animate(yadviga, "npc_yadviga", new Vector2(4f, 0f), "");
+            Animate(yazep, "npc_yazep", Vector2.zero, Omut.World.BossEncounter.FinaleFlag);
+        }
+
+        // Кадры Ульяны: покой и два шага в три стороны.
+        private static void Animate(GameObject npc, string name, Vector2 walk, string flag)
+        {
+            Sprite[] Frames(string dir) => new[]
+            {
+                OmutDataBuilder.FindSprite($"{name}_{dir}_idle"), OmutDataBuilder.FindSprite($"{name}_{dir}_walk_01"), OmutDataBuilder.FindSprite($"{name}_{dir}_walk_02")
+            };
+            EnsureComponent<Omut.NPC.NpcAnimator>(npc).Setup(npc.GetComponent<SpriteRenderer>(), Frames("down"), Frames("up"), Frames("side"), walk, flag);
         }
 
         private static Omut.NPC.Npc AddMikhalych(GameObject go) => go.AddComponent<Omut.NPC.Shipyard>();
@@ -215,20 +249,25 @@ namespace Omut.EditorTools
             EnsureComponent<LoginUI>(ui);
             SetRef(EnsureComponent<PanicBar>(ui), "vignetteSprite", OmutDataBuilder.FindSprite("fx_vignette"));
             EnsureComponent<ScreenFader>(ui);
-            EnsureComponent<MapUI>(ui);
+            EnsureComponent<MapUI>(ui).Setup(OmutDataBuilder.FindSprite("world_map"), Lake);
             EnsureComponent<ZoneBanner>(ui);
             EnsureComponent<CreditsUI>(ui);
             SetRef(EnsureComponent<DialogueUI>(ui), "heroPortrait", OmutDataBuilder.FindSprite("hero_symon_portrait"));
+            SetRef(EnsureComponent<DialogueUI>(ui), "yazepPortrait", OmutDataBuilder.FindSprite("npc_yazep_portrait"));
             EnsureComponent<InventoryUI>(ui);
 
             // Подсказки: цели справа, стрелка к цели, таблички над жителями.
             EnsureComponent<Guide>(ui);
 
             // Панель предметов (1-6) и сумка (B).
-            Sprite[] baits = { OmutDataBuilder.FindSprite("item_worm"), OmutDataBuilder.FindSprite("item_spoon"), OmutDataBuilder.FindSprite("item_phosphor_spoon") };
-            EnsureComponent<Hotbar>(ui).SetSprites(OmutDataBuilder.FindSprite("item_rod"), OmutDataBuilder.FindSprite("item_lantern"),
+            Sprite[] baits =
+            {
+                OmutDataBuilder.FindSprite("item_worm"), OmutDataBuilder.FindSprite("item_maggot"), OmutDataBuilder.FindSprite("item_dough"),
+                OmutDataBuilder.FindSprite("item_spoon"), OmutDataBuilder.FindSprite("item_phosphor_spoon"), OmutDataBuilder.FindSprite("item_glow_leech")
+            };
+            EnsureComponent<Hotbar>(ui).SetSprites(OmutDataBuilder.FindSprite("item_rod_bamboo"), OmutDataBuilder.FindSprite("item_lantern"),
                 OmutDataBuilder.FindSprite("item_thermos"), OmutDataBuilder.FindSprite("item_map"), baits);
-            EnsureComponent<BagUI>(ui).SetSprites(OmutDataBuilder.FindSprite("item_rod"), OmutDataBuilder.FindSprite("item_lantern"),
+            EnsureComponent<BagUI>(ui).SetSprites(OmutDataBuilder.FindSprite("item_rod_bamboo"), OmutDataBuilder.FindSprite("item_lantern"),
                 OmutDataBuilder.FindSprite("item_thermos"), OmutDataBuilder.FindSprite("item_map"), OmutDataBuilder.FindSprite("item_scrap"),
                 OmutDataBuilder.FindSprite("item_diary_page"), OmutDataBuilder.FindSprite("item_coin"), baits);
             EditorUtility.SetDirty(ui);

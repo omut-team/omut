@@ -88,6 +88,11 @@ namespace Omut.Core
             data.spoons = Tackle.Count(BaitType.Spoon);
             data.phosphor = Tackle.Count(BaitType.Phosphor);
             data.currentBait = Tackle.Current.ToString();
+            data.maggots = Tackle.Count(BaitType.Maggot);
+            data.dough = Tackle.Count(BaitType.Dough);
+            data.leeches = Tackle.Count(BaitType.Leech);
+            CaptureRods(data);
+            data.mapVersion = MapVersion;
             data.boatId = CurrentBoat != null ? CurrentBoat.name : "Barkas";
             data.journal = Journal.ToList();
             data.totalCaught = TotalCaught;
@@ -143,6 +148,10 @@ namespace Omut.Core
             Thermos = Mathf.Clamp(data.thermos, 0, MaxThermos);
             Tackle.Set(BaitType.Spoon, data.spoons);
             Tackle.Set(BaitType.Phosphor, data.phosphor);
+            Tackle.Set(BaitType.Maggot, data.maggots);
+            Tackle.Set(BaitType.Dough, data.dough);
+            Tackle.Set(BaitType.Leech, data.leeches);
+            ApplyRods(data);
             if (Enum.TryParse(data.currentBait, out BaitType bait))
                 Tackle.Select(bait);
 
@@ -161,7 +170,11 @@ namespace Omut.Core
                     Hold.TryAdd(info);
             }
 
-            DockingZone.Instance?.Restore(data.onFoot, new Vector2(data.boatX, data.boatY), new Vector2(data.walkerX, data.walkerY));
+            // Сохранение со старой картой: координаты не подходят, ставим к причалу.
+            if (data.mapVersion >= MapVersion)
+                DockingZone.Instance?.Restore(data.onFoot, new Vector2(data.boatX, data.boatY), new Vector2(data.walkerX, data.walkerY));
+            else
+                DockingZone.Instance?.Restore(true, DockingZone.Instance.MooringPosition, DockingZone.Instance.StartPosition);
 
             ApplyQuests(data);
             ApplyBoats(data);

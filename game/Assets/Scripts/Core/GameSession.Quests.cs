@@ -33,6 +33,13 @@ namespace Omut.Core
             flags.Clear();
             LorePieces = 0;
             Quests = new QuestManager(database != null ? database.quests : new List<QuestData>());
+            // Поймал нужную рыбу: сразу видно, сколько осталось.
+            Quests.ProgressChanged += q =>
+            {
+                int done = Quests.Progress(q, this);
+                Notifications.Show(done >= q.count ? $"Задание «{q.title}» выполнено! Сдай: {(q.giver == NpcId.Taras ? "дед Тарас" : "Михалыч")}"
+                    : $"{q.title}: {done} из {q.count}", UiFactory.Theme.Gold);
+            };
         }
 
         private void CaptureQuests(SaveData data)
@@ -87,6 +94,9 @@ namespace Omut.Core
                     ("Возьмусь", () =>
                     {
                         Quests.Accept(quest);
+                        // Нужная рыба уже в трюме: засчитываем сразу, чтобы не ловить заново.
+                        if (quest.goal == QuestGoal.CatchFish)
+                            Quests.SetProgressAtLeast(quest, Hold.CountOf(quest.fishId));
                         Notifications.Show("Новое задание: " + quest.title, UiFactory.Theme.Gold);
                         ui.ShowMenu("Договорились.");
                     }),
@@ -96,9 +106,17 @@ namespace Omut.Core
             return list;
         }
 
-        private void CompleteQuest(QuestData q, DialogueUI ui)
+        public void CompleteQuest(QuestData q, DialogueUI ui)
         {
-            // Задание "принести": рыба уходит из трюма.
+            // Сначала проверяем, что всё готово (рыба и железо ещё лежат в трюме), и только потом забираем.
+            // Раньше было наоборот: железо уходило из трюма, проверка падала, и оно пропадало.
+            if (!Quests.TryComplete(q, this))
+            {
+                ui?.Say($"Пока не всё. Сделано: {Quests.Progress(q, this)} из {q.count}.");
+                return;
+            }
+
+            // Задание "принести": рыба или железо уходят из трюма.
             if (q.goal == QuestGoal.DeliverFish)
             {
                 int left = q.count;
@@ -111,9 +129,6 @@ namespace Omut.Core
                     }
                 }
             }
-
-            if (!Quests.TryComplete(q, this))
-                return;
 
             var reward = new List<string>();
             if (q.rewardMoney > 0)
@@ -137,7 +152,7 @@ namespace Omut.Core
 
             GameEvents.RaisePlaySound("quest");
             Notifications.Show("Задание выполнено: " + q.title, UiFactory.Theme.Gold);
-            ui.Say(q.completeText + (reward.Count > 0 ? "\n<b>Награда:</b> " + string.Join(", ", reward) : ""));
+            ui?.Say(q.completeText + (reward.Count > 0 ? "\n<b>Награда:</b> " + string.Join(", ", reward) : ""));
         }
 
         // ---------- тайна за редкую рыбу ----------

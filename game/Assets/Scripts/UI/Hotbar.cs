@@ -15,15 +15,25 @@ namespace Omut.UI
     {
         public static Hotbar Instance { get; private set; }
 
-        public const int RodSlots = 3;
-        public const int LanternSlot = 3;
-        public const int ThermosSlot = 4;
-        public const int MapSlot = 5;
-        public const int SlotCount = 6;
+        // 1-6: удочка с наживкой (червь, опарыш, тесто, блесна, фосфорная, пиявка), 7 фонарь, 8 чай, 9 карта.
+        public const int RodSlots = 6;
+        public const int LanternSlot = 6;
+        public const int ThermosSlot = 7;
+        public const int MapSlot = 8;
+        public const int SlotCount = 9;
 
-        private static readonly BaitType[] RodBaits = { BaitType.Worm, BaitType.Spoon, BaitType.Phosphor };
-        private static readonly string[] Names = { "Удочка: червь", "Удочка: блесна", "Удочка: фосфорная блесна", "Фонарь", "Термос с чаем", "Карта" };
-        private static readonly Key[] Keys = { Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4, Key.Digit5, Key.Digit6 };
+        private static readonly BaitType[] RodBaits = TackleBox.Order;
+        private static readonly Key[] Keys =
+            { Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4, Key.Digit5, Key.Digit6, Key.Digit7, Key.Digit8, Key.Digit9 };
+
+        private static string Name(int slot)
+        {
+            if (slot < RodSlots)
+                return "Удочка: " + (GameSession.Instance != null ? GameSession.Instance.BaitTitle(RodBaits[slot]).ToLower() : RodBaits[slot].ToString());
+            return slot == LanternSlot ? "Фонарь" : slot == ThermosSlot ? "Термос с чаем" : "Карта";
+        }
+
+        private readonly Image[] rodIcons = new Image[RodSlots];
 
         [SerializeField] private Sprite rodSprite;
         [SerializeField] private Sprite lanternSprite;
@@ -37,13 +47,25 @@ namespace Omut.UI
         private Text caption;
         private float captionTimer;
 
-        // Что выбрано в руке: 0-2 удочка (с наживкой), 3 фонарь.
+        // Что выбрано в руке: 0-5 удочка (с наживкой), 6 фонарь.
         public int Selected { get; private set; }
 
         public static bool HoldsLantern => Instance != null && Instance.Selected == LanternSlot;
 
         // Картинка предмета в руке Сымона (удочка или фонарь).
-        public static Sprite HeldSprite => Instance == null ? null : HoldsLantern ? Instance.lanternSprite : Instance.rodSprite;
+        public static Sprite HeldSprite => Instance == null ? null : HoldsLantern ? Instance.lanternSprite : RodSprite;
+
+        // Удочка, которая сейчас в руке (купленная у Тараса), или стартовая картинка.
+        public static Sprite RodSprite
+        {
+            get
+            {
+                GameSession session = GameSession.Instance;
+                if (session != null && session.CurrentRod != null && session.CurrentRod.sprite != null)
+                    return session.CurrentRod.sprite;
+                return Instance != null ? Instance.rodSprite : null;
+            }
+        }
 
         public void SetSprites(Sprite rod, Sprite lantern, Sprite thermos, Sprite map, Sprite[] baits)
         {
@@ -75,7 +97,12 @@ namespace Omut.UI
             bar = UiFactory.Rect(canvas.transform, "Hotbar");
             UiFactory.Place(bar, new Vector2(0.5f, 0f), new Vector2(width, size), new Vector2(0f, 16f));
 
-            Sprite[] icons = { rodSprite, rodSprite, rodSprite, lanternSprite, thermosSprite, mapSprite };
+            var icons = new Sprite[SlotCount];
+            for (int i = 0; i < RodSlots; i++)
+                icons[i] = rodSprite;
+            icons[LanternSlot] = lanternSprite;
+            icons[ThermosSlot] = thermosSprite;
+            icons[MapSlot] = mapSprite;
             for (int i = 0; i < SlotCount; i++)
             {
                 Image frame = UiFactory.SlotPanel(bar, "Slot" + (i + 1));
@@ -89,6 +116,8 @@ namespace Omut.UI
                 Image icon = UiFactory.Icon(frame.transform, icons[i], new Vector2(60f, 60f));
                 UiFactory.Place(icon.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(60f, 60f), Vector2.zero);
                 icon.raycastTarget = false;
+                if (i < RodSlots)
+                    rodIcons[i] = icon;
 
                 if (i < RodSlots && baitSprites != null && i < baitSprites.Length && baitSprites[i] != null)
                 {
@@ -182,15 +211,15 @@ namespace Omut.UI
                 }
 
                 Selected = slot;
-                ShowCaption(Names[slot]);
+                ShowCaption(Name(slot));
             }
             else if (slot == LanternSlot)
             {
                 bool wasHolding = HoldsLantern;
                 Selected = LanternSlot;
-                ShowCaption(Names[slot]);
-                // В лодке: взял фонарь, он и зажёгся. Нажал ещё раз: погасил.
-                if (!PlayerWalker.OnFoot && Lantern.Instance != null && (wasHolding || !Lantern.Instance.IsOn))
+                ShowCaption(Name(slot));
+                // Взял фонарь, он и зажёгся. Нажал ещё раз: погасил.
+                if (Lantern.Instance != null && (wasHolding || !Lantern.Instance.IsOn))
                     Lantern.Instance.Toggle();
             }
             else if (slot == ThermosSlot)
@@ -203,6 +232,17 @@ namespace Omut.UI
                 if (map != null)
                     map.Toggle();
             }
+        }
+
+        // Фонарь зажгли клавишей F: он в руке. Погасили: снова удочка с текущей наживкой.
+        public void TakeInHand(bool lantern)
+        {
+            GameSession session = GameSession.Instance;
+            if (lantern)
+                Selected = LanternSlot;
+            else if (HoldsLantern && session != null)
+                Selected = RodIndex(session.Tackle.Current);
+            ShowCaption(lantern ? "Фонарь горит" : Name(Selected));
         }
 
         private void ShowCaption(string text)
@@ -223,8 +263,15 @@ namespace Omut.UI
                 frames[i].rectTransform.localScale = Vector3.one * (selected ? 1.08f : 1f);
             }
 
+            Sprite rod = RodSprite;
             for (int i = 0; i < RodSlots; i++)
             {
+                if (rodIcons[i] != null && rodIcons[i].sprite != rod)
+                {
+                    rodIcons[i].sprite = rod;
+                    rodIcons[i].color = Color.white;
+                }
+
                 BaitType bait = RodBaits[i];
                 counts[i].text = TackleBox.IsInfinite(bait) ? "" : session.Tackle.Count(bait).ToString();
                 counts[i].color = session.Tackle.Has(bait) ? Color.white : UiFactory.Theme.Bad;

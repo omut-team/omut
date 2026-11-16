@@ -112,6 +112,9 @@ namespace Omut.Player
         }
 
         // Загрузка сохранения: где лодка и где Сымон.
+        public Vector2 MooringPosition => transform.position;
+        public Vector2 StartPosition => startPoint != null ? (Vector2)startPoint.position : (Vector2)walkPoint.position;
+
         public void Restore(bool onFoot, Vector2 boatPosition, Vector2 walkerPosition)
         {
             Rigidbody2D body = boat.GetComponent<Rigidbody2D>();

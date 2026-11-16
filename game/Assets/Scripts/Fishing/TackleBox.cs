@@ -8,7 +8,9 @@ namespace Omut.Fishing
     // Обычный C#-класс, проверяется тестами (TackleBoxTests).
     public class TackleBox
     {
-        private static readonly BaitType[] Order = { BaitType.Worm, BaitType.Spoon, BaitType.Phosphor };
+        // Порядок как на панели предметов: червь, опарыш, тесто, блесна, фосфорная, пиявка.
+        public static readonly BaitType[] Order =
+            { BaitType.Worm, BaitType.Maggot, BaitType.Dough, BaitType.Spoon, BaitType.Phosphor, BaitType.Leech };
 
         private readonly Dictionary<BaitType, int> counts = new Dictionary<BaitType, int>();
 

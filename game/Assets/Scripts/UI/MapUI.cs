@@ -10,17 +10,27 @@ using UnityEngine.UI;
 
 namespace Omut.UI
 {
-    // Карта озера (M): четыре зоны, причал, маяк и его свет, биостанция, где сейчас лодка.
+    // Карта озера (M): рисунок Ульяны, на нём зоны, маяк, биостанция, где сейчас лодка и Сымон.
     // Справа описание зон и какая рыба там уже поймана.
     public class MapUI : GameWindow
     {
-        private const float MapWidth = 880f;
+        private const float MapWidth = 1000f;
+
+        [Tooltip("Картинка карты (Art/Map/world_map). Совпадает с миром игры")]
+        [SerializeField] private Sprite mapSprite;
 
         private RectTransform map;
         private RectTransform boatMarker;
         private RectTransform heroMarker;
         private Text zonesText;
-        private Rect world = new Rect(-50f, -32f, 100f, 64f);
+        [Tooltip("Какую часть мира показывает картинка")]
+        [SerializeField] private Rect world = new Rect(-50f, -28.14f, 100f, 56.28f);
+
+        public void Setup(Sprite sprite, Rect worldRect)
+        {
+            mapSprite = sprite;
+            world = worldRect;
+        }
         private bool zonesBuilt;
 
         protected override Key ToggleKey => Controls.Map;
@@ -29,7 +39,8 @@ namespace Omut.UI
         {
             RectTransform paper = UiFactory.Window(canvas, "Map", new Vector2(1600f, 860f), "Карта озера", out _);
 
-            Image frame = UiFactory.Panel(paper, "Map", new Color(0.35f, 0.45f, 0.3f));
+            Image frame = UiFactory.Panel(paper, "Map", mapSprite != null ? Color.white : new Color(0.35f, 0.45f, 0.3f));
+            frame.sprite = mapSprite;
             map = frame.rectTransform;
             map.anchorMin = map.anchorMax = new Vector2(0f, 1f);
             map.pivot = new Vector2(0f, 1f);
@@ -39,7 +50,7 @@ namespace Omut.UI
 
             zonesText = UiFactory.Label(paper, "", 24, TextAnchor.UpperLeft, UiFactory.Theme.Ink);
             zonesText.supportRichText = true;
-            UiFactory.Place(zonesText.rectTransform, new Vector2(1f, 1f), new Vector2(580f, 720f), new Vector2(-40f, -100f));
+            UiFactory.Place(zonesText.rectTransform, new Vector2(1f, 1f), new Vector2(480f, 720f), new Vector2(-40f, -100f));
 
             return (RectTransform)paper.parent;
         }
@@ -86,18 +97,19 @@ namespace Omut.UI
 
         private void BuildZones()
         {
+            // Названия зон поверх рисунка (сами зоны на нём видны: залив, омут, риф, причал).
             foreach (Zone zone in Zone.All)
             {
-                Color c = zone.Data != null ? zone.Data.mapColor : new Color(0.3f, 0.5f, 0.6f);
-                RectTransform r = Box("Zone " + zone.Id, zone.Area, c);
-                Text name = UiFactory.HudLabel(r, zone.DisplayName, 24, TextAnchor.MiddleCenter);
-                UiFactory.Stretch(name.rectTransform, 6f);
-            }
-
-            foreach (WalkableGround ground in WalkableGround.All)
-            {
-                Bounds b = ground.GetComponent<BoxCollider2D>().bounds;
-                Box("Land", new Rect(b.min, b.size), new Color(0.45f, 0.55f, 0.3f));
+                Vector2 center = zone.Id == ZoneId.Dock ? new Vector2(zone.Area.center.x, zone.Area.yMax - 2.5f)
+                    : zone.Id == ZoneId.Reef ? new Vector2(-18f, zone.Area.center.y + 2f)
+                    : zone.Area.center;
+                Text name = UiFactory.HudLabel(map, zone.DisplayName, 26, TextAnchor.MiddleCenter);
+                RectTransform r = name.rectTransform;
+                r.anchorMin = r.anchorMax = new Vector2(0f, 1f);
+                r.sizeDelta = new Vector2(320f, 40f);
+                r.anchoredPosition = ToMap(center);
+                name.color = UiFactory.Theme.Gold;
+                name.raycastTarget = false;
             }
 
             foreach (NightLight light in NightLight.All)

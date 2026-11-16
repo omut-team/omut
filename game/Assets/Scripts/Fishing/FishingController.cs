@@ -40,6 +40,8 @@ namespace Omut.Fishing
 
         // Связи с другими системами. По умолчанию простые, следующие этапы подставляют свои.
         public static Func<BaitType> CurrentBait = () => BaitType.Worm;        // TackleBox, этап 11
+        public static Func<RodData> CurrentRod = () => null;                    // удочки Лизы
+        public static Func<BaitData> CurrentBaitData = () => null;
         public static Func<bool> ChestAllowed = () => true;                     // дневник, этап 20
         public static Func<bool> CanFishHere = () => true;                      // на причале нельзя, этап 10
         public static Func<float> FakeBitesPerSecond = () => 0f;                // паника, этап 18
@@ -58,7 +60,7 @@ namespace Omut.Fishing
         public ZoneId CastZone { get; private set; }
         public float ChargeSpeed => chargeSpeed;
         public float BiteWindow => biteWindow;
-        public float MaxCastDistance => maxCastDistance;
+        public float MaxCastDistance => maxCastDistance + (CurrentRod()?.castBonus ?? 0f);
         public Vector2 BobberPosition => bobber != null ? (Vector2)bobber.position : Vector2.zero;
         public FishingState State => state;
         public GameDatabase Database => database;
@@ -161,7 +163,7 @@ namespace Omut.Fishing
                     direction = toMouse.normalized;
             }
 
-            return origin + direction * Mathf.Lerp(minCastDistance, maxCastDistance, power);
+            return origin + direction * Mathf.Lerp(minCastDistance, MaxCastDistance, power);
         }
 
         // Вода ли тут: внутри какой-то зоны и не камень, не берег, не причал.
@@ -204,17 +206,35 @@ namespace Omut.Fishing
 
             var conditions = new CastConditions(CastZone, CurrentPhase(), CurrentBait(), CastDistance, InSpot, ChestAllowed());
             HookedFish = selector.Pick(conditions);
+
+            // Любимая добыча наживки или удочки (тесто: карп, пиявка: сом, магнитная: железо), если она тут водится.
+            if (HookedFish != null)
+            {
+                FishData favorite = Favorite(CurrentBaitData()?.favoriteFish, CurrentBaitData()?.favoriteChance ?? 0f, conditions)
+                                    ?? Favorite(CurrentRod()?.favoriteFish, CurrentRod()?.favoriteChance ?? 0f, conditions);
+                if (favorite != null)
+                    HookedFish = favorite;
+            }
+        }
+
+        private FishData Favorite(string id, float chance, CastConditions conditions)
+        {
+            if (string.IsNullOrEmpty(id) || database == null || Random.value >= chance)
+                return null;
+            FishData fish = database.FindFish(id);
+            return fish != null && selector.Fits(fish, conditions) ? fish : null;
         }
 
         public float NextBiteDelay()
         {
             Vector2 range = InSpot ? biteDelayInSpot : biteDelayOutside;
-            return Random.Range(range.x, range.y);
+            float speed = (CurrentRod()?.biteSpeed ?? 1f) * (CurrentBaitData()?.biteSpeed ?? 1f);
+            return Random.Range(range.x, range.y) * speed;
         }
 
         public string NoBiteHint()
         {
-            switch (CurrentBait())
+            switch (FishData.Kind(CurrentBait()))
             {
                 case BaitType.Phosphor when CurrentPhase() != DayPhase.Night:
                     return "Фосфорная блесна днём бесполезна. Смени наживку (Q).";

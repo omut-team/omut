@@ -24,6 +24,20 @@ namespace Omut.EditorTools
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             importer.filterMode = file.StartsWith("fx_") ? FilterMode.Bilinear : FilterMode.Point;
 
+            // Удочки Лизы нарисованы 64x64: одна клетка, как остальные предметы.
+            if (file.StartsWith("item_rod_"))
+                importer.spritePixelsPerUnit = 64;
+
+            // Рисованная карта озера Ульяны = весь мир: 100 клеток в ширину, сжатие, сглаживание.
+            if (file == "world_map")
+            {
+                importer.spritePixelsPerUnit = 81.92f;
+                importer.maxTextureSize = 8192;
+                importer.filterMode = FilterMode.Bilinear;
+                importer.alphaIsTransparency = false;
+                importer.textureCompression = TextureImporterCompression.CompressedHQ;
+            }
+
             var settings = new TextureImporterSettings();
             importer.ReadTextureSettings(settings);
             if (file.StartsWith("tile_"))

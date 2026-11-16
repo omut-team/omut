@@ -129,6 +129,8 @@ namespace Omut.UI
             Vector2 dir = local.normalized;
             float scale = Mathf.Min(Mathf.Abs(half.x / Mathf.Max(0.001f, Mathf.Abs(dir.x))), Mathf.Abs(half.y / Mathf.Max(0.001f, Mathf.Abs(dir.y))));
             Vector2 edge = dir * scale;
+            // Внизу панель предметов: стрелку держим выше неё.
+            edge.y = Mathf.Max(edge.y, -canvasRect.rect.size.y * 0.5f + 190f);
             float bob = Mathf.Sin(Time.unscaledTime * 5f) * 6f;
 
             arrow.anchoredPosition = edge + dir * bob;
@@ -151,6 +153,11 @@ namespace Omut.UI
                     tags[npc] = CreateTag(npc);
 
                 (RectTransform tag, Image mark) = tags[npc];
+                if (npc.Hidden)
+                {
+                    tag.gameObject.SetActive(false);
+                    continue;
+                }
                 Vector3 viewport = cam != null ? cam.WorldToViewportPoint(npc.transform.position + new Vector3(0f, 1.75f, 0f)) : new Vector3(-1f, -1f, 0f);
                 bool visible = viewport.x > -0.1f && viewport.x < 1.1f && viewport.y > -0.1f && viewport.y < 1.1f && viewport.z > 0f;
                 tag.gameObject.SetActive(visible);

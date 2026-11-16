@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70f7322c0949d0f498b50bc8a562ea3d, type: 3}
+  m_Name: feeder
+  m_EditorClassIdentifier: Omut::Omut.Fishing.RodData
+  id: feeder
+  displayName: "\u0424\u0438\u0434\u0435\u0440 \xAB\u0413\u043B\u0443\u0431\u0438\u043D\u0430\xBB"
+  description: "\u0422\u044F\u0436\u0451\u043B\u0430\u044F \u0434\u043E\u043D\u043D\u0430\u044F.
+    \u041A\u0440\u0443\u043F\u043D\u0430\u044F \u0440\u044B\u0431\u0430 \u0442\u044F\u043D\u0435\u0442\u0441\u044F
+    \u043B\u0435\u0433\u0447\u0435, \u0447\u0430\u0449\u0435 \u0441\u043E\u043C."
+  sprite: {fileID: 21300000, guid: 382112e6205b6b34aaf95ffc838202b2, type: 3}
+  price: 700
+  inShop: 1
+  castBonus: 2
+  biteSpeed: 1
+  pull: 0.75
+  favoriteFish: black_catfish
+  favoriteChance: 0.15

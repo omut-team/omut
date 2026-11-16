@@ -26,6 +26,11 @@ namespace Omut.NPC
 
         public override string Prompt => "поговорить: " + displayName;
 
+        // Житель ещё не появился (дед Язэп до финала): с ним нельзя говорить, табличку не видно.
+        public bool Hidden { get; set; }
+
+        public override bool CanInteract => !Hidden;
+
         public string RandomGreeting() => greetings.Count == 0 ? "..." : greetings[UnityEngine.Random.Range(0, greetings.Count)];
 
         public override void Interact() => DialogueUI.Instance?.Talk(this);

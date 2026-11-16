@@ -82,7 +82,7 @@ namespace Omut.Tests
             Assert.AreEqual(GameState.Fishing, GameManager.Instance.CurrentState);
             yield return null;
 
-            Vector2 water = (Vector2)fishing.transform.position + new Vector2(0f, -3f);
+            Vector2 water = (Vector2)fishing.transform.position + new Vector2(3f, 0f);
             Assert.IsTrue(fishing.IsWater(water), "Под лодкой должна быть вода");
             fishing.ShowBobber(water);
             fishing.Landed(water);
@@ -325,12 +325,43 @@ namespace Omut.Tests
             GameManager.Instance.StartGame();
             yield return null;
 
-            // Путь пешком: от хаты на дорожку, вниз по мосткам до конца. Стык земли и мостков проходим.
+            // Пешком от хаты можно дойти до мостков у лодки, до Тараса у маяка и до Михалыча (поиск в ширину по сетке).
+            Vector2 start = DockingZone.Instance.StartPosition;
             Vector2 pierTip = DockingZone.Instance.transform.Find("WalkPoint").position;
-            for (float y = 26.5f; y >= pierTip.y; y -= 0.1f)
-                Assert.IsTrue(PlayerWalker.CanStand(new Vector2(pierTip.x, y)), $"Застрял на y = {y:0.0}");
-            for (float x = -45f; x <= pierTip.x; x += 0.1f)
-                Assert.IsTrue(PlayerWalker.CanStand(new Vector2(x, 26.5f)), $"Застрял на x = {x:0.0}");
+            Assert.IsTrue(PlayerWalker.CanStand(start), "Старт у хаты");
+            Assert.IsTrue(PlayerWalker.CanStand(pierTip), "Конец мостков");
+
+            const float step = 0.25f;
+            var seen = new System.Collections.Generic.HashSet<Vector2Int>();
+            var queue = new System.Collections.Generic.Queue<Vector2Int>();
+            Vector2 origin = start;
+            queue.Enqueue(Vector2Int.zero);
+            seen.Add(Vector2Int.zero);
+            Vector2Int[] dirs = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+            while (queue.Count > 0 && seen.Count < 40000)
+            {
+                Vector2Int cell = queue.Dequeue();
+                foreach (Vector2Int d in dirs)
+                {
+                    Vector2Int next = cell + d;
+                    if (seen.Contains(next) || !PlayerWalker.CanStand(origin + (Vector2)next * step))
+                        continue;
+                    seen.Add(next);
+                    queue.Enqueue(next);
+                }
+            }
+
+            bool Reached(Vector2 point, float radius)
+            {
+                foreach (Vector2Int c in seen)
+                    if (Vector2.Distance(origin + (Vector2)c * step, point) <= radius)
+                        return true;
+                return false;
+            }
+
+            Assert.IsTrue(Reached(pierTip, 0.3f), "Дошёл до мостков у лодки");
+            Assert.IsTrue(Reached(GameObject.Find("World/Dock/Taras").transform.position, 1.5f), "Дошёл до Тараса");
+            Assert.IsTrue(Reached(GameObject.Find("World/Dock/Mikhalych").transform.position, 1.5f), "Дошёл до Михалыча");
         }
 
         // Подсказки и панель предметов: после новой игры видно, к кому идти, а удочка в руке.
@@ -349,8 +380,10 @@ namespace Omut.Tests
 
             // Блёсен ещё нет: в руку не берутся, остаётся червь.
             int spoons = GameSession.Instance.Tackle.Count(BaitType.Spoon);
+            Hotbar.Instance.Use(3);
+            Assert.AreEqual(spoons > 0 ? 3 : 0, Hotbar.Instance.Selected, "Блесна на 4-й ячейке");
             Hotbar.Instance.Use(1);
-            Assert.AreEqual(spoons > 0 ? 1 : 0, Hotbar.Instance.Selected);
+            Assert.AreEqual(spoons > 0 ? 3 : 0, Hotbar.Instance.Selected, "Опарыша ещё нет");
 
             Hotbar.Instance.Use(Hotbar.LanternSlot);
             Assert.IsTrue(Hotbar.HoldsLantern);
@@ -374,6 +407,54 @@ namespace Omut.Tests
             Assert.IsTrue(Object.FindAnyObjectByType<BagUI>().Open(), "Другое окно открывается");
             Object.FindAnyObjectByType<BagUI>().Close();
             Assert.AreEqual(GameState.Sailing, GameManager.Instance.CurrentState);
+        }
+
+        // Фонарь зажигается и на берегу (F), сам оказывается в руке и плавно разгорается.
+        [UnityTest]
+        public IEnumerator Lantern_WorksOnFoot_AndGoesToHand()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance.StartGame();
+            yield return null;
+            Assert.IsTrue(PlayerWalker.OnFoot, "Игра начинается на берегу");
+
+            if (Lantern.Instance.IsOn)
+                Lantern.Instance.Toggle();
+            Lantern.Instance.Toggle();
+            Assert.IsTrue(Lantern.Instance.IsOn);
+            Assert.IsTrue(Hotbar.HoldsLantern);
+            yield return new WaitForSeconds(0.5f);
+
+            Lantern.Instance.Toggle();
+            Assert.IsFalse(Lantern.Instance.IsOn);
+            Assert.IsFalse(Hotbar.HoldsLantern, "Погасил: снова удочка");
+        }
+
+        // Сдать "Железо со дна": железо уходит из трюма только если задание сдано. Не хватает: ничего не пропадает.
+        [UnityTest]
+        public IEnumerator DeliverQuest_TakesScrapOnlyWhenDone()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance.StartGame();
+            yield return null;
+
+            GameSession session = GameSession.Instance;
+            QuestData quest = session.Quests.Find("q3_scrap");
+            Assert.IsTrue(session.Quests.Accept(quest));
+            FishData scrap = session.Database.FindFish("scrap");
+            for (int i = 0; i < 2; i++)
+                session.Hold.TryAdd(new CatchInfo(scrap, 2f, false, Omut.World.ZoneId.Pool, 1));
+
+            session.CompleteQuest(quest, null);
+            Assert.AreEqual(QuestState.Active, session.Quests.StateOf(quest), "Двух кусков мало");
+            Assert.AreEqual(2, session.Hold.CountOf("scrap"), "Железо не пропало");
+
+            session.Hold.TryAdd(new CatchInfo(scrap, 2f, false, Omut.World.ZoneId.Pool, 1));
+            int money = session.Wallet.Money;
+            session.CompleteQuest(quest, null);
+            Assert.AreEqual(QuestState.Done, session.Quests.StateOf(quest));
+            Assert.AreEqual(0, session.Hold.CountOf("scrap"));
+            Assert.Greater(session.Wallet.Money, money);
         }
     }
 }
