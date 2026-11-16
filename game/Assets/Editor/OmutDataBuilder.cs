@@ -29,7 +29,12 @@ namespace Omut.EditorTools
             GameDatabase db = LoadOrCreate<GameDatabase>(DataRoot + "/GameDatabase.asset", out _);
 
             db.fish = BuildFish(overwrite);
-            db.boats = new List<BoatData> { AssetDatabase.LoadAssetAtPath<BoatData>(DataRoot + "/Boats/Barkas.asset") };
+            db.boats = new List<BoatData>
+            {
+                Boat("Barkas", "Старый баркас", 3f, 4f, 2f, 2, 4, 5, 2.5f, 1f, false, 0, 0, "boat_barkas", overwrite),
+                Boat("Sledopyt", "Следопыт", 3.75f, 5f, 2.5f, 4, 5, 6, 3.5f, 1f, false, 1200, 3, "boat_sledopyt", overwrite),
+                Boat("Okhotnik", "Охотник за тенями", 4.2f, 6f, 3f, 5, 6, 7, 4f, 0.6f, true, 3500, 6, "boat_okhotnik", overwrite),
+            };
             db.items = new List<ItemData>
             {
                 Item("kerosene", "Керосин", "Заправка фонаря на половину бака.", ItemKind.Kerosene, 12, 50, "item_kerosene", overwrite),
@@ -167,6 +172,31 @@ namespace Omut.EditorTools
             }
 
             return list;
+        }
+
+        private static BoatData Boat(string id, string title, float speed, float accel, float decel, int durability, int w, int h,
+            float light, float panic, bool sonar, int price, int scrap, string sprite, bool overwrite)
+        {
+            BoatData boat = LoadOrCreate<BoatData>($"{DataRoot}/Boats/{id}.asset", out bool created);
+            if (created || overwrite)
+            {
+                boat.displayName = title;
+                boat.maxSpeed = speed;
+                boat.acceleration = accel;
+                boat.deceleration = decel;
+                boat.durability = durability;
+                boat.holdWidth = w;
+                boat.holdHeight = h;
+                boat.lightRadius = light;
+                boat.panicMultiplier = panic;
+                boat.hasSonar = sonar;
+                boat.price = price;
+                boat.scrapPrice = scrap;
+                boat.sprite = FindSprite(sprite);
+                EditorUtility.SetDirty(boat);
+            }
+
+            return boat;
         }
 
         private static BaitData Bait(BaitType type, string title, string text, bool infinite, int price, int pack, string sprite, bool overwrite)

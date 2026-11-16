@@ -11,6 +11,13 @@ namespace Omut.Player
         [Header("Название")]
         public string displayName = "Старый баркас";
 
+        [Tooltip("Картинка лодки (носом вправо)")]
+        public Sprite sprite;
+
+        [Header("Цена у Михалыча (этап 14)")]
+        [Min(0)] public int price;
+        [Min(0)] public int scrapPrice;
+
         [Header("Движение (1 юнит = 1 клетка = 32 px)")]
         [Tooltip("Максимальная скорость, клеток в секунду")]
         [Min(0f)] public float maxSpeed = 3f;

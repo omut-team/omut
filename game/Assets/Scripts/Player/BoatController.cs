@@ -43,11 +43,25 @@ namespace Omut.Player
         private void OnEnable()
         {
             moveAction?.Enable();
+            Omut.Core.GameSession.BoatChanged += SetData;
         }
 
         private void OnDisable()
         {
             moveAction?.Disable();
+            Omut.Core.GameSession.BoatChanged -= SetData;
+        }
+
+        // Пересели на другую лодку: другие скорость, разгон и картинка.
+        public void SetData(BoatData newData)
+        {
+            if (newData == null)
+                return;
+
+            data = newData;
+            motor = new BoatMotor(data);
+            if (sprite != null && data.sprite != null)
+                sprite.sprite = data.sprite;
         }
 
         private void OnDestroy()

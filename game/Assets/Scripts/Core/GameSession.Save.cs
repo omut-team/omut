@@ -115,6 +115,7 @@ namespace Omut.Core
             }
 
             CaptureQuests(data);
+            CaptureBoats(data);
             Capturing?.Invoke(data);
             return data;
         }
@@ -161,6 +162,7 @@ namespace Omut.Core
             DockingZone.Instance?.Restore(data.onFoot, new Vector2(data.boatX, data.boatY), new Vector2(data.walkerX, data.walkerY));
 
             ApplyQuests(data);
+            ApplyBoats(data);
             Applying?.Invoke(data);
         }
     }

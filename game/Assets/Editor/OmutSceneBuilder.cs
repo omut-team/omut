@@ -264,6 +264,8 @@ namespace Omut.EditorTools
                 SetRef(fishing, "bobberSprite", OmutDataBuilder.FindSprite("obj_bobber"));
                 SetRef(fishing, "biteSprite", OmutDataBuilder.FindSprite("fx_bite"));
                 SetRef(fishing, "lineSprite", OmutDataBuilder.FindSprite("fx_white"));
+                var damage = EnsureComponent<BoatDamage>(boat.gameObject);
+                SetRef(damage, "sprite", boat.GetComponentInChildren<SpriteRenderer>());
                 SetupBoat(boat);
             }
 

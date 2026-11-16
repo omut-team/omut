@@ -79,6 +79,11 @@ namespace Omut.Core
 
         public static void RaiseDockChanged(bool onShore) => DockChanged?.Invoke(onShore);
 
+        // Лодка пробита и утонула вместе с уловом.
+        public static event Action BoatSunk;
+
+        public static void RaiseBoatSunk() => BoatSunk?.Invoke();
+
         // ---------- звук ----------
 
         // Сыграть звук по имени ("cast", "bite", "bell"...). Слушает AudioManager (этап 21).
@@ -105,6 +110,7 @@ namespace Omut.Core
             FishSold = null;
             PlaySound = null;
             DockChanged = null;
+            BoatSunk = null;
         }
     }
 }
