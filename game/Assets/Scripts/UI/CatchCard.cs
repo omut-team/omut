@@ -12,9 +12,6 @@ namespace Omut.UI
         // Положить улов в трюм. Возвращает текст ошибки или null, если положили. Подставляет трюм (этап 9).
         public static Func<CatchInfo, string> TryStore = info => null;
 
-        // Новая ли это запись в журнале (первый раз поймали). Подставляет журнал (этап 8).
-        public static Func<CatchInfo, bool> IsNewRecord = info => false;
-
         private RectTransform root;
         private Image icon;
         private Text title;
@@ -22,6 +19,7 @@ namespace Omut.UI
         private Text note;
         private Text error;
         private CatchInfo current;
+        private bool needsRender;
 
         private void Awake()
         {
@@ -59,9 +57,22 @@ namespace Omut.UI
 
         private void OnDisable() => GameEvents.FishCaught -= Show;
 
+        // Показываем в LateUpdate, чтобы журнал успел отметить "новая запись" (он тоже слушает FishCaught).
         private void Show(CatchInfo info)
         {
             current = info;
+            needsRender = true;
+        }
+
+        private void LateUpdate()
+        {
+            if (needsRender && current != null)
+                Render(current);
+            needsRender = false;
+        }
+
+        private void Render(CatchInfo info)
+        {
             FishData fish = info.fish;
 
             icon.sprite = fish.sprite;
@@ -76,14 +87,14 @@ namespace Omut.UI
                            price;
             details.supportRichText = true;
 
-            note.text = IsNewRecord(info) ? "Новая запись в журнале!" : "";
+            note.text = info.isNewRecord ? "Новая запись в журнале!" : "";
             error.text = "";
             root.gameObject.SetActive(true);
         }
 
         private void Update()
         {
-            if (current != null && Controls.Pressed(Controls.Cast))
+            if (current != null && !needsRender && root.gameObject.activeSelf && Controls.Pressed(Controls.Cast))
                 Keep();
         }
 
