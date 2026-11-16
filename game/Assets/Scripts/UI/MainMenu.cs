@@ -21,6 +21,7 @@ namespace Omut.UI
         private Button continueButton;
         private SettingsPanel settings;
         private InfoPanel info;
+        private Text online;
 
         // Есть ли сохранение, которое можно продолжить. Подставляет SaveSystem (этап 12).
         public static System.Func<bool> HasSave = () => false;
@@ -52,18 +53,22 @@ namespace Omut.UI
             UiFactory.Place(subtitle.rectTransform, new Vector2(0.5f, 1f), new Vector2(1200f, 50f), new Vector2(0f, -290f));
 
             buttons = UiFactory.Rect(root, "Buttons");
-            UiFactory.Place(buttons, new Vector2(0.5f, 0.5f), new Vector2(460f, 520f), new Vector2(0f, -110f));
+            UiFactory.Place(buttons, new Vector2(0.5f, 0.5f), new Vector2(460f, 620f), new Vector2(0f, -150f));
             UiFactory.Column(buttons, 16f);
 
             continueButton = UiFactory.Button(buttons, "Продолжить", OnContinue, new Vector2(440f, 70f), 34);
             UiFactory.Button(buttons, "Новая игра", OnNewGame, new Vector2(440f, 70f), 34);
             UiFactory.Button(buttons, "Настройки", OnSettings, new Vector2(440f, 70f), 34);
             UiFactory.Button(buttons, "Управление", () => ShowInfo("Управление", Controls.Help), new Vector2(440f, 70f), 34);
+            UiFactory.Button(buttons, "Онлайн-рекорды", OnOnline, new Vector2(440f, 70f), 34);
             UiFactory.Button(buttons, "Об игре", () => ShowInfo("Об игре", AboutText), new Vector2(440f, 70f), 34);
             UiFactory.Button(buttons, "Выход", OnQuit, new Vector2(440f, 70f), 34);
 
             Text version = UiFactory.HudLabel(root, "версия " + Application.version, 22, TextAnchor.LowerRight);
             UiFactory.Place(version.rectTransform, new Vector2(1f, 0f), new Vector2(400f, 40f), new Vector2(-20f, 14f));
+
+            online = UiFactory.HudLabel(root, "", 24, TextAnchor.LowerLeft);
+            UiFactory.Place(online.rectTransform, new Vector2(0f, 0f), new Vector2(900f, 40f), new Vector2(20f, 14f));
 
             settings = new SettingsPanel(canvas.transform, () => buttons.gameObject.SetActive(true));
             info = new InfoPanel(canvas.transform, new Vector2(1100f, 700f), () => buttons.gameObject.SetActive(true));
@@ -77,6 +82,16 @@ namespace Omut.UI
 
             buttons.gameObject.SetActive(true);
             continueButton.gameObject.SetActive(HasSave());
+            Network.AuthService auth = Network.AuthService.Instance;
+            online.text = auth != null && auth.IsLoggedIn ? "Онлайн: " + auth.PlayerName : "Без входа: трофеи не попадают в рекорды";
+        }
+
+        private void OnOnline()
+        {
+            if (LoginUI.Instance == null)
+                return;
+            buttons.gameObject.SetActive(false);
+            LoginUI.Instance.Show(() => Show(true));
         }
 
         private void OnStateChanged(GameState from, GameState to) => Show(to == GameState.Menu);
