@@ -45,6 +45,21 @@ namespace Omut.EditorTools
                 Bait(BaitType.Worm, "Червь", "Мирная рыба: карась, лещ, линь, карп, налим. Бесплатно, копаешь сам.", true, 0, 1, "item_worm", overwrite),
                 Bait(BaitType.Spoon, "Блесна", "Хищники: окунь, щука, судак.", false, 25, 5, "item_spoon", overwrite),
                 Bait(BaitType.Phosphor, "Фосфорная блесна", "Светится в темноте. Только ночные мутанты, днём бесполезна.", false, 60, 3, "item_phosphor_spoon", overwrite),
+                // Наживки Лизы.
+                Bait(BaitType.Maggot, "Опарыш", "Личинки короеда. Берут те же, что на червя, но клюёт быстрее.", false, 15, 10, "item_maggot", overwrite, 0.6f),
+                Bait(BaitType.Dough, "Тесто с анисом", "Мирная рыба, а трофейный карп от него без ума.", false, 25, 5, "item_dough", overwrite, 1f, "carp", 0.4f),
+                Bait(BaitType.Leech, "Светящаяся пиявка", "Ночью, как фосфорная блесна. Чёрный сом берёт чаще.", false, 80, 3, "item_glow_leech", overwrite, 1f, "black_catfish", 0.35f),
+            };
+
+            // Удочки Лизы: стартовая бамбуковая деда, остальные у Тараса, удочка Хозяина в награду.
+            db.rods = new List<RodData>
+            {
+                Rod("bamboo", "Бамбуковая удочка Язэпа", "Дедова. Простая и надёжная.", 0, false, 0f, 1f, 1f, "", 0f, "item_rod_bamboo", overwrite),
+                Rod("telescopic", "Телескоп «Каскад»", "Советская, раскладная. Заброс дальше, клюёт чуть быстрее.", 150, true, 1.5f, 0.9f, 0.95f, "", 0f, "item_rod_telescopic", overwrite),
+                Rod("spinning", "Спиннинг «Полесье»", "Карбон. Для блесны: щука и судак тянутся легче.", 400, true, 2.5f, 0.85f, 0.8f, "pike", 0.2f, "item_rod_spinning", overwrite),
+                Rod("feeder", "Фидер «Глубина»", "Тяжёлая донная. Крупная рыба тянется легче, чаще сом.", 700, true, 2f, 1f, 0.75f, "black_catfish", 0.15f, "item_rod_feeder", overwrite),
+                Rod("magnetic", "Магнитная снасть", "Поисковая. Цепляет железо со дна и сундучки деда.", 600, true, 1f, 1f, 1f, "scrap", 0.35f, "item_rod_magnetic", overwrite),
+                Rod("mystic", "Удочка Хозяина", "Морёный дуб и руны Вадзяніка. Подарок деда после того, как Хозяин отпущен.", 0, false, 3f, 0.7f, 0.65f, "", 0f, "item_rod_mystic", overwrite),
             };
             db.zones = new List<ZoneData>
             {
@@ -216,14 +231,42 @@ namespace Omut.EditorTools
                 boat.hasSonar = sonar;
                 boat.price = price;
                 boat.scrapPrice = scrap;
-                boat.sprite = FindSprite(sprite);
                 EditorUtility.SetDirty(boat);
             }
 
+            // Картинку обновляем всегда: новый рисунок команды подхватится без перезаписи данных.
+            boat.sprite = FindSprite(sprite);
+            EditorUtility.SetDirty(boat);
             return boat;
         }
 
-        private static BaitData Bait(BaitType type, string title, string text, bool infinite, int price, int pack, string sprite, bool overwrite)
+        private static RodData Rod(string id, string title, string text, int price, bool inShop, float cast, float bite, float pull,
+            string favorite, float chance, string sprite, bool overwrite)
+        {
+            RodData rod = LoadOrCreate<RodData>($"{DataRoot}/Rods/{id}.asset", out bool created);
+            if (created || overwrite)
+            {
+                rod.id = id;
+                rod.displayName = title;
+                rod.description = text;
+                rod.price = price;
+                rod.inShop = inShop;
+                rod.castBonus = cast;
+                rod.biteSpeed = bite;
+                rod.pull = pull;
+                rod.favoriteFish = favorite;
+                rod.favoriteChance = chance;
+                EditorUtility.SetDirty(rod);
+            }
+
+            // Картинку обновляем всегда: новый рисунок команды подхватится без перезаписи данных.
+            rod.sprite = FindSprite(sprite);
+            EditorUtility.SetDirty(rod);
+            return rod;
+        }
+
+        private static BaitData Bait(BaitType type, string title, string text, bool infinite, int price, int pack, string sprite, bool overwrite,
+            float biteSpeed = 1f, string favorite = "", float chance = 0f)
         {
             BaitData bait = LoadOrCreate<BaitData>($"{DataRoot}/Baits/{type.ToString().ToLower()}.asset", out bool created);
             if (created || overwrite)
@@ -234,10 +277,15 @@ namespace Omut.EditorTools
                 bait.infinite = infinite;
                 bait.packPrice = price;
                 bait.packSize = pack;
-                bait.sprite = FindSprite(sprite);
+                bait.biteSpeed = biteSpeed;
+                bait.favoriteFish = favorite;
+                bait.favoriteChance = chance;
                 EditorUtility.SetDirty(bait);
             }
 
+            // Картинку обновляем всегда: новый рисунок команды подхватится без перезаписи данных.
+            bait.sprite = FindSprite(sprite);
+            EditorUtility.SetDirty(bait);
             return bait;
         }
 
@@ -252,10 +300,12 @@ namespace Omut.EditorTools
                 item.kind = kind;
                 item.price = price;
                 item.amount = amount;
-                item.sprite = FindSprite(sprite);
                 EditorUtility.SetDirty(item);
             }
 
+            // Картинку обновляем всегда: новый рисунок команды подхватится без перезаписи данных.
+            item.sprite = FindSprite(sprite);
+            EditorUtility.SetDirty(item);
             return item;
         }
 

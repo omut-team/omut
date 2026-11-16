@@ -17,6 +17,7 @@ namespace Omut.Core
         public List<BoatData> boats = new List<BoatData>();
         public List<ItemData> items = new List<ItemData>();
         public List<BaitData> baits = new List<BaitData>();
+        public List<Omut.Fishing.RodData> rods = new List<Omut.Fishing.RodData>();
         public List<QuestData> quests = new List<QuestData>();
         public List<NoteData> notes = new List<NoteData>();
         public List<DialogueData> dialogues = new List<DialogueData>();
@@ -32,6 +33,7 @@ namespace Omut.Core
         public BoatData FindBoat(string id) => boats.Find(b => b != null && b.name == id);
 
         public BaitData FindBait(BaitType type) => baits.Find(b => b != null && b.type == type);
+        public Omut.Fishing.RodData FindRod(string id) => rods.Find(r => r != null && r.id == id);
 
         public ItemData FindItem(ItemKind kind) => items.Find(i => i != null && i.kind == kind);
 

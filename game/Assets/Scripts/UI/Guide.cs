@@ -153,6 +153,11 @@ namespace Omut.UI
                     tags[npc] = CreateTag(npc);
 
                 (RectTransform tag, Image mark) = tags[npc];
+                if (npc.Hidden)
+                {
+                    tag.gameObject.SetActive(false);
+                    continue;
+                }
                 Vector3 viewport = cam != null ? cam.WorldToViewportPoint(npc.transform.position + new Vector3(0f, 1.75f, 0f)) : new Vector3(-1f, -1f, 0f);
                 bool visible = viewport.x > -0.1f && viewport.x < 1.1f && viewport.y > -0.1f && viewport.y < 1.1f && viewport.z > 0f;
                 tag.gameObject.SetActive(visible);
