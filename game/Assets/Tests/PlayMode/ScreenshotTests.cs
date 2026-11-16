@@ -108,6 +108,12 @@ namespace Omut.Tests
             Object.FindAnyObjectByType<JournalUI>().Close();
             yield return null;
 
+            Object.FindAnyObjectByType<MapUI>().Open();
+            yield return new WaitForSeconds(0.2f);
+            yield return Shot("map");
+            Object.FindAnyObjectByType<MapUI>().Close();
+            yield return null;
+
             DockingZone.Instance.Board();
             yield return new WaitForSeconds(0.3f);
             FishingController fishing = FishingController.Instance;

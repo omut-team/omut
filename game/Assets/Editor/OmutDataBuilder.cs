@@ -46,6 +46,13 @@ namespace Omut.EditorTools
                 Bait(BaitType.Spoon, "Блесна", "Хищники: окунь, щука, судак.", false, 25, 5, "item_spoon", overwrite),
                 Bait(BaitType.Phosphor, "Фосфорная блесна", "Светится в темноте. Только ночные мутанты, днём бесполезна.", false, 60, 3, "item_phosphor_spoon", overwrite),
             };
+            db.zones = new List<ZoneData>
+            {
+                ZoneAsset(ZoneId.Dock, "Тихий причал", "Хата деда, маяк, Тарас и Михалыч. В свете маяка безопасно даже ночью.", "безопасно", new Color(0.35f, 0.62f, 0.68f), false, overwrite),
+                ZoneAsset(ZoneId.Bay, "Заросший залив", "Мелко, камыш и кувшинки, камней нет. Мирная рыба на червя.", "спокойно", new Color(0.4f, 0.68f, 0.66f), false, overwrite),
+                ZoneAsset(ZoneId.Pool, "Глубокий омут", "Тёмная вода и коряги. Хищники на блесну, ночью мутанты.", "тревожно, коряги", new Color(0.18f, 0.36f, 0.48f), false, overwrite),
+                ZoneAsset(ZoneId.Reef, "Маячный риф", "Скалы, затопленная биостанция и вечный туман. Сундучки деда и самые редкие рыбы.", "жутко, скалы, туман", new Color(0.25f, 0.32f, 0.36f), true, overwrite),
+            };
             BuildMore(db, overwrite);
 
             EditorUtility.SetDirty(db);
@@ -172,6 +179,23 @@ namespace Omut.EditorTools
             }
 
             return list;
+        }
+
+        private static ZoneData ZoneAsset(ZoneId id, string title, string text, string danger, Color color, bool fog, bool overwrite)
+        {
+            ZoneData zone = LoadOrCreate<ZoneData>($"{DataRoot}/Zones/{id}.asset", out bool created);
+            if (created || overwrite)
+            {
+                zone.id = id;
+                zone.displayName = title;
+                zone.description = text;
+                zone.danger = danger;
+                zone.mapColor = color;
+                zone.alwaysFoggy = fog;
+                EditorUtility.SetDirty(zone);
+            }
+
+            return zone;
         }
 
         private static BoatData Boat(string id, string title, float speed, float accel, float decel, int durability, int w, int h,

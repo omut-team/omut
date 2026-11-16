@@ -23,6 +23,8 @@ namespace Omut.EditorTools
             SetRef(fog, "whiteSprite", OmutDataBuilder.FindSprite("fx_white"));
             SetRef(fog, "unlitMaterial", Database.unlitMaterial);
 
+            EnsureComponent<ZoneTracker>(systems);
+
             PanicEffects panic = EnsureComponent<PanicEffects>(systems);
             SetRef(panic, "silhouetteSprite", OmutDataBuilder.FindSprite("obj_reef_rock"));
             SetRef(panic, "unlitMaterial", Database.unlitMaterial);
@@ -128,6 +130,8 @@ namespace Omut.EditorTools
             EnsureComponent<LoginUI>(ui);
             SetRef(EnsureComponent<PanicBar>(ui), "vignetteSprite", OmutDataBuilder.FindSprite("fx_vignette"));
             EnsureComponent<ScreenFader>(ui);
+            EnsureComponent<MapUI>(ui);
+            EnsureComponent<ZoneBanner>(ui);
             SetRef(EnsureComponent<DialogueUI>(ui), "heroPortrait", OmutDataBuilder.FindSprite("hero_symon_portrait"));
             EnsureComponent<InventoryUI>(ui);
         }

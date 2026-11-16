@@ -20,6 +20,7 @@ namespace Omut.Core
         public List<QuestData> quests = new List<QuestData>();
         public List<NoteData> notes = new List<NoteData>();
         public List<DialogueData> dialogues = new List<DialogueData>();
+        public List<Omut.World.ZoneData> zones = new List<Omut.World.ZoneData>();
 
         [Tooltip("Материал спрайтов без освещения (туман, метки эхолота): Art/Materials/SpriteUnlit")]
         public Material unlitMaterial;

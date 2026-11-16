@@ -108,21 +108,21 @@ namespace Omut.EditorTools
             };
             Tiled(world, "Sand", "tile_sand", Lake.center, Lake.size + new Vector2(2f, 2f), -35);
 
-            BuildZone(world, ZoneId.Dock, "Тихий причал", DockZone, "tile_water_dock", false, 2);
-            BuildZone(world, ZoneId.Bay, "Заросший залив", BayZone, "tile_water_bay", false, 6);
-            BuildZone(world, ZoneId.Pool, "Глубокий омут", PoolZone, "tile_water_deep", false, 5);
-            BuildZone(world, ZoneId.Reef, "Маячный риф", ReefZone, "tile_water_reef", true, 4);
+            BuildZone(world, ZoneId.Dock, DockZone, "tile_water_dock", 2);
+            BuildZone(world, ZoneId.Bay, BayZone, "tile_water_bay", 6);
+            BuildZone(world, ZoneId.Pool, PoolZone, "tile_water_deep", 5);
+            BuildZone(world, ZoneId.Reef, ReefZone, "tile_water_reef", 4);
 
             BuildDock(world);
             BuildDecor(world, random);
             BuildWorldExtras(world, random);
         }
 
-        private static void BuildZone(Transform world, ZoneId id, string title, Rect area, string tile, bool foggy, int spots)
+        private static void BuildZone(Transform world, ZoneId id, Rect area, string tile, int spots)
         {
             var go = new GameObject("Zone " + id);
             go.transform.SetParent(world, false);
-            go.AddComponent<Zone>().Setup(id, title, area, foggy);
+            go.AddComponent<Zone>().Setup(Database.zones.Find(z => z.id == id), area);
             go.AddComponent<FishingSpotSpawner>().Setup(OmutDataBuilder.FindSprite("fx_ripple"), spots, 7f);
 
             Tiled(go.transform, "Water", tile, area.center, area.size, -30);
