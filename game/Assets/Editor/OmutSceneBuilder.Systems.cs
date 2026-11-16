@@ -129,6 +129,14 @@ namespace Omut.EditorTools
             Light2D garage = PointLight(dock.Find("Garage"), "Lamp", new Vector2(0f, 1.6f), 2.5f, 0.8f, new Color(0.9f, 0.9f, 1f));
             garage.gameObject.AddComponent<NightLight>().Setup(false, 0f, 0.1f);
 
+            // Водоворот Хозяина Омута в центре омута (появляется ночью после письма деда).
+            var boss = new GameObject("BossWhirlpool");
+            boss.transform.SetParent(world, false);
+            boss.transform.position = new Vector3(6f, 0f, 0f);
+            BossEncounter encounter = boss.AddComponent<BossEncounter>();
+            SetRef(encounter, "rippleSprite", OmutDataBuilder.FindSprite("fx_ripple"));
+            SetRef(encounter, "unlitMaterial", Database.unlitMaterial);
+
             SpriteRenderer chest = Solid(dock, "DockChest", "obj_dock_chest", new Vector2(-43.3f, 24.3f), new Vector2(1.3f, 0.5f), new Vector2(0f, 0.25f));
             SetRef(chest.gameObject.AddComponent<DockChest>(), "sprite", chest);
 
@@ -170,6 +178,7 @@ namespace Omut.EditorTools
             EnsureComponent<ScreenFader>(ui);
             EnsureComponent<MapUI>(ui);
             EnsureComponent<ZoneBanner>(ui);
+            EnsureComponent<CreditsUI>(ui);
             SetRef(EnsureComponent<DialogueUI>(ui), "heroPortrait", OmutDataBuilder.FindSprite("hero_symon_portrait"));
             EnsureComponent<InventoryUI>(ui);
         }

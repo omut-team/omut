@@ -224,12 +224,12 @@ namespace Omut.EditorTools
 
             for (int i = 0; i < 18; i++)
             {
-                SpriteRenderer snag = Solid(hazards, "Snag", "obj_snag", RandomIn(PoolZone, 4f, random), new Vector2(1.1f, 0.5f), new Vector2(0f, 0.25f));
+                SpriteRenderer snag = Solid(hazards, "Snag", "obj_snag", RandomInPool(random), new Vector2(1.1f, 0.5f), new Vector2(0f, 0.25f));
                 snag.gameObject.AddComponent<Hazard>();
             }
 
             for (int i = 0; i < 6; i++)
-                Solid(hazards, "Rock", "obj_reef_rock", RandomIn(PoolZone, 4f, random), new Vector2(0.8f, 0.6f), new Vector2(0f, 0.3f));
+                Solid(hazards, "Rock", "obj_reef_rock", RandomInPool(random), new Vector2(0.8f, 0.6f), new Vector2(0f, 0.3f));
 
             for (int i = 0; i < 45; i++)
             {
@@ -245,6 +245,17 @@ namespace Omut.EditorTools
             return new Vector2(
                 Mathf.Lerp(area.xMin + margin, area.xMax - margin, (float)random.NextDouble()),
                 Mathf.Lerp(area.yMin + margin, area.yMax - margin, (float)random.NextDouble()));
+        }
+
+        public static readonly Vector2 BossCenter = new Vector2(6f, 0f);
+
+        // Точка в омуте, но не в водовороте Хозяина (там должна быть чистая вода).
+        private static Vector2 RandomInPool(System.Random random)
+        {
+            Vector2 p;
+            do p = RandomIn(PoolZone, 4f, random);
+            while (Vector2.Distance(p, BossCenter) < 5f);
+            return p;
         }
 
         private static Vector2 RandomNearEdge(Rect area, float depth, System.Random random)
