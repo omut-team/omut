@@ -122,5 +122,22 @@ namespace Omut.Tests
 
             Assert.AreEqual(0, calls);
         }
-    }
+    
+        [Test]
+        public void SailingWindowSailing_RoundTrip()
+        {
+            var machine = new GameStateMachine(GameState.Sailing);
+
+            Assert.IsTrue(machine.TryChangeTo(GameState.Window));
+            Assert.IsTrue(machine.TryChangeTo(GameState.Sailing));
+        }
+
+        [Test]
+        public void FishingToWindow_IsForbidden()
+        {
+            var machine = new GameStateMachine(GameState.Fishing);
+
+            Assert.IsFalse(machine.TryChangeTo(GameState.Window));
+        }
+}
 }
