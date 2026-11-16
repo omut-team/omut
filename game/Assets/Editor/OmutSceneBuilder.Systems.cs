@@ -24,6 +24,7 @@ namespace Omut.EditorTools
             SetRef(fog, "unlitMaterial", Database.unlitMaterial);
 
             EnsureComponent<ZoneTracker>(systems);
+            SetupAudio(EnsureComponent<AudioManager>(systems));
 
             PanicEffects panic = EnsureComponent<PanicEffects>(systems);
             SetRef(panic, "silhouetteSprite", OmutDataBuilder.FindSprite("obj_reef_rock"));
@@ -44,6 +45,40 @@ namespace Omut.EditorTools
                 so.FindProperty("lightIntensity").animationCurveValue = Omut.World.DayNightCycle.CreateDefaultIntensity();
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
+        }
+
+        // Звуки Лизы из Assets/Audio: sfx_<id>.wav и music_day/music_night. Чего нет, синтезируется кодом.
+        private static void SetupAudio(AudioManager audio)
+        {
+            var so = new SerializedObject(audio);
+            SerializedProperty list = so.FindProperty("clips");
+            list.ClearArray();
+            foreach (string id in ProceduralSounds.Ids)
+            {
+                AudioClip clip = FindClip("sfx_" + id);
+                if (clip == null)
+                    continue;
+                list.InsertArrayElementAtIndex(list.arraySize);
+                SerializedProperty item = list.GetArrayElementAtIndex(list.arraySize - 1);
+                item.FindPropertyRelative("id").stringValue = id;
+                item.FindPropertyRelative("clip").objectReferenceValue = clip;
+            }
+
+            so.FindProperty("dayMusic").objectReferenceValue = FindClip("music_day");
+            so.FindProperty("nightMusic").objectReferenceValue = FindClip("music_night");
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static AudioClip FindClip(string name)
+        {
+            foreach (string guid in AssetDatabase.FindAssets(name + " t:AudioClip", new[] { "Assets/Audio" }))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                if (System.IO.Path.GetFileNameWithoutExtension(path) == name)
+                    return AssetDatabase.LoadAssetAtPath<AudioClip>(path);
+            }
+
+            return null;
         }
 
         public const string UnlitMaterialPath = "Assets/Art/Materials/SpriteUnlit.mat";

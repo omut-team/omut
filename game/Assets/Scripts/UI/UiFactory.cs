@@ -161,6 +161,7 @@ namespace Omut.UI
             colors.disabledColor = new Color(0.6f, 0.6f, 0.6f, 0.5f);
             button.colors = colors;
 
+            button.onClick.AddListener(() => Core.GameEvents.RaisePlaySound("click"));
             if (onClick != null)
                 button.onClick.AddListener(onClick);
 
