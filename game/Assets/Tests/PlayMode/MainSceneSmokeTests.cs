@@ -396,5 +396,32 @@ namespace Omut.Tests
             Assert.IsFalse(Lantern.Instance.IsOn);
             Assert.IsFalse(Hotbar.HoldsLantern, "Погасил: снова удочка");
         }
+
+        // Сдать "Железо со дна": железо уходит из трюма только если задание сдано. Не хватает: ничего не пропадает.
+        [UnityTest]
+        public IEnumerator DeliverQuest_TakesScrapOnlyWhenDone()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance.StartGame();
+            yield return null;
+
+            GameSession session = GameSession.Instance;
+            QuestData quest = session.Quests.Find("q3_scrap");
+            Assert.IsTrue(session.Quests.Accept(quest));
+            FishData scrap = session.Database.FindFish("scrap");
+            for (int i = 0; i < 2; i++)
+                session.Hold.TryAdd(new CatchInfo(scrap, 2f, false, Omut.World.ZoneId.Pool, 1));
+
+            session.CompleteQuest(quest, null);
+            Assert.AreEqual(QuestState.Active, session.Quests.StateOf(quest), "Двух кусков мало");
+            Assert.AreEqual(2, session.Hold.CountOf("scrap"), "Железо не пропало");
+
+            session.Hold.TryAdd(new CatchInfo(scrap, 2f, false, Omut.World.ZoneId.Pool, 1));
+            int money = session.Wallet.Money;
+            session.CompleteQuest(quest, null);
+            Assert.AreEqual(QuestState.Done, session.Quests.StateOf(quest));
+            Assert.AreEqual(0, session.Hold.CountOf("scrap"));
+            Assert.Greater(session.Wallet.Money, money);
+        }
     }
 }
