@@ -117,6 +117,7 @@ namespace Omut.Core
             CaptureQuests(data);
             CaptureBoats(data);
             data.panic = Panic.Value;
+            data.diaryPages = DiaryPages;
             Capturing?.Invoke(data);
             return data;
         }
@@ -164,6 +165,7 @@ namespace Omut.Core
 
             ApplyQuests(data);
             ApplyBoats(data);
+            SetDiaryPages(data.diaryPages);
             Panic.Set(Mathf.Min(data.panic, PanicMeter.SteeringLevel - 1f)); // после загрузки сразу в обморок не падаем
             Applying?.Invoke(data);
         }

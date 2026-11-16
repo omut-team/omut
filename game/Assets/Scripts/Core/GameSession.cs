@@ -47,6 +47,8 @@ namespace Omut.Core
 
             FishingController.CurrentBait = () => Tackle.Current;
             HookSaving();
+            JournalUI.DiaryText = DiaryText;
+            FishingController.ChestAllowed = () => DiaryPages < DiaryPagesTotal;
             Merchant.AddMoreGoods = AddBaitGoods;
 
             hudLines.Add(() => $"Монеты: <b>{Wallet.Money}</b>");
@@ -145,6 +147,7 @@ namespace Omut.Core
             ResetQuests();
             ResetBoats();
             Panic.Reset();
+            ResetDiary();
             BoatChanged?.Invoke(CurrentBoat);
         }
 
@@ -197,6 +200,7 @@ namespace Omut.Core
         {
             TotalCaught++;
             Quests.OnFishCaught(info);
+            OnChestCaught(info);
             info.isNewRecord = Journal.Register(info);
             if (info.isNewRecord)
                 Notifications.Show($"Новая запись в журнале: {info.Title} ({Journal.CaughtCount} из {Journal.TotalEntries})", UiFactory.Theme.Gold);
@@ -205,6 +209,10 @@ namespace Omut.Core
         // Положить улов в трюм. null = положили, иначе текст для игрока.
         private string StoreCatch(CatchInfo info)
         {
+            // Сундучок в трюм не кладём: страница уже в дневнике.
+            if (info.fish != null && info.fish.isChest)
+                return null;
+
             if (Hold.TryAdd(info) != null)
             {
                 Notifications.Show($"{info.Title} в трюме. Улов стоит {Hold.TotalPrice} мон.");

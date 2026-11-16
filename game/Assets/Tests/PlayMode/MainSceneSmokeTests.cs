@@ -239,5 +239,38 @@ namespace Omut.Tests
             Assert.Less(session.Panic.Value, 1f);
             Assert.AreEqual(1, session.Boat.Durability, "Лодка побита");
         }
+
+        [UnityTest]
+        public IEnumerator FiveChests_OpenDockChest_UnlocksBoss()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance.StartGame();
+            yield return new WaitForSeconds(0.3f);
+
+            GameSession session = GameSession.Instance;
+            var chest = session.Database.FindFish("grandpa_chest");
+            Assert.IsTrue(FishingController.ChestAllowed());
+            for (int i = 0; i < 5; i++)
+            {
+                var info = new CatchInfo(chest, 15f, true, Omut.World.ZoneId.Reef, 1);
+                GameEvents.RaiseFishCaught(info);
+                Assert.IsNull(CatchCard.TryStore(info), "Сундучок не кладётся в трюм, но и не ошибка");
+                yield return null;
+                Object.FindAnyObjectByType<CatchCard>().Dismiss();
+            }
+
+            Assert.AreEqual(5, session.DiaryPages);
+            Assert.AreEqual(0, session.Hold.Count);
+            Assert.IsFalse(FishingController.ChestAllowed(), "Больше сундучков нет");
+            yield return null;
+
+            var dockChest = Object.FindAnyObjectByType<Omut.World.DockChest>();
+            Assert.IsNotNull(dockChest);
+            dockChest.Interact();
+            yield return null;
+            Assert.IsTrue(session.HasFlag(Omut.World.DockChest.BossFlag));
+            DialogueUI.Instance.Close();
+            yield return null;
+        }
 }
 }

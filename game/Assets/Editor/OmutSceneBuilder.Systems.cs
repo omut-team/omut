@@ -94,6 +94,9 @@ namespace Omut.EditorTools
             Light2D garage = PointLight(dock.Find("Garage"), "Lamp", new Vector2(0f, 1.6f), 2.5f, 0.8f, new Color(0.9f, 0.9f, 1f));
             garage.gameObject.AddComponent<NightLight>().Setup(false, 0f, 0.1f);
 
+            SpriteRenderer chest = Solid(dock, "DockChest", "obj_dock_chest", new Vector2(-43.3f, 24.3f), new Vector2(1.3f, 0.5f), new Vector2(0f, 0.25f));
+            SetRef(chest.gameObject.AddComponent<DockChest>(), "sprite", chest);
+
             Transform hero = dock.Find("Hero");
             Light2D heroLight = PointLight(hero, "WalkerLight", new Vector2(0f, 0.6f), 2.2f, 0.7f, new Color(1f, 0.85f, 0.6f));
             heroLight.enabled = false;

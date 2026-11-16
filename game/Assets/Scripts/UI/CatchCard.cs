@@ -20,6 +20,8 @@ namespace Omut.UI
         private Text error;
         private CatchInfo current;
         private bool needsRender;
+        private Button keepButton;
+        private Button releaseButton;
 
         private void Awake()
         {
@@ -47,8 +49,8 @@ namespace Omut.UI
             RectTransform buttons = UiFactory.Rect(paper, "Buttons");
             UiFactory.Place(buttons, new Vector2(0.5f, 0f), new Vector2(760f, 70f), new Vector2(0f, 24f));
             UiFactory.Row(buttons, 30f);
-            UiFactory.Button(buttons, "В трюм (Space)", Keep, new Vector2(330f, 64f));
-            UiFactory.Button(buttons, "Отпустить", Release, new Vector2(330f, 64f));
+            keepButton = UiFactory.Button(buttons, "В трюм (Space)", Keep, new Vector2(330f, 64f));
+            releaseButton = UiFactory.Button(buttons, "Отпустить", Release, new Vector2(330f, 64f));
 
             root.gameObject.SetActive(false);
         }
@@ -87,7 +89,9 @@ namespace Omut.UI
                            price;
             details.supportRichText = true;
 
-            note.text = info.isNewRecord ? "Новая запись в журнале!" : "";
+            note.text = fish.isChest ? "Внутри страница дневника деда! Читать: J" : (info.isNewRecord ? "Новая запись в журнале!" : "");
+            UiFactory.SetButtonText(keepButton, fish.isChest ? "Забрать (Space)" : "В трюм (Space)");
+            releaseButton.gameObject.SetActive(!fish.isChest);
             error.text = "";
             root.gameObject.SetActive(true);
         }
