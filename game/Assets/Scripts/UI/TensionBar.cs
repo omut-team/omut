@@ -23,8 +23,8 @@ namespace Omut.UI
             root = UiFactory.Rect(canvas.transform, "Tension");
             UiFactory.Place(root, new Vector2(0.5f, 0f), new Vector2(Width, 230f), new Vector2(0f, 70f));
 
-            Image back = UiFactory.Panel(root, "Back", UiFactory.Theme.Hud);
-            UiFactory.Stretch(back.rectTransform, -16f);
+            Image back = UiFactory.HudPanel(root, "Back");
+            UiFactory.Stretch(back.rectTransform, -28f);
 
             title = UiFactory.HudLabel(root, "", 30, TextAnchor.UpperCenter);
             UiFactory.Place(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(Width, 40f), new Vector2(0f, 0f));
@@ -43,7 +43,7 @@ namespace Omut.UI
             needleImage.gameObject.AddComponent<Outline>().effectColor = Color.black;
 
             progressFill = UiFactory.Bar(root, "Progress", new Vector2(Width, 22f), new Color(0f, 0f, 0f, 0.6f), UiFactory.Theme.Gold);
-            UiFactory.Place(progressFill.transform.parent as RectTransform, new Vector2(0.5f, 1f), new Vector2(Width, 22f), new Vector2(0f, -112f));
+            UiFactory.Place(UiFactory.BarRoot(progressFill), new Vector2(0.5f, 1f), new Vector2(Width, 22f), new Vector2(0f, -112f));
 
             warning = UiFactory.HudLabel(root, "", 30, TextAnchor.MiddleCenter);
             warning.color = new Color(1f, 0.45f, 0.35f);

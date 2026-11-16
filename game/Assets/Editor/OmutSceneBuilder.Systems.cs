@@ -81,6 +81,30 @@ namespace Omut.EditorTools
             return null;
         }
 
+        public const string UiSkinPath = "Assets/Resources/UiSkin.asset";
+
+        // Оформление интерфейса: шрифты из Art/Fonts и картинки из Art/UI (стиль макета Ульяны).
+        private static void EnsureUiSkin()
+        {
+            UiSkin skin = OmutDataBuilder.LoadOrCreate<UiSkin>(UiSkinPath, out _);
+            skin.bodyFont = AssetDatabase.LoadAssetAtPath<Font>("Assets/Art/Fonts/PTSans-Regular.ttf");
+            skin.boldFont = AssetDatabase.LoadAssetAtPath<Font>("Assets/Art/Fonts/PTSans-Bold.ttf");
+            skin.titleFont = AssetDatabase.LoadAssetAtPath<Font>("Assets/Art/Fonts/Lora.ttf");
+            skin.panel = OmutDataBuilder.FindSprite("ui_panel");
+            skin.plank = OmutDataBuilder.FindSprite("ui_button_plank");
+            skin.button = OmutDataBuilder.FindSprite("ui_button_wood");
+            skin.slot = OmutDataBuilder.FindSprite("ui_slot");
+            skin.slotSelected = OmutDataBuilder.FindSprite("ui_slot_selected");
+            skin.hud = OmutDataBuilder.FindSprite("ui_hud");
+            skin.bar = OmutDataBuilder.FindSprite("ui_bar");
+            skin.tag = OmutDataBuilder.FindSprite("ui_tag");
+            skin.markQuest = OmutDataBuilder.FindSprite("ui_mark_quest");
+            skin.markTurnIn = OmutDataBuilder.FindSprite("ui_mark_turnin");
+            skin.arrow = OmutDataBuilder.FindSprite("ui_arrow");
+            EditorUtility.SetDirty(skin);
+            AssetDatabase.SaveAssets();
+        }
+
         public const string UnlitMaterialPath = "Assets/Art/Materials/SpriteUnlit.mat";
 
         // Материал спрайтов без освещения (туман, метки эхолота, значок поклёвки видны в темноте).

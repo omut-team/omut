@@ -55,6 +55,8 @@ namespace Omut.UI
             {
                 clockText.text = text;
                 lastShown = text;
+                if (clockPanel != null)
+                    clockPanel.gameObject.SetActive(text.Length > 0);
             }
 
             if (messageTimer > 0f)
@@ -89,54 +91,25 @@ namespace Omut.UI
             messageTimer = messageSeconds;
         }
 
-        // Создаём Canvas и два текста кодом, пока нет нарисованного интерфейса.
+        // Часы в правой колонке HUD (тёмная деревянная панель), надпись про колокол по центру сверху.
         private void BuildDefaultUi()
         {
-            var canvasObject = new GameObject("ClockCanvas", typeof(Canvas), typeof(CanvasScaler));
-            canvasObject.transform.SetParent(transform, false);
-
-            var canvas = canvasObject.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 10;
-
-            var scaler = canvasObject.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920, 1080);
-
-            Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-
             if (clockText == null)
-                clockText = CreateText(canvas.transform, "ClockText", font, 36, TextAnchor.UpperRight,
-                    new Vector2(1f, 1f), new Vector2(-30f, -20f), new Vector2(700f, 60f));
+            {
+                clockPanel = HudLayout.AddPanel(HudLayout.Right, "Clock", 470f, 64f);
+                clockText = UiFactory.HudLabel(clockPanel.transform, "", 32, TextAnchor.MiddleCenter);
+                UiFactory.Stretch(clockText.rectTransform, 8f);
+            }
 
             if (messageText == null)
-                messageText = CreateText(canvas.transform, "MessageText", font, 44, TextAnchor.MiddleCenter,
-                    new Vector2(0.5f, 1f), new Vector2(0f, -120f), new Vector2(1400f, 80f));
+            {
+                Canvas canvas = UiFactory.CreateCanvas("ClockMessageCanvas", 24, transform);
+                messageText = UiFactory.HudLabel(canvas.transform, "", 46, TextAnchor.MiddleCenter);
+                messageText.color = UiFactory.Theme.Gold;
+                UiFactory.Place(messageText.rectTransform, new Vector2(0.5f, 1f), new Vector2(1400f, 80f), new Vector2(0f, -250f));
+            }
         }
 
-        private static Text CreateText(Transform parent, string name, Font font, int size, TextAnchor alignment,
-            Vector2 anchor, Vector2 position, Vector2 boxSize)
-        {
-            var textObject = new GameObject(name, typeof(RectTransform), typeof(Text), typeof(Outline));
-            textObject.transform.SetParent(parent, false);
-
-            var rect = textObject.GetComponent<RectTransform>();
-            rect.anchorMin = anchor;
-            rect.anchorMax = anchor;
-            rect.pivot = anchor;
-            rect.anchoredPosition = position;
-            rect.sizeDelta = boxSize;
-
-            var text = textObject.GetComponent<Text>();
-            text.font = font;
-            text.fontSize = size;
-            text.alignment = alignment;
-            text.color = Color.white;
-            text.raycastTarget = false; // текст не должен перехватывать клики мышью
-
-            // Чёрная обводка, чтобы текст читался и на светлой воде, и ночью.
-            textObject.GetComponent<Outline>().effectColor = new Color(0f, 0f, 0f, 0.8f);
-            return text;
-        }
+        private Image clockPanel;
     }
 }

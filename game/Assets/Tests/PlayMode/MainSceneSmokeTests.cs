@@ -316,5 +316,20 @@ namespace Omut.Tests
             yield return new WaitForSeconds(0.5f);
             Assert.IsTrue(CreditsUI.Instance.IsOpen);
         }
+
+        [UnityTest]
+        public IEnumerator Walker_CanWalkFromHutToPierTip()
+        {
+            GameEvents.RaiseNewGameStarted();
+            GameManager.Instance.StartGame();
+            yield return null;
+
+            // Путь пешком: от хаты на дорожку, вниз по мосткам до конца. Стык земли и мостков проходим.
+            Vector2 pierTip = DockingZone.Instance.transform.Find("WalkPoint").position;
+            for (float y = 26.5f; y >= pierTip.y; y -= 0.1f)
+                Assert.IsTrue(PlayerWalker.CanStand(new Vector2(pierTip.x, y)), $"Застрял на y = {y:0.0}");
+            for (float x = -45f; x <= pierTip.x; x += 0.1f)
+                Assert.IsTrue(PlayerWalker.CanStand(new Vector2(x, 26.5f)), $"Застрял на x = {x:0.0}");
+        }
 }
 }

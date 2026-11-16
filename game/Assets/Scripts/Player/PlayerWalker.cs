@@ -21,6 +21,11 @@ namespace Omut.Player
 
         private const float FeetRadius = 0.25f;
 
+        private static readonly Vector2[] FeetOffsets =
+        {
+            new Vector2(0.22f, 0f), new Vector2(-0.22f, 0f), new Vector2(0f, 0.12f), new Vector2(0f, -0.12f)
+        };
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics() => OnFoot = false;
 
@@ -92,8 +97,15 @@ namespace Omut.Player
         // Можно ли стоять: под ногами земля или мостки, и не упираемся в дом, маяк или NPC.
         public static bool CanStand(Vector2 point)
         {
-            if (!WalkableGround.IsWalkable(point))
+            // Ноги (центр и 4 точки вокруг) должны стоять на земле или мостках.
+            // Каждую точку проверяем отдельно: так можно перейти с мостков на землю через стык.
+            if (!WalkableGround.IsWalkable(point, 0f))
                 return false;
+            foreach (Vector2 offset in FeetOffsets)
+            {
+                if (!WalkableGround.IsWalkable(point + offset, 0f))
+                    return false;
+            }
 
             foreach (Collider2D hit in Physics2D.OverlapCircleAll(point, FeetRadius))
             {

@@ -44,7 +44,42 @@ namespace Omut.EditorTools
                 settings.spritePivot = new Vector2(0.5f, 0f);
             }
 
+            if (Borders.TryGetValue(file, out Vector4 border))
+                settings.spriteBorder = border;
+
             importer.SetTextureSettings(settings);
+        }
+
+        // Края для растяжения (9-slice) картинок интерфейса: слева, снизу, справа, сверху (в пикселях).
+        public static readonly System.Collections.Generic.Dictionary<string, Vector4> Borders =
+            new System.Collections.Generic.Dictionary<string, Vector4>
+            {
+                { "ui_panel", new Vector4(28, 28, 28, 28) },
+                { "ui_button_plank", new Vector4(110, 22, 110, 22) },
+                { "ui_button_wood", new Vector4(14, 12, 14, 12) },
+                { "ui_slot", new Vector4(10, 10, 10, 10) },
+                { "ui_slot_selected", new Vector4(8, 8, 8, 8) },
+                { "ui_hud", new Vector4(12, 12, 12, 12) },
+                { "ui_bar", new Vector4(8, 8, 8, 8) },
+                { "ui_tag", new Vector4(12, 10, 12, 10) },
+            };
+
+        // Проставить края уже импортированным картинкам (вызывает сборщик сцены).
+        public static void FixBorders()
+        {
+            foreach (var pair in Borders)
+            {
+                foreach (string guid in AssetDatabase.FindAssets(pair.Key + " t:Texture2D", new[] { "Assets/Art" }))
+                {
+                    string path = AssetDatabase.GUIDToAssetPath(guid);
+                    if (System.IO.Path.GetFileNameWithoutExtension(path) != pair.Key || !(AssetImporter.GetAtPath(path) is TextureImporter importer))
+                        continue;
+                    if (importer.spriteBorder == pair.Value)
+                        continue;
+                    importer.spriteBorder = pair.Value;
+                    importer.SaveAndReimport();
+                }
+            }
         }
 
         // Объекты, которые "стоят" на земле или воде: опора внизу (вид 45°).

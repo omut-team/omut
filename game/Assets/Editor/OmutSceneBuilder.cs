@@ -36,6 +36,8 @@ namespace Omut.EditorTools
         {
             OmutDataBuilder.Build(false);
             ArtImportSettings.FixPivots();
+            ArtImportSettings.FixBorders();
+            EnsureUiSkin();
             EnsureUnlitMaterial();
 
             var scene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);

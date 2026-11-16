@@ -26,14 +26,15 @@ namespace Omut.UI
             UiFactory.Stretch(vignette.rectTransform, -60f);
             vignette.transform.SetAsFirstSibling();
 
-            root = UiFactory.Rect(canvas.transform, "Panic");
-            UiFactory.Place(root, new Vector2(1f, 1f), new Vector2(420f, 70f), new Vector2(-30f, -80f));
+            // Панель в левой колонке HUD под монетами: "Страх 35  чай [C]: 1" и шкала.
+            Image panel = HudLayout.AddPanel(HudLayout.Left, "Panic", 470f, 96f);
+            root = panel.rectTransform;
 
-            label = UiFactory.HudLabel(root, "Страх", 26, TextAnchor.UpperRight);
-            UiFactory.Place(label.rectTransform, new Vector2(1f, 1f), new Vector2(420f, 32f), Vector2.zero);
+            label = UiFactory.HudLabel(root, "Страх", 25, TextAnchor.MiddleLeft);
+            UiFactory.Place(label.rectTransform, new Vector2(0f, 1f), new Vector2(430f, 34f), new Vector2(22f, -12f));
 
-            fill = UiFactory.Bar(root, "Bar", new Vector2(420f, 22f), new Color(0f, 0f, 0f, 0.6f), UiFactory.Theme.Good);
-            UiFactory.Place(fill.transform.parent as RectTransform, new Vector2(1f, 0f), new Vector2(420f, 22f), Vector2.zero);
+            fill = UiFactory.Bar(root, "Bar", new Vector2(426f, 26f), new Color(0.1f, 0.08f, 0.06f, 1f), UiFactory.Theme.Good);
+            UiFactory.Place(UiFactory.BarRoot(fill), new Vector2(0f, 0f), new Vector2(426f, 26f), new Vector2(22f, 16f));
         }
 
         private void Update()
@@ -49,7 +50,8 @@ namespace Omut.UI
             UiFactory.SetBar(fill, k);
             fill.color = Color.Lerp(UiFactory.Theme.Good, UiFactory.Theme.Bad, k);
             int thermos = session != null ? session.Thermos : 0;
-            label.text = $"Страх {Mathf.RoundToInt(panic)}   чай [C]: {thermos}";
+            string level = panic >= PanicMeter.SteeringLevel ? "руки дрожат" : panic >= PanicMeter.WhisperLevel ? "жутко" : "спокойно";
+            label.text = $"Страх: {Mathf.RoundToInt(panic)} ({level})     чай [C]: {thermos}";
 
             // Виньетка с 40 и пульсирует сильнее к 100.
             float strength = inGame ? Mathf.InverseLerp(40f, 100f, panic) : 0f;

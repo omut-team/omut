@@ -8,22 +8,65 @@ using UnityEngine.UI;
 namespace Omut.UI
 {
     // Набор помощников, чтобы собирать интерфейс кодом: холст, панели, тексты, кнопки, ползунки.
-    // Пока Ульяна не нарисовала интерфейс, все окна строятся из простых прямоугольников.
-    // Когда появится арт, в Theme можно подставить спрайты панелей (9-slice).
+    // Оформление (шрифты, бумага, дерево) берётся из UiSkin (Resources/UiSkin), в стиле макета Ульяны.
+    // Без UiSkin всё рисуется простыми цветными прямоугольниками.
     public static class UiFactory
     {
         public static readonly Vector2 ReferenceResolution = new Vector2(1920, 1080);
 
-        private static Font font;
+        private static Font fallbackFont;
 
-        public static Font Font
+        private static UiSkin Skin => UiSkin.Current;
+
+        private static Font Fallback
         {
             get
             {
-                if (font == null)
-                    font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                return font;
+                if (fallbackFont == null)
+                    fallbackFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                return fallbackFont;
             }
+        }
+
+        // Основной шрифт (PT Sans), жирный (PT Sans Bold) и шрифт заголовков (Lora).
+        public static Font Font => Skin != null && Skin.bodyFont != null ? Skin.bodyFont : Fallback;
+        public static Font BoldFont => Skin != null && Skin.boldFont != null ? Skin.boldFont : Font;
+        public static Font TitleFont => Skin != null && Skin.titleFont != null ? Skin.titleFont : Font;
+
+        // Картинка 32 px на клетку, холст 100 px на юнит: множитель, чтобы рамки были нужной толщины.
+        private static void Slice(Image image, Sprite sprite, float multiplier)
+        {
+            if (sprite == null)
+                return;
+            image.sprite = sprite;
+            image.type = Image.Type.Sliced;
+            image.pixelsPerUnitMultiplier = multiplier;
+            image.color = Color.white;
+        }
+
+        // Бумага в деревянной рамке (окна, диалог, карточки).
+        public static Image PaperPanel(Transform parent, string name)
+        {
+            Image image = Panel(parent, name, Theme.Paper);
+            if (Skin != null && Skin.panel != null) Slice(image, Skin.panel, 2.2f);
+            else image.gameObject.AddComponent<Outline>().effectColor = Theme.Ink;
+            return image;
+        }
+
+        // Тёмная деревянная панель для HUD.
+        public static Image HudPanel(Transform parent, string name)
+        {
+            Image image = Panel(parent, name, Theme.Hud);
+            if (Skin != null && Skin.hud != null) Slice(image, Skin.hud, 2.4f);
+            return image;
+        }
+
+        // Ячейка инвентаря (трюм, панель предметов, сумка).
+        public static Image SlotPanel(Transform parent, string name)
+        {
+            Image image = Panel(parent, name, new Color(0.55f, 0.47f, 0.36f, 1f));
+            if (Skin != null && Skin.slot != null) Slice(image, Skin.slot, 3f);
+            return image;
         }
 
         // Цвета интерфейса "тетрадь рыбака".
@@ -60,6 +103,7 @@ namespace Omut.UI
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = ReferenceResolution;
             scaler.matchWidthOrHeight = 0.5f;
+            go.AddComponent<AdaptiveScaler>(); // ничего не обрезается на любом мониторе
             return canvas;
         }
 
@@ -115,13 +159,13 @@ namespace Omut.UI
             Image shade = Panel(parent, name, Theme.Shade);
             Stretch(shade.rectTransform);
 
-            Image paper = Panel(shade.transform, "Paper", Theme.Paper);
+            Image paper = PaperPanel(shade.transform, "Paper");
             Place(paper.rectTransform, new Vector2(0.5f, 0.5f), size, Vector2.zero);
-            paper.gameObject.AddComponent<Outline>().effectColor = Theme.Ink;
 
-            titleText = Label(paper.transform, title, 40, TextAnchor.UpperCenter, Theme.Ink);
+            titleText = Label(paper.transform, title, 42, TextAnchor.UpperCenter, Theme.Ink);
+            titleText.font = TitleFont;
             titleText.fontStyle = FontStyle.Bold;
-            Place(titleText.rectTransform, new Vector2(0.5f, 1f), new Vector2(size.x - 40f, 60f), new Vector2(0f, -16f));
+            Place(titleText.rectTransform, new Vector2(0.5f, 1f), new Vector2(size.x - 120f, 60f), new Vector2(0f, -30f));
 
             return paper.rectTransform;
         }
@@ -145,6 +189,7 @@ namespace Omut.UI
         public static Text HudLabel(Transform parent, string text, int size, TextAnchor alignment)
         {
             Text label = Label(parent, text, size, alignment, Color.white);
+            label.font = BoldFont;
             label.gameObject.AddComponent<Outline>().effectColor = new Color(0f, 0f, 0f, 0.85f);
             return label;
         }
@@ -166,7 +211,41 @@ namespace Omut.UI
                 button.onClick.AddListener(onClick);
 
             Text label = Label(image.transform, text, fontSize, TextAnchor.MiddleCenter, Theme.ButtonText);
+            label.font = BoldFont;
             Stretch(label.rectTransform, 4f);
+
+            // Широкая кнопка: дощечка как в меню Ульяны, узкая: деревянная плашка.
+            if (Skin != null && size.x >= 260f && Skin.plank != null)
+            {
+                Slice(image, Skin.plank, 4f);
+                label.color = Theme.Ink;
+                label.rectTransform.offsetMin = new Vector2(70f, 4f);
+                label.rectTransform.offsetMax = new Vector2(-70f, -4f);
+                label.resizeTextForBestFit = true;
+                label.resizeTextMinSize = 14;
+                label.resizeTextMaxSize = fontSize;
+            }
+            else if (Skin != null && Skin.button != null)
+            {
+                Slice(image, Skin.button, 2.4f);
+                label.gameObject.AddComponent<Outline>().effectColor = new Color(0f, 0f, 0f, 0.7f);
+                label.rectTransform.offsetMin = new Vector2(16f, 2f);
+                label.rectTransform.offsetMax = new Vector2(-16f, -2f);
+                label.resizeTextForBestFit = true;
+                label.resizeTextMinSize = 12;
+                label.resizeTextMaxSize = fontSize;
+            }
+
+            if (Skin != null)
+            {
+                ColorBlock skinned = button.colors;
+                skinned.normalColor = new Color(0.94f, 0.92f, 0.88f);
+                skinned.highlightedColor = Color.white;
+                skinned.selectedColor = new Color(0.94f, 0.92f, 0.88f);
+                skinned.pressedColor = new Color(0.72f, 0.66f, 0.58f);
+                skinned.disabledColor = new Color(0.55f, 0.52f, 0.5f, 0.6f);
+                button.colors = skinned;
+            }
 
             var layout = image.gameObject.AddComponent<LayoutElement>();
             layout.preferredWidth = size.x;
@@ -211,8 +290,17 @@ namespace Omut.UI
         {
             Image back = Panel(parent, name, background);
             back.rectTransform.sizeDelta = size;
+            float inset = 0f;
+            if (Skin != null && Skin.bar != null)
+            {
+                Slice(back, Skin.bar, 2.5f); // деревянная рамка шкалы
+                inset = 5f;
+            }
 
-            Image fillImage = Panel(back.transform, "Fill", fill);
+            RectTransform area = Rect(back.transform, "Area");
+            Stretch(area, inset);
+
+            Image fillImage = Panel(area, "Fill", fill);
             fillImage.rectTransform.anchorMin = Vector2.zero;
             fillImage.rectTransform.anchorMax = new Vector2(0f, 1f);
             fillImage.rectTransform.pivot = new Vector2(0f, 0.5f);
@@ -220,6 +308,9 @@ namespace Omut.UI
             fillImage.rectTransform.offsetMax = Vector2.zero;
             return fillImage;
         }
+
+        // Вся шкала (рамка) по её заливке.
+        public static RectTransform BarRoot(Image fill) => (RectTransform)fill.transform.parent.parent;
 
         // Заполнить шкалу на долю value (0..1).
         public static void SetBar(Image fill, float value)

@@ -94,8 +94,8 @@ namespace Omut.UI
 
                 GridItem captured = item;
                 total += item.catchInfo.price;
-                string night = item.catchInfo.caughtAtNight ? " ночн." : "";
-                UiFactory.Button(sellList, $"{item.catchInfo.Title} {item.catchInfo.weight:0.0} кг{night}: {item.catchInfo.price}",
+                string night = item.catchInfo.caughtAtNight ? "★ " : "";
+                UiFactory.Button(sellList, $"{night}{item.catchInfo.Title}: {item.catchInfo.price} мон.",
                     () => Sell(captured), new Vector2(330f, 60f), 22);
             }
 
@@ -130,6 +130,9 @@ namespace Omut.UI
             Button buy = UiFactory.Button(row.transform, "Купить", () => Buy(good), new Vector2(130f, 56f), 24);
             UiFactory.Place((RectTransform)buy.transform, new Vector2(1f, 0.5f), new Vector2(130f, 56f), new Vector2(-10f, 0f));
             buy.interactable = reason == null && affordable;
+            // Почему нельзя купить: прямо на кнопке, чтобы не гадать.
+            if (reason != null) UiFactory.SetButtonText(buy, "Хватит");
+            else if (!affordable) UiFactory.SetButtonText(buy, "Мало денег");
         }
 
         private void Buy(ShopGood good)
