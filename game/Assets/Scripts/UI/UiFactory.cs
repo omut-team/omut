@@ -366,6 +366,35 @@ namespace Omut.UI
             return content;
         }
 
+        // Поле ввода текста (имя, пароль, адрес сервера).
+        public static InputField Input(Transform parent, string placeholder, bool password, Vector2 size)
+        {
+            Image back = Panel(parent, "Input " + placeholder, Color.white);
+            back.rectTransform.sizeDelta = size;
+            back.gameObject.AddComponent<Outline>().effectColor = Theme.InkLight;
+
+            Text text = Label(back.transform, "", 28, TextAnchor.MiddleLeft, Theme.Ink);
+            Stretch(text.rectTransform, 10f);
+            text.horizontalOverflow = HorizontalWrapMode.Overflow;
+            text.supportRichText = false;
+
+            Text hint = Label(back.transform, placeholder, 28, TextAnchor.MiddleLeft, new Color(0.5f, 0.5f, 0.5f));
+            Stretch(hint.rectTransform, 10f);
+            hint.fontStyle = FontStyle.Italic;
+
+            var input = back.gameObject.AddComponent<InputField>();
+            input.textComponent = text;
+            input.placeholder = hint;
+            input.targetGraphic = back;
+            input.contentType = password ? InputField.ContentType.Password : InputField.ContentType.Standard;
+            input.lineType = InputField.LineType.SingleLine;
+
+            var layout = back.gameObject.AddComponent<LayoutElement>();
+            layout.preferredWidth = size.x;
+            layout.preferredHeight = size.y;
+            return input;
+        }
+
         // Удалить все дочерние объекты (перед перестройкой списка).
         public static void ClearChildren(Transform parent)
         {

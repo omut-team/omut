@@ -41,6 +41,7 @@ namespace Omut.EditorTools
             EnsureComponent<JournalUI>(ui);
             EnsureComponent<QuestLogUI>(ui);
             EnsureComponent<ShipyardUI>(ui);
+            EnsureComponent<LoginUI>(ui);
             SetRef(EnsureComponent<DialogueUI>(ui), "heroPortrait", OmutDataBuilder.FindSprite("hero_symon_portrait"));
             EnsureComponent<InventoryUI>(ui);
         }
