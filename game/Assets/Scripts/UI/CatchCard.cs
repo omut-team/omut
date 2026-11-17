@@ -20,6 +20,10 @@ namespace Omut.UI
         private Text error;
         private CatchInfo current;
         private bool needsRender;
+        private float showAt;
+
+        // Карточка появляется, когда улов долетел до лодки (анимация вытаскивания в FishingController).
+        public const float ShowDelay = 0.6f;
         private Button keepButton;
         private Button releaseButton;
 
@@ -31,6 +35,7 @@ namespace Omut.UI
 
             icon = UiFactory.Icon(paper, null, new Vector2(300f, 200f));
             UiFactory.Place(icon.rectTransform, new Vector2(0.5f, 1f), new Vector2(300f, 200f), new Vector2(0f, -80f));
+            icon.gameObject.AddComponent<UiWiggle>(); // трофей выпрыгивает и покачивается
 
             title = UiFactory.Label(paper, "", 44, TextAnchor.MiddleCenter, UiFactory.Theme.Ink);
             title.fontStyle = FontStyle.Bold;
@@ -68,12 +73,21 @@ namespace Omut.UI
 
             current = info;
             needsRender = true;
+            showAt = Time.unscaledTime + ShowDelay;
         }
 
         private void LateUpdate()
         {
-            if (needsRender && current != null)
-                Render(current);
+            if (!needsRender)
+                return;
+            if (current == null)
+            {
+                needsRender = false;
+                return;
+            }
+            if (Time.unscaledTime < showAt)
+                return;
+            Render(current);
             needsRender = false;
         }
 
@@ -84,6 +98,7 @@ namespace Omut.UI
             icon.sprite = fish.sprite;
             icon.color = fish.sprite != null ? Color.white : new Color(1f, 1f, 1f, 0f);
             title.text = fish.displayName;
+            icon.GetComponent<UiWiggle>()?.Replay();
 
             string price = fish.isChest ? "внутри страница дневника деда" : $"цена у Тараса: {info.price} мон.";
             if (info.caughtAtNight && !fish.isChest)
@@ -92,10 +107,15 @@ namespace Omut.UI
                            $"Редкость: <color=#{ColorUtility.ToHtmlStringRGB(FishData.RarityColor(fish.rarity))}>{FishData.RarityName(fish.rarity)}</color>\n" +
                            price;
             details.supportRichText = true;
+            if (fish.isJunk)
+                details.text = $"Вес: {info.weight:0.00} кг\nМусор со дна\n{price}";
 
-            note.text = fish.isChest ? "Внутри страница дневника деда! Читать: J" : (info.isNewRecord ? "Новая запись в журнале!" : "");
+            note.text = fish.isChest ? "Внутри страница дневника деда! Читать: J"
+                : fish.isJunk ? "Не рыба, а мусор. Тарас даст пару монет."
+                : (info.isNewRecord ? "Новая запись в журнале!" : "");
             UiFactory.SetButtonText(keepButton, fish.isChest ? "Забрать (Space)" : "В трюм (Space)");
             releaseButton.gameObject.SetActive(!fish.isChest);
+            UiFactory.SetButtonText(releaseButton, fish.isJunk ? "Выбросить" : "Отпустить");
             error.text = "";
             root.gameObject.SetActive(true);
         }
@@ -134,7 +154,9 @@ namespace Omut.UI
             if (current == null)
                 return;
 
-            Notifications.Show($"{current.Title} отпущен(а) обратно в озеро.");
+            Notifications.Show(current.fish != null && current.fish.isJunk
+                ? $"{current.Title}: выброшено обратно в воду."
+                : $"{current.Title} отпущен(а) обратно в озеро.");
             Close();
         }
 
