@@ -118,11 +118,11 @@ namespace Omut.EditorTools
         {
             var rows = new List<FishRow>
             {
-                Row(1, "crucian", "Карась", 0.4f, 1.2f, 12, Rarity.Common, FishTime.Day, ZoneMask.Bay, BaitType.Worm, FishBehaviour.Steady, 0.15f, 1, 1,
+                Row(1, "crucian", "Карась", 0.4f, 1.2f, 12, Rarity.Common, FishTime.Day, ZoneMask.Bay | ZoneMask.Pool | ZoneMask.Dock, BaitType.Worm, FishBehaviour.Steady, 0.15f, 1, 1,
                     "Золотистый и упрямый. Дед говорил: карась в заливе есть всегда, даже когда больше никого нет."),
                 Row(2, "perch", "Окунь", 0.5f, 1.8f, 15, Rarity.Common, FishTime.Day, Everywhere, BaitType.Spoon, FishBehaviour.Steady, 0.25f, 1, 1,
                     "Полосатый разбойник. Хватает блесну где угодно, лишь бы светло."),
-                Row(3, "bream", "Лещ", 1.0f, 3.2f, 14, Rarity.Common, FishTime.Day, ZoneMask.Bay, BaitType.Worm, FishBehaviour.Steady, 0.3f, 2, 1,
+                Row(3, "bream", "Лещ", 1.0f, 3.2f, 14, Rarity.Common, FishTime.Day, ZoneMask.Bay | ZoneMask.Pool, BaitType.Worm, FishBehaviour.Steady, 0.3f, 2, 1,
                     "Широкий, как лопата. Ходит стаями по мелководью и любит червя."),
                 Row(4, "tench", "Линь", 1.5f, 4.0f, 22, Rarity.Uncommon, FishTime.Day, ZoneMask.Bay, BaitType.Worm, FishBehaviour.Heavy, 0.45f, 2, 1,
                     "Скользкий, в зелёной слизи. Тянет тяжело и молча, как бревно."),

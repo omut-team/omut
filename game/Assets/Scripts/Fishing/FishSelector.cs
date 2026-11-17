@@ -53,6 +53,12 @@ namespace Omut.Fishing
             }
         }
 
+        // Какая доля клёва может прийтись на мусор и железо вместе (остальное рыба).
+        public const float ExtraShare = 0.28f;
+
+        // Настоящая рыба (есть в журнале): не мусор и не металлолом.
+        public static bool IsRealFish(FishData fish) => fish != null && !fish.isJunk && fish.InJournal;
+
         // Мусор клюёт редко и одинаково везде, круги на воде его не приманивают.
         public const float JunkWeight = 6f;
 
@@ -89,17 +95,31 @@ namespace Omut.Fishing
         public FishData Pick(CastConditions c)
         {
             List<FishData> candidates = Candidates(c);
-            float total = 0f;
-            foreach (FishData fish in candidates)
-                total += Weight(fish, c.inSpot);
 
+            // Мусор и железо цепляются только как попутный улов: если настоящая рыба здесь
+            // на эту наживку не клюёт, не клюёт ничего, и игрок видит подсказку сменить наживку или место.
+            // (Раньше в омуте на червя ловились одни сапоги и железо, и подсказки не было.)
+            if (!candidates.Exists(IsRealFish))
+                return null;
+
+            // Мусор и железо вместе не больше ExtraShare от всего клёва, даже где рыбы мало (омут в сумерках).
+            float fishTotal = 0f, extraTotal = 0f;
+            foreach (FishData fish in candidates)
+            {
+                if (IsRealFish(fish)) fishTotal += Weight(fish, c.inSpot);
+                else extraTotal += Weight(fish, c.inSpot);
+            }
+
+            float maxExtra = fishTotal * ExtraShare / (1f - ExtraShare);
+            float extraScale = extraTotal > maxExtra && extraTotal > 0f ? maxExtra / extraTotal : 1f;
+            float total = fishTotal + extraTotal * extraScale;
             if (total <= 0f)
                 return null;
 
             double roll = random.NextDouble() * total;
             foreach (FishData fish in candidates)
             {
-                roll -= Weight(fish, c.inSpot);
+                roll -= Weight(fish, c.inSpot) * (IsRealFish(fish) ? 1f : extraScale);
                 if (roll <= 0)
                     return fish;
             }

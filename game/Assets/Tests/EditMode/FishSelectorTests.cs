@@ -17,6 +17,7 @@ namespace Omut.Tests
         {
             var fish = ScriptableObject.CreateInstance<FishData>();
             fish.id = id;
+            fish.journalNumber = 1; // настоящая рыба (у мусора и железа номера нет)
             fish.rarity = rarity;
             fish.time = time;
             fish.zones = zones;
