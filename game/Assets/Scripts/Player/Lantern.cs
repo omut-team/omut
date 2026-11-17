@@ -180,9 +180,13 @@ namespace Omut.Player
                 walkerLight.intensity = Mathf.Lerp(dark ? 0.7f : 0f, 1f * flicker, glow);
                 if (handGlow != null)
                 {
-                    SpriteRenderer body = walkerLight.transform.parent != null ? walkerLight.transform.parent.GetComponent<SpriteRenderer>() : null;
-                    bool left = body != null && body.flipX;
-                    handGlow.transform.localPosition = new Vector2(left ? -0.3f : 0.3f, -0.05f);
+                    // Огонёк там, где фонарь в руке (рука зависит от того, куда смотрит Сымон).
+                    PlayerWalker walker = PlayerWalker.Instance;
+                    if (walker != null)
+                    {
+                        HeldItemView.Place(walker.Facing, true, out Vector2 hand, out _, out _);
+                        handGlow.transform.position = (Vector2)walker.transform.position + hand;
+                    }
                 }
             }
         }

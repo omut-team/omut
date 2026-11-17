@@ -38,7 +38,9 @@ namespace Omut.Core
             return ok;
         }
 
-        private void AutoSave(string reason)
+        // Сохранить сразу после важного события (взял или сдал задание, открыл сундук).
+        // Раньше игра сохранялась только утром и у причала: сдал задание, вышел, и оно пропадало.
+        public void AutoSave(string reason)
         {
             GameManager game = GameManager.Instance;
             if (game == null || game.CurrentState == GameState.Menu)
@@ -46,6 +48,15 @@ namespace Omut.Core
 
             if (SaveGame())
                 Notifications.Show("Автосохранение (" + reason + ")", new Color(0.7f, 0.8f, 0.7f));
+        }
+
+        // Закрыл игру посреди дня: сохраняем, чтобы ничего не потерять. В автотестах (batch) не пишем.
+        private void OnApplicationQuit()
+        {
+            GameManager game = GameManager.Instance;
+            if (Application.isBatchMode || game == null || game.CurrentState == GameState.Menu)
+                return;
+            SaveGame();
         }
 
         private void OnNewDayAutoSave(int day) => AutoSave("утро");
