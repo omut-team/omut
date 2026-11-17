@@ -25,7 +25,7 @@ MonoBehaviour:
   pricePerKg: 14
   rarity: 0
   time: 1
-  zones: 2
+  zones: 6
   bait: 0
   minCastDistance: 0
   behaviour: 0

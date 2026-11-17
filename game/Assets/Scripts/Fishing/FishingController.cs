@@ -238,8 +238,10 @@ namespace Omut.Fishing
             {
                 case BaitType.Phosphor when CurrentPhase() != DayPhase.Night:
                     return "Фосфорная блесна днём бесполезна. Смени наживку (Q).";
-                case BaitType.Worm when CastZone == ZoneId.Pool || CastZone == ZoneId.Reef:
-                    return "Тут на червя не клюёт. Хищнику нужна блесна (Q).";
+                case BaitType.Worm when CastZone == ZoneId.Reef:
+                    return "На рифе на червя не клюёт. Днём нужна блесна, ночью фосфорная (Q).";
+                case BaitType.Worm when CurrentPhase() == DayPhase.Evening:
+                    return "В сумерках на червя не клюёт. Возьми блесну (Q).";
                 case BaitType.Spoon when CastZone == ZoneId.Bay:
                     return "В заливе мирная рыба. Попробуй червя (Q).";
                 default:
