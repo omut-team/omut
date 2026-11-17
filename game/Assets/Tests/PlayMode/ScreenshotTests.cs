@@ -158,9 +158,18 @@ namespace Omut.Tests
             yield return Shot("reeling");
 
             fishing.OnCaught();
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.25f);
+            yield return Shot("catch_fly"); // щука летит из воды в лодку
+            yield return new WaitForSeconds(0.6f);
             yield return Shot("catch");
 
+            Object.FindAnyObjectByType<CatchCard>().Dismiss();
+            yield return null;
+
+            // Мусор со дна на карточке трофея.
+            GameEvents.RaiseFishCaught(new CatchInfo(fishing.Database.FindFish("tire"), 6.2f, false, Omut.World.ZoneId.Pool, 1));
+            yield return new WaitForSeconds(0.9f);
+            yield return Shot("catch_junk");
             Object.FindAnyObjectByType<CatchCard>().Dismiss();
             yield return null;
 

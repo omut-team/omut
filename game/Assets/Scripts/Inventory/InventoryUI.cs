@@ -24,6 +24,8 @@ namespace Omut.Inventory
         private Text confirmText;
 
         private readonly List<DraggableItem> views = new List<DraggableItem>();
+        // Что уже показывали: новая рыба или вещь в трюме "выпрыгивает" один раз.
+        private readonly HashSet<GridItem> shown = new HashSet<GridItem>();
         private GridItem selected;
         private GridItem pendingThrow;
         private DraggableItem dragging;
@@ -146,6 +148,12 @@ namespace Omut.Inventory
 
             Image picture = UiFactory.Icon(back.transform, item.catchInfo.fish.sprite, Vector2.zero);
             picture.preserveAspect = false;
+            // Живая картинка: новая выпрыгивает, выбранная покачивается.
+            var wiggle = picture.gameObject.AddComponent<UiWiggle>();
+            wiggle.sway = item == selected;
+            wiggle.angle = 3f;
+            if (!shown.Add(item))
+                wiggle.SkipPop();
 
             var view = back.gameObject.AddComponent<DraggableItem>();
             view.Setup(this, item, back);
@@ -166,7 +174,11 @@ namespace Omut.Inventory
             picture.anchorMin = picture.anchorMax = new Vector2(0.5f, 0.5f);
             picture.sizeDelta = new Vector2(item.baseSize.x * Cell - 8f, item.baseSize.y * Cell - 8f);
             picture.anchoredPosition = Vector2.zero;
-            picture.localRotation = Quaternion.Euler(0f, 0f, rotated ? 90f : 0f);
+            Quaternion turn = Quaternion.Euler(0f, 0f, rotated ? 90f : 0f);
+            picture.localRotation = turn;
+            UiWiggle wiggle = picture.GetComponent<UiWiggle>();
+            if (wiggle != null)
+                wiggle.SetBaseRotation(turn);
         }
 
         private Color ItemColor(GridItem item, bool isSelected)
@@ -181,7 +193,12 @@ namespace Omut.Inventory
         {
             selected = item;
             foreach (DraggableItem view in views)
+            {
                 view.Tint(ItemColor(view.Item, view.Item == selected));
+                UiWiggle wiggle = view.GetComponentInChildren<UiWiggle>();
+                if (wiggle != null)
+                    wiggle.sway = view.Item == selected;
+            }
             UpdateInfo();
         }
 
@@ -193,7 +210,7 @@ namespace Omut.Inventory
             if (selected != null)
             {
                 CatchInfo c = selected.catchInfo;
-                info.text = $"<b>{c.Title}</b>\nВес: {c.weight:0.00} кг\nРедкость: {FishData.RarityName(c.fish.rarity)}\n" +
+                info.text = $"<b>{c.Title}</b>\nВес: {c.weight:0.00} кг\nРедкость: {(c.fish.isJunk ? "мусор со дна" : FishData.RarityName(c.fish.rarity))}\n" +
                             $"Цена: {c.price} мон.{(c.caughtAtNight ? " (ночной x3)" : "")}\nПоймана в день {c.day}";
             }
             else
