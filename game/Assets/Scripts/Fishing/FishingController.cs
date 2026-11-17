@@ -267,10 +267,38 @@ namespace Omut.Fishing
             int day = DayNightCycle.Instance != null ? DayNightCycle.Instance.Clock.Day : 1;
 
             LastCatch = new CatchInfo(fish, weight, night, CastZone, day);
+            // Улов вылетает из воды в лодку (рыба, мусор, сундучок). Хозяина Омута показывает финал.
+            if (!fish.isBoss && fish.sprite != null)
+                StartCoroutine(FlyToBoat(fish.sprite, BobberPosition, RodTip));
             GameEvents.RaiseBaitUsed(CurrentBait());
             SetState(Caught);
             Sfx("caught");
             GameEvents.RaiseFishCaught(LastCatch);
+        }
+
+        // Вытаскивание: картинка улова по дуге от поплавка к лодке, кувыркается и пропадает у борта.
+        private System.Collections.IEnumerator FlyToBoat(Sprite sprite, Vector2 from, Vector2 to)
+        {
+            var go = new GameObject("CaughtFly");
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = sprite;
+            sr.sortingOrder = 50;
+            float size = Mathf.Max(sprite.bounds.size.x, sprite.bounds.size.y);
+            float scale = size > 0f ? 1.3f / size : 1f; // щука и шина не больше лодки
+            const float duration = 0.7f;
+
+            for (float t = 0f; t < 1f; t += Time.deltaTime / duration)
+            {
+                Vector2 p = Vector2.Lerp(from, to, t);
+                p.y += Mathf.Sin(t * Mathf.PI) * 1.6f; // дуга
+                go.transform.position = p;
+                go.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Sin(t * 18f) * 25f * (1f - t)); // бьётся
+                go.transform.localScale = Vector3.one * scale * Mathf.Lerp(1f, 0.6f, t * t);
+                sr.color = new Color(1f, 1f, 1f, t < 0.85f ? 1f : (1f - t) / 0.15f);
+                yield return null;
+            }
+
+            Destroy(go);
         }
 
         public void OnLost(bool lineBroke)
