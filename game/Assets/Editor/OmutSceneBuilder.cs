@@ -24,7 +24,7 @@ namespace Omut.EditorTools
         // Мир = рисованная карта озера Ульяны (Art/Map/world_map.png): 100 x 56.28 клеток.
         // Причал внизу, залив слева, омут справа (водоворот), риф с биостанцией наверху.
         public static readonly Rect Lake = new Rect(-50f, -28.14f, 100f, 56.28f);
-        public static readonly Vector2 BoatStart = new Vector2(8.6f, -16.6f);
+        public static readonly Vector2 BoatStart = new Vector2(9.8f, -17.6f);
 
         public static readonly Rect DockZone = new Rect(-50f, -28.14f, 100f, 16.14f);
         public static readonly Rect BayZone = new Rect(-50f, -12f, 36f, 25f);
@@ -132,6 +132,7 @@ namespace Omut.EditorTools
 
             // Земля и мостки, по которым ходит Сымон (из маски карты).
             BuildWalkable(dock);
+            BuildFences(dock);
 
             // Дома нарисованы на карте: здесь только невидимые стены у их основания, чтобы не ходить сквозь них.
             // Позиция = низ дома на карте, к ней привязан свет окон и маяка.
@@ -145,13 +146,13 @@ namespace Omut.EditorTools
         }
 
         // Точки на карте Ульяны: лодка в кармане между мостками, Тарас у маяка, Михалыч у мастерской.
-        public static readonly Vector2 MooringPoint = new Vector2(8.6f, -16.6f);
-        public static readonly Vector2 PierTip = new Vector2(8.6f, -19.5f);
+        public static readonly Vector2 MooringPoint = new Vector2(9.8f, -17.6f);
+        public static readonly Vector2 PierTip = new Vector2(9.8f, -19.9f);
         public static readonly Vector2 HeroStart = new Vector2(-21.3f, -18.8f);
-        public static readonly Vector2 TarasPosition = new Vector2(20.0f, -17.3f);
+        public static readonly Vector2 TarasPosition = new Vector2(20.0f, -16.9f);
         public static readonly Vector2 MikhalychPosition = new Vector2(-6.0f, -18.0f);
         public static readonly Vector2 YadvigaPosition = new Vector2(-15.5f, -21.0f);
-        public static readonly Vector2 YazepPosition = new Vector2(12.5f, -19.4f);
+        public static readonly Vector2 YazepPosition = new Vector2(12.6f, -19.9f);
         public static readonly Vector2 ChestPosition = new Vector2(-17.6f, -18.3f);
 
         // Все "стоящие" объекты на одном слое: сортировка по Y (вид 45°, Renderer2D: Custom Axis 0,1,0).
@@ -179,6 +180,12 @@ namespace Omut.EditorTools
             SpriteRenderer hero = Plain(dock, "Hero", "hero_symon", HeroStart, StandingOrder);
             var walker = hero.gameObject.AddComponent<PlayerWalker>();
             SetRef(walker, "sprite", hero);
+            // Кадры ходьбы из tools/make_hero.py (Сымон по кадрам Ульяны).
+            Sprite[] Hero(string dir) => new[]
+            {
+                OmutDataBuilder.FindSprite($"hero_symon_{dir}_idle"), OmutDataBuilder.FindSprite($"hero_symon_{dir}_walk_01"), OmutDataBuilder.FindSprite($"hero_symon_{dir}_walk_02")
+            };
+            walker.SetFrames(Hero("down"), Hero("up"), Hero("side"));
 
             // Место швартовки у конца мостков.
             var mooring = new GameObject("DockingZone");

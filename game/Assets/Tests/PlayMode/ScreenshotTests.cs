@@ -80,6 +80,13 @@ namespace Omut.Tests
             yield return new WaitForSeconds(0.5f);
             yield return Shot("dock");
 
+            // Сымон на нижних мостках у лодки (видно, где садиться).
+            Omut.Player.PlayerWalker.Instance.transform.position = Omut.Player.DockingZone.Instance.transform.Find("WalkPoint").position;
+            yield return new WaitForSeconds(0.3f);
+            yield return Shot("pier");
+            Omut.Player.PlayerWalker.Instance.transform.position = Omut.Player.DockingZone.Instance.StartPosition;
+            yield return null;
+
             GameSession session = GameSession.Instance;
             foreach (string id in new[] { "pike", "crucian", "carp", "bream", "black_catfish" })
                 session.Hold.TryAdd(new CatchInfo(session.Database.FindFish(id), 3.3f, id == "black_catfish", Omut.World.ZoneId.Pool, 1));

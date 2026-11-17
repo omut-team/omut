@@ -25,11 +25,20 @@ namespace Omut.Player
         [Tooltip("С какого расстояния лодка может причалить, клеток")]
         [SerializeField] private float dockRadius = 3.5f;
 
+        [Tooltip("С какого расстояния от лодки Сымон может в неё сесть (стоит на мостках у кармана)")]
+        [SerializeField] private float boardRadius = 3.3f;
+
         public BoatController Boat => boat;
         public PlayerWalker Walker => walker;
 
         // Лодка у причала (рядом с мостками).
         public bool BoatNearDock => boat != null && Vector2.Distance(boat.transform.position, transform.position) <= dockRadius;
+
+        // Сымон пешком стоит у лодки: на нижних мостках у точки посадки или где угодно на мостках рядом с лодкой.
+        // Раньше садились только с одной точки (1,3 клетки от неё), и к лодке подходили, а сесть не могли.
+        public bool CanBoard(Vector2 walkerPosition) =>
+            BoatNearDock && (Vector2.Distance(walkerPosition, walkPoint.position) <= 1.8f
+                             || Vector2.Distance(walkerPosition, boat.transform.position) <= boardRadius);
 
         private void Awake()
         {
@@ -69,7 +78,7 @@ namespace Omut.Player
                         Disembark();
                 }
             }
-            else if (Vector2.Distance(walker.transform.position, walkPoint.position) <= 1.3f)
+            else if (CanBoard(walker.transform.position))
             {
                 Hud.SetPrompt("E: сесть в лодку", 20);
                 if (Controls.Pressed(Controls.Interact))

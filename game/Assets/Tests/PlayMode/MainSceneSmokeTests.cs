@@ -82,7 +82,7 @@ namespace Omut.Tests
             Assert.AreEqual(GameState.Fishing, GameManager.Instance.CurrentState);
             yield return null;
 
-            Vector2 water = (Vector2)fishing.transform.position + new Vector2(3f, 0f);
+            Vector2 water = (Vector2)fishing.transform.position + new Vector2(-4f, 0f);
             Assert.IsTrue(fishing.IsWater(water), "Под лодкой должна быть вода");
             fishing.ShowBobber(water);
             fishing.Landed(water);
@@ -362,6 +362,18 @@ namespace Omut.Tests
             Assert.IsTrue(Reached(pierTip, 0.3f), "Дошёл до мостков у лодки");
             Assert.IsTrue(Reached(GameObject.Find("World/Dock/Taras").transform.position, 1.5f), "Дошёл до Тараса");
             Assert.IsTrue(Reached(GameObject.Find("World/Dock/Mikhalych").transform.position, 1.5f), "Дошёл до Михалыча");
+
+            // Заборы и перила держат: за длинным забором луг, за перилами у маяка скалы, верхние перила над водой.
+            Assert.IsFalse(Reached(new Vector2(-20f, -26f), 0.5f), "Прошёл сквозь длинный забор");
+            Assert.IsFalse(Reached(new Vector2(21f, -19f), 0.5f), "Перелез через перила у маяка");
+            Assert.IsFalse(Reached(new Vector2(5f, -13.1f), 0.3f), "Залез на верхние перила");
+            Assert.IsFalse(Reached(DockingZone.Instance.MooringPosition, 1f), "Ходит по воде в кармане с лодкой");
+
+            // В лодку можно сесть и с нижних мостков, и с верхних напротив лодки.
+            Vector2 topPier = new Vector2(DockingZone.Instance.MooringPosition.x, -14.6f);
+            Assert.IsTrue(Reached(topPier, 0.3f), "Дошёл до верхних мостков у лодки");
+            Assert.IsTrue(DockingZone.Instance.CanBoard(pierTip), "Сесть с нижних мостков");
+            Assert.IsTrue(DockingZone.Instance.CanBoard(topPier), "Сесть с верхних мостков");
         }
 
         // Подсказки и панель предметов: после новой игры видно, к кому идти, а удочка в руке.
