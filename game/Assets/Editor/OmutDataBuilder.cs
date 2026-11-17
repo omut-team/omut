@@ -90,7 +90,7 @@ namespace Omut.EditorTools
             public BaitType bait;
             public FishBehaviour behaviour;
             public int w, h;
-            public bool chest, boss;
+            public bool chest, boss, junk;
         }
 
         private static FishRow Row(int number, string id, string name, float min, float max, float price, Rarity rarity,
@@ -105,6 +105,14 @@ namespace Omut.EditorTools
         }
 
         private static readonly ZoneMask Everywhere = ZoneMask.All;
+
+        // Мусор: без номера в журнале, клюёт на что угодно в любое время, 1 монета за кг.
+        private static FishRow Junk(string id, string name, float min, float max, ZoneMask zones, float strength, int w, int h, string text)
+        {
+            FishRow row = Row(0, id, name, min, max, 1, Rarity.Common, FishTime.Always, zones, BaitType.Any, FishBehaviour.Steady, strength, w, h, text);
+            row.junk = true;
+            return row;
+        }
 
         private static List<FishRow> FishTable()
         {
@@ -140,6 +148,18 @@ namespace Omut.EditorTools
                     "Тот, кого боится всё озеро. В трюм не помещается. Говорят, он помнит деда Язэпа."),
                 Row(0, "scrap", "Металлолом", 1f, 4f, 3, Rarity.Uncommon, FishTime.Always, ZoneMask.Pool | ZoneMask.Reef, BaitType.Any, FishBehaviour.Heavy, 0.3f, 1, 1,
                     "Ржавое железо со дна. Михалыч берёт его для ремонта лодки."),
+
+                // Мусор со дна (картинки Ильи): клюёт редко, Тарас берёт за копейки.
+                Junk("boot", "Дырявый сапог", 0.5f, 1.2f, ZoneMask.Bay | ZoneMask.Pool, 0.15f, 1, 1,
+                    "Резиновый сапог, весь в тине и дырах. Второй, наверное, тоже где-то на дне."),
+                Junk("bottle", "Бутылка", 0.3f, 0.6f, ZoneMask.Bay, 0.1f, 1, 1,
+                    "Старая бутылка, обросла ракушками. Записки внутри нет."),
+                Junk("can", "Ржавая банка", 0.2f, 0.5f, ZoneMask.Pool, 0.1f, 1, 1,
+                    "Консервная банка, ржавая насквозь. Даже Михалыч такое не берёт."),
+                Junk("plastic_bag", "Пакет", 0.1f, 0.3f, ZoneMask.Bay, 0.08f, 1, 1,
+                    "Пакет из магазина в райцентре. Как он сюда доплыл, непонятно."),
+                Junk("tire", "Старая шина", 4f, 9f, ZoneMask.Pool, 0.35f, 2, 2,
+                    "Шина от трактора. Тянется тяжело, а толку ноль."),
             };
 
             FishRow chest = rows[12];
@@ -187,6 +207,7 @@ namespace Omut.EditorTools
                     fish.holdSize = new Vector2Int(row.w, row.h);
                     fish.isChest = row.chest;
                     fish.isBoss = row.boss;
+                    fish.isJunk = row.junk;
                     EditorUtility.SetDirty(fish);
                 }
 

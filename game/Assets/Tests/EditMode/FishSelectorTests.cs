@@ -142,6 +142,25 @@ namespace Omut.Tests
             Assert.AreEqual(FishSelector.RarityWeight(Rarity.Common, true), FishSelector.RarityWeight(Rarity.Common, false));
         }
 
+        // Мусор (сапог, шина) клюёт, но заметно реже обычной рыбы, и круги на воде его не приманивают.
+        [Test]
+        public void Junk_BitesRarelyThanFish()
+        {
+            FishData boot = Make("boot", Rarity.Common, FishTime.Always, ZoneMask.Bay, BaitType.Any);
+            boot.isJunk = true;
+            var selector = new FishSelector(new List<FishData> { crucian, boot }, 11);
+            var c = new CastConditions(ZoneId.Bay, DayPhase.Day, BaitType.Worm, 3f);
+
+            int junk = 0;
+            for (int i = 0; i < 1000; i++)
+                if (selector.Pick(c) == boot)
+                    junk++;
+
+            Assert.Greater(junk, 0, "Мусор вообще клюёт");
+            Assert.Less(junk, 200, "Мусор клюёт реже карася");
+            Assert.AreEqual(FishSelector.Weight(boot, true), FishSelector.Weight(boot, false));
+        }
+
         [Test]
         public void Weight_InRange()
         {

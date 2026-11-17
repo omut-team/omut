@@ -35,3 +35,4 @@ MonoBehaviour:
   holdSize: {x: 1, y: 1}
   isChest: 0
   isBoss: 0
+  isJunk: 0
