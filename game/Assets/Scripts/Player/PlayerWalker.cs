@@ -19,6 +19,17 @@ namespace Omut.Player
         [SerializeField] private float speed = 3.5f;
         [SerializeField] private SpriteRenderer sprite;
 
+        // Кадры ходьбы (покой, шаг 1, шаг 2), как у жителей. Боковые смотрят вправо.
+        [SerializeField] private Sprite[] down = new Sprite[3];
+        [SerializeField] private Sprite[] up = new Sprite[3];
+        [SerializeField] private Sprite[] side = new Sprite[3];
+
+        private Sprite[] facing;
+
+        // Куда смотрит Сымон: вниз, вверх, вправо или влево (по нему предмет в руке).
+        public Vector2 Facing { get; private set; } = Vector2.down;
+        private float walkTime;
+
         private const float FeetRadius = 0.25f;
 
         private static readonly Vector2[] FeetOffsets =
@@ -43,10 +54,25 @@ namespace Omut.Player
         public void Show(Vector2 position)
         {
             transform.position = position;
+            Facing = Vector2.down;
+            facing = down;
+            sprite.flipX = false;
+            if (down != null && down.Length > 0 && down[0] != null)
+                sprite.sprite = down[0];
             sprite.enabled = true;
         }
 
         public void Hide() => sprite.enabled = false;
+
+        // Повернуть Сымона стоя (для катсцен и скриншотов).
+        public void Face(Vector2 direction) => Animate(direction, false);
+
+        public void SetFrames(Sprite[] downFrames, Sprite[] upFrames, Sprite[] sideFrames)
+        {
+            down = downFrames;
+            up = upFrames;
+            side = sideFrames;
+        }
 
         private void Update()
         {
@@ -54,7 +80,10 @@ namespace Omut.Player
             if (!OnFoot || (game != null && game.CurrentState != GameState.Sailing))
                 return;
 
-            Move(ReadInput() * speed * Time.deltaTime);
+            Vector2 input = ReadInput();
+            Vector2 before = transform.position;
+            Move(input * speed * Time.deltaTime);
+            Animate(input, (Vector2)transform.position != before);
 
             Interactable target = Interactable.FindNearest(transform.position);
             if (target != null)
@@ -93,9 +122,32 @@ namespace Omut.Player
             if (stuck ? WalkableGround.IsWalkable(tryY, 0f) : CanStand(tryY)) position = tryY;
 
             transform.position = position;
+        }
 
-            if (delta.x > 0.001f) sprite.flipX = false;
-            else if (delta.x < -0.001f) sprite.flipX = true;
+        // Поворот по нажатым клавишам и шаги, пока Сымон реально идёт (в стену не "шагает").
+        private void Animate(Vector2 input, bool moving)
+        {
+            if (input.sqrMagnitude > 0.0001f)
+            {
+                if (Mathf.Abs(input.x) > Mathf.Abs(input.y))
+                {
+                    facing = side;
+                    sprite.flipX = input.x < 0f;
+                    Facing = input.x < 0f ? Vector2.left : Vector2.right;
+                }
+                else
+                {
+                    facing = input.y > 0f ? up : down;
+                    sprite.flipX = false;
+                    Facing = input.y > 0f ? Vector2.up : Vector2.down;
+                }
+            }
+
+            walkTime = moving ? walkTime + Time.deltaTime : 0f;
+            Sprite[] frames = facing ?? down;
+            int index = moving ? 1 + Mathf.FloorToInt(walkTime * 7f) % 2 : 0;
+            if (frames != null && frames.Length > index && frames[index] != null)
+                sprite.sprite = frames[index];
         }
 
         // Можно ли стоять: под ногами земля или мостки, и не упираемся в дом, маяк или NPC.

@@ -28,6 +28,13 @@ namespace Omut.EditorTools
             if (file.StartsWith("item_rod_"))
                 importer.spritePixelsPerUnit = 64;
 
+            // Вещи Ульяны из больших картинок (tools/make_icons.py): 128x128, одна клетка, сглаживание.
+            if (assetPath.StartsWith("Assets/Art/Items/") && System.Array.IndexOf(SmoothIcons, file) >= 0)
+            {
+                importer.spritePixelsPerUnit = 128;
+                importer.filterMode = FilterMode.Bilinear;
+            }
+
             // Рисованная карта озера Ульяны = весь мир: 100 клеток в ширину, сжатие, сглаживание.
             if (file == "world_map")
             {
@@ -63,6 +70,9 @@ namespace Omut.EditorTools
 
             importer.SetTextureSettings(settings);
         }
+
+        public static readonly string[] SmoothIcons =
+            { "item_coin", "item_diary_page", "item_lantern", "item_map", "item_scrap", "item_thermos" };
 
         // Края для растяжения (9-slice) картинок интерфейса: слева, снизу, справа, сверху (в пикселях).
         public static readonly System.Collections.Generic.Dictionary<string, Vector4> Borders =

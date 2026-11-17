@@ -80,8 +80,29 @@ namespace Omut.Tests
             yield return new WaitForSeconds(0.5f);
             yield return Shot("dock");
 
+            // Сымон на нижних мостках у лодки (видно, где садиться).
+            Omut.Player.PlayerWalker.Instance.transform.position = Omut.Player.DockingZone.Instance.transform.Find("WalkPoint").position;
+            yield return new WaitForSeconds(0.3f);
+            yield return Shot("pier");
+
+            // Удочка в руке при повороте: спиной, боком влево, боком вправо (камера ближе).
+            Camera.main.orthographicSize = 2.5f;
+            yield return new WaitForSeconds(0.6f); // камера доезжает до Сымона
+            foreach (Vector2 dir in new[] { Vector2.up, Vector2.left, Vector2.right })
+            {
+                Omut.Player.PlayerWalker.Instance.Face(dir);
+                yield return null;
+                yield return Shot("hero_" + (dir.y > 0f ? "up" : dir.x < 0f ? "left" : "right"));
+            }
+            Omut.Player.PlayerWalker.Instance.Face(Vector2.down);
+            yield return null;
+            yield return Shot("hero_down");
+            Camera.main.orthographicSize = 7f;
+            Omut.Player.PlayerWalker.Instance.transform.position = Omut.Player.DockingZone.Instance.StartPosition;
+            yield return null;
+
             GameSession session = GameSession.Instance;
-            foreach (string id in new[] { "pike", "crucian", "carp", "bream", "black_catfish" })
+            foreach (string id in new[] { "pike", "crucian", "carp", "bream", "black_catfish", "tire", "boot", "grandpa_chest" })
                 session.Hold.TryAdd(new CatchInfo(session.Database.FindFish(id), 3.3f, id == "black_catfish", Omut.World.ZoneId.Pool, 1));
 
             Merchant taras = Object.FindAnyObjectByType<Merchant>();

@@ -19,4 +19,4 @@ MonoBehaviour:
   kind: 1
   price: 20
   amount: 1
-  sprite: {fileID: 21300000, guid: 2420f90d5e2b7e342b741b68dc69ad98, type: 3}
+  sprite: {fileID: 21300000, guid: 52c7ba8d12dce574ca3b2770e009d2ef, type: 3}

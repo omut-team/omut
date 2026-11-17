@@ -28,6 +28,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b446f3f185ade7f4d931a71112eb6777, type: 2}
   - {fileID: 11400000, guid: 1b0789a88f6f0384da032557da1a419c, type: 2}
   - {fileID: 11400000, guid: 50d386a7bdc83aa4a92a6881f414b60b, type: 2}
+  - {fileID: 11400000, guid: 17b245ed575f64547ba537abd12e99e4, type: 2}
+  - {fileID: 11400000, guid: 99fbee0ec39ff114084b6de1475b4520, type: 2}
+  - {fileID: 11400000, guid: 6596035bcc0765d4482e799352e11a9c, type: 2}
+  - {fileID: 11400000, guid: dac145e00a1a6114b9a1ce8ebcf6e958, type: 2}
+  - {fileID: 11400000, guid: a5d2f4e535425bd46a002ee0715f92d3, type: 2}
   boats:
   - {fileID: 11400000, guid: 5afcb7acba48933439c4f9c1af8a915d, type: 2}
   - {fileID: 11400000, guid: b1441da4ee368164b92d7a891ffb4ec8, type: 2}

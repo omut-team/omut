@@ -98,6 +98,7 @@ namespace Omut.Core
                         if (quest.goal == QuestGoal.CatchFish)
                             Quests.SetProgressAtLeast(quest, Hold.CountOf(quest.fishId));
                         Notifications.Show("Новое задание: " + quest.title, UiFactory.Theme.Gold);
+                        AutoSave("новое задание");
                         ui.ShowMenu("Договорились.");
                     }),
                     ("Не сейчас", () => ui.ShowMenu("Как знаешь.")))));
@@ -153,6 +154,7 @@ namespace Omut.Core
             GameEvents.RaisePlaySound("quest");
             Notifications.Show("Задание выполнено: " + q.title, UiFactory.Theme.Gold);
             ui?.Say(q.completeText + (reward.Count > 0 ? "\n<b>Награда:</b> " + string.Join(", ", reward) : ""));
+            AutoSave("задание сдано");
         }
 
         // ---------- тайна за редкую рыбу ----------
@@ -197,6 +199,7 @@ namespace Omut.Core
                 LorePieces++;
                 Notifications.Show($"Тайна озера: {LorePieces} из {notes.Count}", UiFactory.Theme.Gold);
                 GameEvents.RaisePlaySound("quest");
+                AutoSave("тайна озера");
                 ui.PlayLines(new List<DialogueLine>
                 {
                     new DialogueLine("Тарас", $"{fish.catchInfo.Title}... Ну, раз принёс, слушай."),

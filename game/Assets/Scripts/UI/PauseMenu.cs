@@ -109,6 +109,8 @@ namespace Omut.UI
         // Выход в меню: перезагружаем сцену, чтобы мир начался с чистого листа.
         private void OnMenu()
         {
+            // Перед выходом в меню сохраняем, иначе "Продолжить" загрузит старое сохранение.
+            SaveGame?.Invoke();
             GameManager.Instance?.BackToMenu();
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }

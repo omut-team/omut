@@ -4,7 +4,7 @@
 #    По ней сборщик сцены ставит берег (лодка не заплывает на сушу) и места для рыбы.
 # Запуск из корня репозитория: python tools/make_world_map.py
 import sys
-from PIL import Image, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter
 
 Image.MAX_IMAGE_PIXELS = None
 SRC = "design/export/ui/ui_map_bg.png"
@@ -15,6 +15,61 @@ CELL = 0.5
 
 src = Image.open(SRC).convert("RGB")
 W, H = src.size
+
+
+# Убираем с фона то, что в игре живёт своей жизнью и рисуется отдельно:
+# лодку в кармане мостков (там стоит игровая лодка), водоворот (его рисует BossEncounter ночью),
+# дым из трубы и луч маяка (свет маяка делает Light2D). Закрашиваем водой, взятой рядом (сдвинутый кусок).
+# Координаты в долях маленькой карты 1200 px по ширине, как в превью.
+def patch(img, shape, points, shift, feather=1.6, match=False):
+    k = img.width / 1200
+    mask = Image.new("L", img.size, 0)
+    d = ImageDraw.Draw(mask)
+    if shape == "ellipse":
+        (cx, cy), (rx, ry) = points
+        d.ellipse([(cx - rx) * k, (cy - ry) * k, (cx + rx) * k, (cy + ry) * k], fill=255)
+    else:
+        d.polygon([(x * k, y * k) for x, y in points], fill=255)
+    mask = mask.filter(ImageFilter.GaussianBlur(feather * k))
+    dx, dy = int(shift[0] * k), int(shift[1] * k)
+    source = img.transform(img.size, Image.AFFINE, (1, 0, dx, 0, 1, dy))
+    if match:
+        # Подогнать цвет заплатки под воду вокруг (кольцо вокруг области), чтобы не было тёмного пятна.
+        box = mask.getbbox()
+        ring = mask.filter(ImageFilter.MaxFilter(31)).point(lambda v: 255 if v > 0 else 0)
+        ring = Image.composite(Image.new("L", img.size, 0), ring, mask.point(lambda v: 255 if v > 0 else 0))
+        grow = (box[0] - 60, box[1] - 60, box[2] + 60, box[3] + 60)
+        from PIL import ImageStat
+        want = ImageStat.Stat(img.crop(grow), ring.crop(grow)).mean
+        have = ImageStat.Stat(source.crop(grow), ring.crop(grow)).mean
+        source = Image.merge("RGB", [ch.point(lambda v, f=w / max(h, 1): min(255, int(v * f)))
+                                     for ch, w, h in zip(source.split(), want, have)])
+    img.paste(source, (0, 0), mask)
+
+
+def keep(img, original, boxes):
+    k = img.width / 1200
+    for a, b, c, d2 in boxes:
+        box = tuple(int(v * k) for v in (a, b, c, d2))
+        img.paste(original.crop(box), box[:2])
+
+
+clean = src.copy()
+# Лодка в кармане между мостками (вместе с веслом, тенью и отражением); столбы мостков рядом оставляем.
+patch(clean, "poly", [(645, 562), (645, 540), (665, 524), (688, 514), (704, 517), (704, 545), (690, 566), (666, 568)], (60, 0), 0.8)
+keep(clean, src, [(693, 503, 702, 533), (660, 554, 669, 572), (638, 510, 648, 564)])
+# Дым из трубы хаты (сама труба остаётся).
+patch(clean, "poly", [(310, 468), (309, 444), (318, 426), (332, 408), (352, 394), (380, 398), (392, 430), (384, 448), (350, 460), (336, 468)], (75, 6), 1.5, match=True)
+keep(clean, src, [(316, 471, 334, 482)])
+# Луч маяка над водой: огонь в фонаре маяка остаётся.
+patch(clean, "poly", [(868, 409), (756, 384), (750, 470), (868, 447)], (0, -70), 2.5)
+patch(clean, "poly", [(906, 409), (1032, 398), (1032, 494), (906, 449)], (0, -78), 2.5)
+# Водоворот Хозяина: появляется в игре сам, когда пора.
+patch(clean, "ellipse", ((1003, 268), (118, 56)), (-210, 105), 4.0)
+patch(clean, "poly", [(970, 296), (1052, 296), (1052, 320), (970, 320)], (0, -34), 2.0)
+src = clean
+if len(sys.argv) > 2:
+    clean.resize((1200, round(1200 * H / W)), Image.LANCZOS).save(sys.argv[2])
 world_h = WORLD_W * H / W
 cols, rows = int(WORLD_W / CELL), int(round(world_h / CELL))
 
