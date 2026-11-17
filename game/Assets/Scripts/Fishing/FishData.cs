@@ -96,6 +96,9 @@ namespace Omut.Fishing
         [Tooltip("Хозяин Омута: ловится только в финале и в трюм не кладётся")]
         public bool isBoss;
 
+        [Tooltip("Мусор со дна (сапог, бутылка, шина): клюёт редко, стоит копейки, в журнал не идёт")]
+        public bool isJunk;
+
         public bool InJournal => journalNumber > 0;
 
         // Подходит ли время суток.

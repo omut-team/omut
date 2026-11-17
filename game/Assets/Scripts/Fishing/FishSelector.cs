@@ -53,6 +53,11 @@ namespace Omut.Fishing
             }
         }
 
+        // Мусор клюёт редко и одинаково везде, круги на воде его не приманивают.
+        public const float JunkWeight = 6f;
+
+        public static float Weight(FishData fish, bool inSpot) => fish.isJunk ? JunkWeight : RarityWeight(fish.rarity, inSpot);
+
         public bool Fits(FishData fish, CastConditions c)
         {
             if (fish == null || fish.isBoss)
@@ -86,7 +91,7 @@ namespace Omut.Fishing
             List<FishData> candidates = Candidates(c);
             float total = 0f;
             foreach (FishData fish in candidates)
-                total += RarityWeight(fish.rarity, c.inSpot);
+                total += Weight(fish, c.inSpot);
 
             if (total <= 0f)
                 return null;
@@ -94,7 +99,7 @@ namespace Omut.Fishing
             double roll = random.NextDouble() * total;
             foreach (FishData fish in candidates)
             {
-                roll -= RarityWeight(fish.rarity, c.inSpot);
+                roll -= Weight(fish, c.inSpot);
                 if (roll <= 0)
                     return fish;
             }

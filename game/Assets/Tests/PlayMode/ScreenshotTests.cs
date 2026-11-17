@@ -102,7 +102,7 @@ namespace Omut.Tests
             yield return null;
 
             GameSession session = GameSession.Instance;
-            foreach (string id in new[] { "pike", "crucian", "carp", "bream", "black_catfish" })
+            foreach (string id in new[] { "pike", "crucian", "carp", "bream", "black_catfish", "tire", "boot", "grandpa_chest" })
                 session.Hold.TryAdd(new CatchInfo(session.Database.FindFish(id), 3.3f, id == "black_catfish", Omut.World.ZoneId.Pool, 1));
 
             Merchant taras = Object.FindAnyObjectByType<Merchant>();
