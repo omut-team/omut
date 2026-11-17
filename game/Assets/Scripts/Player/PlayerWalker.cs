@@ -25,6 +25,9 @@ namespace Omut.Player
         [SerializeField] private Sprite[] side = new Sprite[3];
 
         private Sprite[] facing;
+
+        // Куда смотрит Сымон: вниз, вверх, вправо или влево (по нему предмет в руке).
+        public Vector2 Facing { get; private set; } = Vector2.down;
         private float walkTime;
 
         private const float FeetRadius = 0.25f;
@@ -51,10 +54,18 @@ namespace Omut.Player
         public void Show(Vector2 position)
         {
             transform.position = position;
+            Facing = Vector2.down;
+            facing = down;
+            sprite.flipX = false;
+            if (down != null && down.Length > 0 && down[0] != null)
+                sprite.sprite = down[0];
             sprite.enabled = true;
         }
 
         public void Hide() => sprite.enabled = false;
+
+        // Повернуть Сымона стоя (для катсцен и скриншотов).
+        public void Face(Vector2 direction) => Animate(direction, false);
 
         public void SetFrames(Sprite[] downFrames, Sprite[] upFrames, Sprite[] sideFrames)
         {
@@ -122,11 +133,13 @@ namespace Omut.Player
                 {
                     facing = side;
                     sprite.flipX = input.x < 0f;
+                    Facing = input.x < 0f ? Vector2.left : Vector2.right;
                 }
                 else
                 {
                     facing = input.y > 0f ? up : down;
                     sprite.flipX = false;
+                    Facing = input.y > 0f ? Vector2.up : Vector2.down;
                 }
             }
 

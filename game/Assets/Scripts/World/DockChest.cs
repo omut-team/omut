@@ -52,6 +52,7 @@ namespace Omut.World
 
             session.SetFlag(OpenedFlag);
             session.SetFlag(BossFlag);
+            session.AutoSave("сундук открыт");
             GameEvents.RaisePlaySound("chest");
             ui.Monologue(new List<DialogueLine>
             {

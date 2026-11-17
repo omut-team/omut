@@ -467,6 +467,39 @@ namespace Omut.Tests
             Assert.AreEqual(QuestState.Done, session.Quests.StateOf(quest));
             Assert.AreEqual(0, session.Hold.CountOf("scrap"));
             Assert.Greater(session.Wallet.Money, money);
+            int paid = session.Wallet.Money;
+
+            // Сдал задание: игра сама сохранилась. Перезапуск ("Продолжить") помнит, что оно сдано, и деньги за него.
+            SaveData saved = SaveSystem.Load();
+            Assert.IsNotNull(saved, "После сдачи задания нет сохранения");
+            CollectionAssert.Contains(saved.doneQuests, "q3_scrap");
+
+            GameEvents.RaiseNewGameStarted();
+            Assert.AreEqual(QuestState.Available, session.Quests.StateOf(session.Quests.Find("q3_scrap")), "Новая игра сбросила задания");
+            GameEvents.RaiseContinueRequested();
+            yield return null;
+            Assert.AreEqual(QuestState.Done, session.Quests.StateOf(session.Quests.Find("q3_scrap")), "После загрузки задание сдано");
+            Assert.AreEqual(paid, session.Wallet.Money);
+        }
+
+        // Удочка в руке: со спины за Сымоном, лицом к нам в правой руке (слева на экране), боком смотрит по ходу.
+        [Test]
+        public void HeldRod_FollowsFacing()
+        {
+            HeldItemView.Place(Vector2.up, false, out Vector2 back, out _, out bool behindBack);
+            Assert.IsTrue(behindBack, "Спиной: удочка за спиной");
+            Assert.Greater(back.x, 0f);
+
+            HeldItemView.Place(Vector2.down, false, out Vector2 front, out bool flipFront, out bool behindFront);
+            Assert.IsFalse(behindFront);
+            Assert.IsTrue(flipFront);
+            Assert.Less(front.x, 0f);
+
+            HeldItemView.Place(Vector2.right, false, out Vector2 right, out bool flipRight, out _);
+            HeldItemView.Place(Vector2.left, false, out Vector2 left, out bool flipLeft, out _);
+            Assert.IsFalse(flipRight);
+            Assert.IsTrue(flipLeft);
+            Assert.AreEqual(right.x, -left.x, 0.001f, "Влево и вправо зеркально");
         }
     }
 }
