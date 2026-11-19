@@ -222,14 +222,20 @@ namespace Omut.Fishing
             float pull = FishingController.CurrentRod()?.pull ?? 1f;
             c.Reel = new TensionModel(FishBehaviours.Create(fish.behaviour), fish.strength * pull, extra);
             c.Sfx("hook");
+            c.Sfx("fish_splash"); // рыба забилась на крючке
             GameEvents.RaiseFishHooked(fish);
         }
 
-        public override void Exit() => c.Reel = null;
+        public override void Exit()
+        {
+            c.Reel = null;
+            AudioManager.Instance?.StopLoop();
+        }
 
         public override void Tick(float dt)
         {
             ReelResult result = c.Reel.Tick(dt, Controls.LeftMouseHeld, Controls.RightMouseHeld);
+            ReelSound(Controls.LeftMouseHeld, c.Reel.Tension);
             c.BobBobber(0.1f + c.Reel.Tension * 0.2f);
             c.PullBobberTowardsBoat(c.Reel.Progress);
 
@@ -245,6 +251,18 @@ namespace Omut.Fishing
                     c.OnLost(false);
                     break;
             }
+        }
+
+        // Катушка трещит, пока игрок тянет (ЛКМ). Чем сильнее натянута леска, тем быстрее и громче.
+        private static void ReelSound(bool pulling, float tension)
+        {
+            AudioManager audio = AudioManager.Instance;
+            if (audio == null)
+                return;
+            if (pulling)
+                audio.PlayLoop("reel", 0.7f + 0.3f * tension, 0.9f + 0.3f * tension);
+            else
+                audio.StopLoop();
         }
     }
 

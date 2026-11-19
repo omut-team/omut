@@ -13,7 +13,7 @@ namespace Omut.Core
         public static readonly string[] Ids =
         {
             "bell", "splash", "cast", "bite", "hook", "caught", "line_break", "coins", "hit", "quest",
-            "whisper", "drink", "lantern", "chest", "faint", "click", "repair"
+            "whisper", "drink", "lantern", "chest", "faint", "click", "repair", "fish_splash", "reel"
         };
 
         public static AudioClip Create(string id)
@@ -48,6 +48,8 @@ namespace Omut.Core
                 case "chest": return Tone(0.6f, t => 140f + 40f * Mathf.Sin(t * 9f), t => Mathf.Sin(t / 0.6f * Mathf.PI) * 0.35f);
                 case "faint": return Tone(2.2f, t => 110f - 40f * t, t => Mathf.Sin(t / 2.2f * Mathf.PI) * 0.5f);
                 case "click": return Tone(0.04f, t => 1200f, t => Decay(t, 0.04f, 10f) * 0.25f);
+                case "fish_splash": return Noise(0.8f, random, t => (0.5f + 0.5f * Mathf.Abs(Mathf.Sin(t * 22f))) * Decay(t, 0.8f, 2f) * 0.6f, 0.3f);
+                case "reel": return Noise(0.5f, random, t => (Mathf.Repeat(t, 0.05f) < 0.012f ? 0.35f : 0.04f), 0.15f);
                 case "repair": return Noise(0.5f, random, t => (Mathf.Repeat(t, 0.16f) < 0.03f ? 0.7f : 0f), 0.2f);
                 default: return null;
             }
