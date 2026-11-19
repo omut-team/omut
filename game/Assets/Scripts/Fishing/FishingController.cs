@@ -274,6 +274,7 @@ namespace Omut.Fishing
                 StartCoroutine(FlyToBoat(fish.sprite, BobberPosition, RodTip));
             GameEvents.RaiseBaitUsed(CurrentBait());
             SetState(Caught);
+            Sfx("fish_splash"); // улов вылетает из воды
             Sfx("caught");
             GameEvents.RaiseFishCaught(LastCatch);
         }

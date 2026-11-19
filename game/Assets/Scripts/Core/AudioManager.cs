@@ -34,6 +34,8 @@ namespace Omut.Core
         private AudioSource musicB;
         private AudioSource sfx;
         private AudioSource voice;
+        private AudioSource loop;
+        private string loopId;
         private bool nightPlaying;
         private float crossfade = 1f;
 
@@ -47,6 +49,7 @@ namespace Omut.Core
             musicB = CreateSource(true);
             sfx = CreateSource(false);
             voice = CreateSource(false);
+            loop = CreateSource(true);
 
             foreach (NamedClip named in clips)
             {
@@ -96,15 +99,45 @@ namespace Omut.Core
             if (string.IsNullOrEmpty(id))
                 return;
 
+            AudioClip clip = Clip(id);
+            if (clip != null)
+                sfx.PlayOneShot(clip, SfxVolume);
+        }
+
+        private AudioClip Clip(string id)
+        {
             if (!cache.TryGetValue(id, out AudioClip clip))
             {
                 clip = ProceduralSounds.Create(id);
                 cache[id] = clip;
             }
 
-            if (clip != null)
-                sfx.PlayOneShot(clip, SfxVolume);
+            return clip;
         }
+
+        // Звук по кругу, пока его не выключат (катушка, пока игрок тянет рыбу).
+        // volume и pitch можно менять каждый кадр: катушка трещит быстрее, когда леска натянута.
+        public void PlayLoop(string id, float volume = 1f, float pitch = 1f)
+        {
+            if (loopId != id)
+            {
+                loopId = id;
+                loop.clip = Clip(id);
+                if (loop.clip != null)
+                    loop.Play();
+            }
+
+            loop.volume = SfxVolume * volume;
+            loop.pitch = pitch;
+        }
+
+        public void StopLoop()
+        {
+            loopId = null;
+            loop.Stop();
+        }
+
+        public bool LoopPlaying => loop != null && loop.isPlaying;
 
         private float VoiceVolume => SettingsManager.Instance != null ? SettingsManager.Instance.Data.voiceVolume : 1f;
 
@@ -171,6 +204,13 @@ namespace Omut.Core
 
         private void Update()
         {
+            // На паузе время стоит, катушка тоже замолкает.
+            if (loopId != null)
+            {
+                if (Time.timeScale <= 0f && loop.isPlaying) loop.Pause();
+                else if (Time.timeScale > 0f && !loop.isPlaying) loop.UnPause();
+            }
+
             DayNightCycle cycle = DayNightCycle.Instance;
             bool wantNight = (cycle != null && cycle.Clock.Phase == DayPhase.Night) || FogController.InEternalFog;
 
